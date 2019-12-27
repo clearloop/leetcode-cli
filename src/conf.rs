@@ -57,7 +57,6 @@ impl std::default::Default for Config {
         
         let plugins: HashMap<&'static str, &'static str> = HashMap::new();
 
-        
         Config {
             categories: [
                 "algorithms",

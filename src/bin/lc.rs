@@ -1,6 +1,7 @@
-use leetcode_cli::conf::Config;
+use lc::{info, error, warn};
 
 fn main() {
-    let conf = Config::default();
-    println!("conf: {:#?}", conf);
+    info!("info");
+    warn!("warn");
+    error!("error");
 }
