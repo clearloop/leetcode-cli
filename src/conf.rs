@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 #[derive(Debug)]
-pub struct Config {
+pub struct Conf {
     pub categories: [&'static str; 3],
     pub langs: [&'static str; 16],
     pub urls: HashMap<&'static str, &'static str>,
@@ -14,8 +14,8 @@ pub struct Config {
     pub plugins: HashMap<&'static str, &'static str>,
 }
 
-impl std::default::Default for Config {
-    fn default() -> Config {
+impl std::default::Default for Conf {
+    fn default() -> Conf {
         let mut urls: HashMap<&'static str, &'static str> = HashMap::new();
         urls.insert("base", "https://leetcode.com");
         urls.insert("graphql", "https://leetcode.com/graphql");
@@ -57,7 +57,7 @@ impl std::default::Default for Config {
         
         let plugins: HashMap<&'static str, &'static str> = HashMap::new();
 
-        Config {
+        Conf {
             categories: [
                 "algorithms",
                 "database",

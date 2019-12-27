@@ -1,7 +1,7 @@
 use lc::{info, error, warn};
-
+use lc::api::API;
+    
 fn main() {
-    info!("info");
-    warn!("warn");
-    error!("error");
+    let mut a = API::new();
+    a.login();
 }
