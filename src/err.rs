@@ -5,6 +5,7 @@ pub enum LcError {
     ConfigError,
     ClientBuildError,
     DirError,
+    ParseCookieError,
     RequestError,
 }
 
@@ -19,6 +20,9 @@ impl std::string::ToString for LcError {
             },
             LcError::DirError => {
                 "Directory can not open.".error()
+            },
+            LcError::ParseCookieError => {
+                "Cookie parsed failed.".error()
             },
             LcError::RequestError => {
                 "Request failed.".error()

@@ -36,6 +36,12 @@ impl Logger for str {
     }
 
     fn error(&self) -> String {
-        return format!("{} {}", "Error".red().bold(), &self);
+        return format!(
+            "{} {}{}{}",
+            "Error".red().bold(),
+            "(".red().bold(),
+            &self,
+            ")".red().bold(),
+        );
     }
 }
