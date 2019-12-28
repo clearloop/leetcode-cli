@@ -1,94 +1,163 @@
-use std::collections::HashMap;
+use toml;
+use std::{fs, collections::HashMap};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct Conf {
-    pub categories: [&'static str; 3],
-    pub langs: [&'static str; 16],
-    pub urls: HashMap<&'static str, &'static str>,
-    pub auto_login: HashMap<&'static str, i32>,
-    pub code: HashMap<&'static str, &'static str>,
-    pub file: HashMap<&'static str, &'static str>,
-    pub color: HashMap<&'static str, &'static str>,
-    pub icon: HashMap<&'static str, &'static str>,
-    pub network: HashMap<&'static str, i32>,
-    pub plugins: HashMap<&'static str, &'static str>,
+const DEFAULT_CONFIG: &'static str = r#"
+# usually you don't wanna change those
+[sys]
+categories = [
+  "algorithms",
+  "database",
+  "shell"
+]
+
+langs = [
+  "bash",
+  "c",
+  "cpp",
+  "csharp",
+  "golang",
+  "java",
+  "javascript",
+  "kotlin",
+  "mysql",
+  "php",
+  "python",
+  "python3",
+  "ruby",
+  "rust",
+  "scala",
+  "swift"
+]
+
+[sys.urls]
+base = "https://leetcode.com"
+graphql = "https://leetcode.com/graphql"
+login = "https://leetcode.com/accounts/login/"
+problems = "https://leetcode.com/api/problems/$category/"
+problem = "https://leetcode.com/problems/$slug/description/"
+test = "https://leetcode.com/problems/$slug/interpret_solution/"
+session = "https://leetcode.com/session/"
+submit = "https://leetcode.com/problems/$slug/submit/"
+submissions = "https://leetcode.com/api/submissions/$slug"
+submission = "https://leetcode.com/submissions/detail/$id/"
+verify = "https://leetcode.com/submissions/detail/$id/check/"
+favorites = "https://leetcode.com/list/api/questions"
+favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
+
+# but you will want change these
+[autologin]
+enable = false
+retry = 2
+
+[code]
+editor = "vim"
+lang = "rust"
+
+[file]
+show = "${fid}.${slug}"
+submission = "${fid}.${slug}.${sid}.${ac}"
+
+[color]
+enable = true
+theme = "default"
+
+[network]
+concurrency = 10
+delay = 1
+"#;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Config {
+    pub sys: Sys,
+    pub autologin: AutoLogin,
+    pub code: Code,
+    pub file: File,
+    pub color: Color,
+    pub network: Network
 }
 
-impl std::default::Default for Conf {
-    fn default() -> Conf {
-        let mut urls: HashMap<&'static str, &'static str> = HashMap::new();
-        urls.insert("base", "https://leetcode.com");
-        urls.insert("graphql", "https://leetcode.com/graphql");
-        urls.insert("login", "https://leetcode.com/accounts/login");
-        urls.insert("problems", "https://leetcode.com/api/problems/$category/");
-        urls.insert("problem", "https://leetcode.com/problems/$slug/description/");
-        urls.insert("test", "https://leetcode.com/problems/$slug/interpret_solution/");
-        urls.insert("session", "https://leetcode.com/session/");
-        urls.insert("submit", "https://leetcode.com/problems/$slug/submit/");
-        urls.insert("submissions", "https://leetcode.com/api/submissions/$slug");
-        urls.insert("submission", "https://leetcode.com/submissions/detail/$id/");
-        urls.insert("verify", "https://leetcode.com/submissions/detail/$id/check/");
-        urls.insert("favorites", "https://leetcode.com/list/api/questions");
-        urls.insert("favorite_delete", "https://leetcode.com/list/api/questions/$hash/$id");
-        urls.insert("plugin", "https://github.com/skygragon/leetcode-cli-plugins/raw/master/plugins/$name.js");
-        
-        let mut auto_login: HashMap<&'static str, i32> = HashMap::new();
-        auto_login.insert("enable", 0);
-        auto_login.insert("retry", 2);
-        
-        let mut code: HashMap<&'static str, &'static str> = HashMap::new();
-        code.insert("editor", "emacs");
-        code.insert("lang", "rust");
-        
-        let mut file: HashMap<&'static str, &'static str> = HashMap::new();
-        file.insert("show", "${fid}.${slug}");
-        file.insert("submission", "${fid}.${slug}.${sid}.${ac}");
-        
-        let mut color: HashMap<&'static str, &'static str> = HashMap::new();
-        color.insert("enable", "true");
-        color.insert("theme", "default");
-        
-        let mut icon: HashMap<&'static str, &'static str> = HashMap::new();
-        icon.insert("theme", "");
-        
-        let mut network: HashMap<&'static str, i32> = HashMap::new();
-        network.insert("concurrency", 10);
-        network.insert("delay", 1);
-        
-        let plugins: HashMap<&'static str, &'static str> = HashMap::new();
-
-        Conf {
-            categories: [
-                "algorithms",
-                "database",
-                "shell"
-            ],
-            langs: [
-                "bash",
-                "c",
-                "cpp",
-                "csharp",
-                "golang",
-                "java",
-                "javascript",
-                "kotlin",
-                "mysql",
-                "php",
-                "python",
-                "python3",
-                "ruby",
-                "rust",
-                "scala",
-                "swift"
-            ],
-            urls,
-            auto_login,
-            code,
-            file,
-            color,
-            icon,
-            network,
-            plugins,
-        }
+impl Config {
+    /// Sync new config to config.toml
+    pub fn sync(&self) {
+        let home = dirs::home_dir().unwrap();
+        let conf = home.join(".leetcode/conf.toml");
+        fs::write(conf, toml::ser::to_string_pretty(&self).unwrap()).unwrap();
     }
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Sys {
+    pub categories: [String; 3],
+    pub langs: [String; 16],
+    pub urls: HashMap<String, String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Urls {
+    pub base: String,
+    pub graphql: String,
+    pub login: String,
+    pub problems: String,
+    pub problem: String,
+    pub test: String,
+    pub session: String,
+    pub submit: String,
+    pub submissions: String,
+    pub submission: String,
+    pub verify: String,
+    pub favorites: String,
+    pub favorite_delete: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AutoLogin {
+    pub enable: bool,
+    pub retry: i32
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Code {
+    pub editor: String,
+    pub lang: String
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct File {
+    pub show: String,
+    pub submission: String
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Color {
+    pub enable: bool,
+    pub theme: String
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Network {
+    pub concurrency: i32,
+    pub delay: i32
+}
+
+pub fn locate() -> Config {
+    let home = dirs::home_dir().unwrap();
+    let root = home.join(".leetcode");
+    let conf = root.join("conf.toml");
+    
+    if !root.is_dir() {
+        info!("Generate leetcode root dir at {:?}.", &root);
+        fs::DirBuilder::new()
+            .recursive(true)
+            .create(&root)
+            .unwrap();
+    }
+
+    if !conf.is_file() {
+        fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
+    }
+
+    let s = fs::read_to_string(&conf).unwrap();
+    toml::from_str(&s).unwrap()
+}
+

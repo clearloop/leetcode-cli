@@ -1,4 +1,5 @@
-pub mod api;
+#[macro_use]
+extern crate log;
+
 pub mod conf;
-pub mod log;
-pub mod err;
+

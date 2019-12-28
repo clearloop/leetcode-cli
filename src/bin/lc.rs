@@ -1,6 +1,7 @@
-use lc::api::API;
-    
+use lc::conf;
+
 fn main() {
-    let mut a = API::new();
-    println!("{:#?}", a.login().unwrap());
+    let c = conf::locate();
+    c.sync();
+    println!("{:#?}", &c);
 }
