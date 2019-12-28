@@ -11,7 +11,13 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+app_dirs = "1.2.1"
+diesel = { version = "1.4.3", features = ["sqlite"]}
 dirs = "2.0.2"
-sled = "0.30.3"
-colored = "1.9.0"
+env_logger = "0.7.1"
+log = "0.4"
 reqwest = "0.9.24"
+sled = "0.30.3"
+toml = "0.5.5"
+serde = "1.0.104"
+serde_derive = "1.0.104"

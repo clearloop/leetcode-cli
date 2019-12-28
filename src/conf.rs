@@ -161,3 +161,6 @@ pub fn locate() -> Config {
     toml::from_str(&s).unwrap()
 }
 
+pub fn root() -> std::path::PathBuf {
+    dirs::home_dir().unwrap().join(".leetcode")
+}
