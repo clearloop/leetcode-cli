@@ -1,6 +1,11 @@
-use lc::plugins::chrome;
+use lc::plugins::leetcode;
+
 
 fn main() {
-    let cookies = chrome::cookies();
-    println!("{:#?}", cookies);
+    env_logger::init();
+    
+    let lc = leetcode::LeetCode::new();
+    if let Some(res) = lc.get_user_info() {
+        println!("{:#?}", res);
+    }
 }

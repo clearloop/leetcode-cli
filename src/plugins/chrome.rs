@@ -23,15 +23,33 @@ mod schema {
 /// 
 /// The order between table and struct must be same.
 #[derive(Queryable, Debug, Clone)]
-pub struct Cookies {
+struct Cookies {
     pub encrypted_value: Vec<u8>,
     pub host_key: String,
     pub name: String,
 }
 
+/// Spawn cookies to cookie format
+#[derive(Debug)]
+pub struct Ident {
+    pub csrf: String,
+    session: String,
+}
+
+impl std::string::ToString for Ident {
+    fn to_string(&self) -> String {
+        format!(
+            "LEETCODE_SESSION={};csrftoken={};",
+            self.session,
+            self.csrf
+        ).to_string()
+    }
+}
+
 /// Get cookies from chrome storage
-pub fn cookies() -> HashMap<String, String> {
+pub fn cookies() -> Ident {
     use self::schema::cookies::dsl::*;
+    debug!("Derive cookies from google chrome...");
     
     let home = dirs::home_dir().unwrap();
     let p = match std::env::consts::OS {
@@ -65,7 +83,10 @@ pub fn cookies() -> HashMap<String, String> {
         }
     }
     
-    m
+    Ident {
+        csrf: m.get("csrftoken").unwrap().to_string(),
+        session: m.get("LEETCODE_SESSION").unwrap().to_string(),
+    }
 }
 
 

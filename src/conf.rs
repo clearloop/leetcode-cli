@@ -140,19 +140,10 @@ pub struct Network {
     pub delay: i32
 }
 
-pub fn locate() -> Config {
-    let home = dirs::home_dir().unwrap();
-    let root = home.join(".leetcode");
-    let conf = root.join("conf.toml");
-    
-    if !root.is_dir() {
-        info!("Generate leetcode root dir at {:?}.", &root);
-        fs::DirBuilder::new()
-            .recursive(true)
-            .create(&root)
-            .unwrap();
-    }
 
+/// Locate lc's config file
+pub fn locate() -> Config {
+    let conf = root().join("conf.toml");
     if !conf.is_file() {
         fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
     }
@@ -161,6 +152,16 @@ pub fn locate() -> Config {
     toml::from_str(&s).unwrap()
 }
 
+/// Get root path of lc
 pub fn root() -> std::path::PathBuf {
-    dirs::home_dir().unwrap().join(".leetcode")
+    let dir = dirs::home_dir().unwrap().join(".leetcode");
+    if !dir.is_dir() {
+        info!("Generate root dir at {:?}.", &dir);
+        fs::DirBuilder::new()
+            .recursive(true)
+            .create(&dir)
+            .unwrap();
+    }
+
+    dir
 }
