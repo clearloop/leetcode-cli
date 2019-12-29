@@ -20,6 +20,9 @@ use crate::{
     conf::{self, Config},
 };
 
+/// Standardize leetcode api response
+pub type LeetCodeResp = Option<Response>;
+
 /// Leet API set
 pub struct LeetCode {
     conf: Config,
@@ -68,30 +71,50 @@ impl LeetCode {
         }
     }
 
-    /// **Deprecated** API: 400 Error
-    #[allow(dead_code)]
-    fn get_user_info(self) -> Option<Response> {
-        debug!("running leetcode.get_user_info...");
-        let mut m: HashMap<&str, &str> = HashMap::new();
-        m.insert(
-            "body",
-            r#"{
-  "query": "{
-     user {
-       username,
-       isCurrentUserPremium
-     }
-   }",
-  "variables": {}
-}"#
+    pub fn get_favorites(self) -> LeetCodeResp {
+        debug!("running leetcode.get_category_problems...");
+        let url = &self.conf.sys.urls["favorites"];
+        let headers = LeetCode::headers(
+            self.default_headers,
+            vec![("Referer", url)],
         );
 
+        let req = self.client
+            .get(url)
+            .headers(headers);
+
+        println!("{:#?}", &req);
+        let res = req
+            .send();
+
+        match res.is_err() {
+            true => {
+                error!("get_favorites request failed.");
+                None
+            }
+            _ => Some(res.unwrap())
+        }
+    }
+    
+    pub fn get_user_info(self) -> Option<Response> {
+        debug!("running leetcode.get_user_info...");
         let headers = LeetCode::headers(
             self.default_headers,
             vec![("Referer", &self.conf.sys.urls["graphql"])],
         );
         
-        let req = self.client
+        let mut m: HashMap<&str, &str> = HashMap::new();
+        m.insert(
+            "query",
+            r#"{
+              user {
+                username,
+                isCurrentUserPremium
+              },
+            }"#,
+        );
+
+        let res = self.client
             .post(&self.conf.sys.urls["graphql"])
             .headers(headers)
             .json(&m)

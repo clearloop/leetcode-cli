@@ -126,9 +126,9 @@ fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> String {
     
     decrypter.pad(false);
 
-    let mut count = decrypter.update(&v[3..], &mut plaintext).unwrap();
-    count += decrypter.finalize(&mut plaintext[count..]).unwrap();
-    plaintext.truncate(count - block_size);
-    
+    let count = decrypter.update(&v[3..], &mut plaintext).unwrap();
+    decrypter.finalize(&mut plaintext[count..]).unwrap();
+    plaintext.retain(|x| x >= &20_u8);
+
     String::from_utf8_lossy(&plaintext.to_vec()).to_string()
 }
