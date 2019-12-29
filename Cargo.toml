@@ -1,12 +1,19 @@
 [[bin]]
-name = "lc"
-path = "src/bin/lc.rs"
+name = "leetcode"
+path = "src/bin/leetcode.rs"
 
 [package]
-name = "lc"
+name = "leetcode-cli"
 version = "0.1.0"
-authors = ["clearloop <udtrokia@gmail.com>"]
+authors = ["clearloop <udtrokia@163.com>"]
 edition = "2018"
+description = "Leet your code in command-line."
+repository = "https://github.com/clearloop/leetcode-cli"
+license = "MIT"
+documentation = "https://docs.rs/leetcode_cli"
+homepage = "https://github.com/clearloop/leetcode-cli"
+keywords = ["games"]
+readme = './README.md'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -19,7 +26,6 @@ keyring = "0.7.1"
 log = "0.4"
 openssl = "0.10.26"
 reqwest = "0.9.24"
-sled = "0.30.3"
 toml = "0.5.5"
 serde = "1.0.104"
 serde_derive = "1.0.104"

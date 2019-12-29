@@ -1,4 +1,4 @@
-use lc::plugins::leetcode;
+use leetcode_cli::plugins::leetcode;
 
 fn main() {
     env_logger::init();
