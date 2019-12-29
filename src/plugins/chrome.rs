@@ -70,8 +70,13 @@ pub fn cookies() -> Ident {
     let res = cookies
         .filter(host_key.like("%leetcode.com"))
         .load::<Cookies>(&conn)
-        .expect("Error loading cookies");
+        .expect("Loading cookies from google chrome failed.");
 
+    // Get system password
+    let ring = Keyring::new("Chrome Safe Storage", "Chrome");
+    let pass = ring.get_password().expect("Get Password failed");
+
+    // Decode cookies
     let mut m: HashMap<String, String> = HashMap::new();
     for c in res.to_owned() {
         if (
@@ -79,7 +84,7 @@ pub fn cookies() -> Ident {
         ) || (
             c.name == "LEETCODE_SESSION".to_string()
         ) {
-            m.insert(c.name, decode_cookies(c.encrypted_value));
+            m.insert(c.name, decode_cookies(&pass, c.encrypted_value));
         }
     }
     
@@ -91,13 +96,10 @@ pub fn cookies() -> Ident {
 
 
 /// Decode cookies from chrome
-fn decode_cookies(v: Vec<u8>) -> String {
-    let ring = Keyring::new("Chrome Safe Storage", "Chrome");
-    let pass = ring.get_password().expect("Get Password failed");
-
+fn decode_cookies(pass: &str, v: Vec<u8>) -> String {
     let mut key = [0_u8; 16];
     pkcs5::pbkdf2_hmac(
-        &pass.as_bytes(),
+        pass.as_bytes(),
         b"saltysalt",
         1003,
         hash::MessageDigest::sha1(),

@@ -9,3 +9,4 @@
 4. follow crypto guide to implement decrypt
 5. check line by line
 6. find the iv bug
+7. remove aes tmp blocks
