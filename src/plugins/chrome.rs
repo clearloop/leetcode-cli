@@ -1,17 +1,11 @@
 use crate::store;
-use crypto::{
-    aes,
-    pbkdf2,
-    sha1::Sha1,
-    hmac::Hmac,
-    blockmodes::NoPadding,
-    buffer::{
-        RefReadBuffer,
-        RefWriteBuffer,
-    },
-};
 use diesel::prelude::*;
 use keyring::Keyring;
+use openssl::{
+    hash,
+    pkcs5,
+    symm
+};
 use std::collections::HashMap;
 
 /// LeetCode Cookies Schema
@@ -25,12 +19,6 @@ mod schema {
     }
 }
 
-/// Fix LeetCode Cookie
-type CookieValue = [u8; 1024];
-
-/// Fix Chrome PBKDF2 key
-type ChromeKey = [u8; 16];
-
 /// Please make sure the order
 /// 
 /// The order between table and struct must be same.
@@ -42,7 +30,7 @@ pub struct Cookies {
 }
 
 /// Get cookies from chrome storage
-pub fn cookies() -> HashMap<String, Vec<u8>> {
+pub fn cookies() -> HashMap<String, String> {
     use self::schema::cookies::dsl::*;
     
     let home = dirs::home_dir().unwrap();
@@ -66,7 +54,7 @@ pub fn cookies() -> HashMap<String, Vec<u8>> {
         .load::<Cookies>(&conn)
         .expect("Error loading cookies");
 
-    let mut m: HashMap<String, Vec<u8>> = HashMap::new();
+    let mut m: HashMap<String, String> = HashMap::new();
     for c in res.to_owned() {
         if (
             c.name == "csrftoken".to_string()
@@ -82,39 +70,44 @@ pub fn cookies() -> HashMap<String, Vec<u8>> {
 
 
 /// Decode cookies from chrome
-fn decode_cookies(v: Vec<u8>) -> Vec<u8> {
+fn decode_cookies(v: Vec<u8>) -> String {
     let ring = Keyring::new("Chrome Safe Storage", "Chrome");
     let pass = ring.get_password().expect("Get Password failed");
-    let mut mac = Hmac::new(Sha1::new(), pass.as_bytes());
-    let mut key: ChromeKey = [0_u8; 16];
 
-    pbkdf2::pbkdf2(&mut mac, b"saltysalt", 1003, &mut key);
+    let mut key = [0_u8; 16];
+    pkcs5::pbkdf2_hmac(
+        &pass.as_bytes(),
+        b"saltysalt",
+        1003,
+        hash::MessageDigest::sha1(),
+        &mut key
+    ).expect("pbkdf2 hmac went error.");
+    
     chrome_decrypt(v, key)
 }
 
 
 /// Decrypt chrome cookie value with aes-128-cbc
-fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> Vec<u8> {
-    let iv: ChromeKey = [0_u8; 16];
-    let mut res: CookieValue = [0_u8; 1024];
-    
-    let mut decryptor = aes::cbc_decryptor(
-        aes::KeySize::KeySize128,
+fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> String {
+    // <space>: \u16
+    let iv = vec![32_u8; 16];
+    let mut decrypter = symm::Crypter::new(
+        symm::Cipher::aes_128_cbc(),
+        symm::Mode::Decrypt,
         &key,
-        &iv,
-        NoPadding
-    );
+        Some(&iv)
+    ).unwrap();
+
     
-    let mut v_buf = RefReadBuffer::new(&v[3..]);
-    let mut r_buf = RefWriteBuffer::new(&mut res);
+    let data_len = v.len() - 3;
+    let block_size = symm::Cipher::aes_128_cbc().block_size();
+    let mut plaintext = vec![0; data_len + block_size];
+    
+    decrypter.pad(false);
 
-    decryptor.decrypt(
-        &mut v_buf, &mut r_buf, true
-    ).expect("Decrypt Cookies with aes-128-cbc failed");
-
-    std::str::from_utf8(&res)
-        .expect("Failed to trime cookie bytes")
-        .trim_matches(char::from(0))
-        .as_bytes()
-        .to_vec()
+    let mut count = decrypter.update(&v[3..], &mut plaintext).unwrap();
+    count += decrypter.finalize(&mut plaintext[count..]).unwrap();
+    plaintext.truncate(count - block_size);
+    
+    String::from_utf8_lossy(&plaintext.to_vec()).to_string()
 }
