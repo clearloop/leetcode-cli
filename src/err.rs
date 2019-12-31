@@ -6,11 +6,15 @@ pub enum Error {
     DownloadError(String),
     NetworkError(&'static str),
     ParseError(&'static str),
+    CacheError(String),
 }
 
 impl std::fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Error::CacheError(s) => {
+                write!(f, "{}, please try again", s)
+            },
             Error::DownloadError(s) => {
                 write!(f, "Download {} failed, please try again", s)
             },

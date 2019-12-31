@@ -87,8 +87,11 @@ impl Command for ListCommand {
     /// because of...leetcode content these three categories.
     fn handler(m: &ArgMatches) {
         let cache = Cache::new();
-        let r = cache.download_problems();
+        if cache.is_err() {
+            return 
+        }
+        
+        let r = cache.unwrap().download_problems();
         println!("res: {:?}", r);
-        // let cli = leetcode::LeetCode::new();
     }
 }
