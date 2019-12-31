@@ -42,9 +42,10 @@ extern crate log;
 #[macro_use]
 extern crate diesel;
 
-mod cache;
 mod cfg;
+mod cmds;
 mod err;
 mod plugins;
-pub mod cmds;
-pub mod flag;
+mod flag;
+pub mod cache;
+pub mod cli;

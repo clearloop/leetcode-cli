@@ -2,6 +2,7 @@
 use std::fmt;
 
 /// Error enum
+#[derive(Clone)]
 pub enum Error {
     DownloadError(String),
     NetworkError(&'static str),

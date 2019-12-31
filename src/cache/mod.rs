@@ -1,8 +1,9 @@
 //! Cache part - Save bad networks' ass.
 mod models;
 mod parser;
-mod schemas;
 mod sql;
+mod schemas;
+
 use self::models::*;
 use self::schemas::problems::dsl::*;
 use self::sql::*;
@@ -22,7 +23,7 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 
-/// req if data not download
+/// req if data not download3
 pub struct Cache {
     conn: SqliteConnection,
     leetcode: LeetCode
@@ -42,11 +43,11 @@ impl Cache {
     }
     
     /// Download leetcode problems to db
-    pub fn download_problems(self) -> Result<(), Error> {
+    pub fn download_problems(self) -> Result<Vec<Problem>, Error> {
         info!("Downloading leetcode categories...");
         let mut ps: Vec<Problem> = vec![];
 
-        for i in self.leetcode.conf.sys.categories.clone().into_iter() {
+        for i in &self.leetcode.conf.sys.categories.to_owned() {
             let res = self.leetcode
                 .clone()
                 .get_category_problems(&i);
@@ -54,7 +55,7 @@ impl Cache {
             if res.is_err() {
                 return Err(res.err().unwrap());
             }
-            
+
             let json: Result<Value, ReqwestError> = res.unwrap().json();
             if json.is_err() {
                 error!("{:?}", Error::DownloadError(format!("category {}", &i)));
@@ -70,14 +71,21 @@ impl Cache {
         }
 
         // store problems into database
-        let j = serde_json::to_string(&ps[..3]);
+        let j = serde_json::to_string(&ps);
         if j.is_err() {
             error!("{:?}", Error::ParseError("data from cache"));
             return Err(Error::ParseError("data from cache"));
         }
 
-        println!("{:?}", &j);
-        Ok(())
+        ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap());
+        let res = diesel::insert_into(problems).values(&ps).execute(&self.conn);
+        if res.is_err() {
+            let err = res.err().unwrap();
+            error!("{:?}", Error::CacheError(format!("Save to cache failed -> {}", &err)));
+            return Err(Error::CacheError(format!("Save to cache failed -> {}", &err)));
+        }
+
+        Ok(ps)
     }
 
     /// Get problems from cache
@@ -86,31 +94,28 @@ impl Cache {
     ///
     /// [TODO]:
     ///  1. make downloading async
-    pub fn get_problems(&self) -> Vec<Problem> {
-        let mut res = problems.load::<Problem>(&self.conn);
+    pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
+        let res = problems.load::<Problem>(&self.conn);
         if res.is_err() {
-            error!("Select problems from cache failed -> {:?}", res.err().unwrap());
-            // &self.download_problems();
-
-            res = problems.load::<Problem>(&self.conn);
-            if res.is_err() {
-                // error!("Select problems from cache failed");
-            }
+            let err = res.err().unwrap();
+            warn!("Select problems from cache failed -> {:?} -> try downloading", &err);
+            return Err(Error::CacheError(
+                format!("Select problems from cache failed -> {:?} -> try downloading", &err)
+            ));
         }
-
-        res.unwrap()
+        
+        Ok(res.unwrap())
     }
 
     /// New cache
     pub fn new() -> Result<Self, Error> {
         let p = cfg::root().join("lc.db");
         let c = conn(p.to_string_lossy().to_string());
-
         let r = diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c);
         if r.is_err() {
             let err = r.err().unwrap();
-            error!("{:?}", Error::CacheError(format!("create local cache failed -> {}", &err)));
-            return Err(Error::CacheError(format!("create local cache failed -> {}", &err)));
+            error!("{:?}", Error::CacheError(format!("Create local cache failed -> {}", &err)));
+            return Err(Error::CacheError(format!("Create local cache failed -> {}", &err)));
         }
         
         Ok(Cache{

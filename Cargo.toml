@@ -20,6 +20,7 @@ readme = './README.md'
 [dependencies]
 app_dirs = "1.2.1"
 clap = "2.33.0"
+colored = "1.9.1"
 diesel = { version = "1.4.3", features = ["sqlite"]}
 dirs = "2.0.2"
 env_logger = "0.7.1"

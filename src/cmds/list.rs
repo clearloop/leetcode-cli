@@ -91,7 +91,10 @@ impl Command for ListCommand {
             return 
         }
         
-        let r = cache.unwrap().download_problems();
-        println!("res: {:?}", r);
+        let r = cache.unwrap().get_problems();
+        for i in r.unwrap() {
+            println!("{}", i);
+        }
+        
     }
 }
