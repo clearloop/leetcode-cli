@@ -1,5 +1,5 @@
 # leetcode-cli
-[![doc](https://img.shields.io/badge/0.1.0-docs-green.svg)](https://docs.rs/leetcode-cli/)
+[![doc](https://img.shields.io/badge/0.1.2-docs-green.svg)](https://docs.rs/leetcode-cli/)
 [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
@@ -23,7 +23,7 @@ cargo install leetcode-cli
 
 ## RoadMap
 
-<command>list</command> before the first weekend of 2020.
+<kbd>list</kbd> before the first weekend of 2020.
 
 ## Usage
 

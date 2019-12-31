@@ -185,8 +185,8 @@ mod req {
                 .send();
 
             if res.is_err() {
-                error!("Network request leetcode::{} failed, please try again", &self.name);
-                return Err(Error::NetworkError);
+                error!("{:?}", Error::NetworkError(&self.name));
+                return Err(Error::NetworkError(&self.name));
             }
 
             Ok(res.unwrap())

@@ -1,3 +1,7 @@
+use self::models::*;
+use self::parser::*;
+use self::schemas::*;
+use crate::{cfg, err::Error, plugins::LeetCode};
 use diesel::{
     Connection,
     SqliteConnection,
@@ -5,59 +9,15 @@ use diesel::{
     query_dsl::filter_dsl::FindDsl
 };
 
+use reqwest::Error as ReqwestError;
+use serde_json::{map::Map, Value};
+
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
     SqliteConnection::establish(&p)
         .unwrap_or_else(|_| panic!("Error connecting to {:?}", p))
 }
 
-/// Leetcode data schemas
-mod schemas {
-    table! {
-        problems(id) {
-            state -> Text,
-            id -> Integer,
-            fid -> Integer,
-            name -> Text,
-            slug -> Text,
-            locked -> Bool,
-            percent -> Float,
-            level -> Integer,
-            starred -> Bool,
-            category -> Text,
-        }
-    }
-}
-
-/// Leetcode data models
-mod models {
-    #[derive(Queryable, Debug, Clone)]
-    pub struct Problem {
-        state: String,
-        id: i32,
-        fid: i32,
-        name: String,
-        slug: String,
-        locked: bool,
-        percent: f32,
-        level: i32,
-        starred: bool,
-        category: String
-    }
-}
-
-use self::models::*;
-use self::schemas::*;
-use crate::{
-    cfg,
-    err::Error,
-    plugins::LeetCode,
-};
-use reqwest::Error as ReqwestError;
-use serde_json::{
-    map::Map,
-    Value,
-};
 /// Save bad networks' ass.
 pub struct Cache {
     conn: SqliteConnection,
@@ -76,77 +36,31 @@ impl Cache {
     /// Download leetcode problems to db
     pub fn download_problems(self) -> Result<(), Error> {
         info!("Downloading leetcode categories...");
-        let problems: Vec<Problem> = vec![];
+        let mut problems: Vec<Problem> = vec![];
 
         for i in self.leetcode.conf.sys.categories.clone().into_iter() {
             let res = self.leetcode
                 .clone()
                 .get_category_problems(&i);
 
-            // Download error
             if res.is_err() {
                 return Err(res.err().unwrap());
             }
-
-            // Parse error
+            
             let json: Result<Value, ReqwestError> = res.unwrap().json();
             if json.is_err() {
-                error!("Downloading category {} failed, please try again.", &i);
-                return Err(Error::DownloadError);
+                error!("{:?}", Error::DownloadError(format!("category {}", &i)));
+                return Err(Error::DownloadError(format!("category {}", &i)));
             }
 
             // Get "stat_status_pairs" from respnonse
-            let obj = json.unwrap();
-            if let Some(Value::Array(pairs)) = obj.get("stat_status_pairs") {
-                for p in pairs {
-                    let state: String = match p.get("status") {
-                        Some(Value::Null) => "Null".to_string(),
-                        Some(Value::String(s)) => s.to_string(),
-                        _ => return Err(Error::ParseError),
-                    };
-
-                    let paid_only: bool = match p.get("paid_only") {
-                        Some(Value::Bool(b)) => *b,
-                        _ => return Err(Error::ParseError),
-                    };
-
-                    let stat = p.get("stat");
-                    println!("stat: {:#?}", stat);
-                    
-                    let is_favor: bool = match p.get("is_favor") {
-                        Some(Value::Bool(b)) => *b,
-                        _ => return Err(Error::ParseError),
-                    };
-
-                    let difficult: i32 = match p.get("difficulty") {
-                        Some(Value::Object(o)) => {
-                            match o.get("level") {
-                                Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
-                                _ => return Err(Error::ParseError),
-                            }
-                        },
-                        _ => return Err(Error::ParseError),
-                    };
-
-                    let category_slug: String = match obj.get("category_slug") {
-                        Some(Value::String(s)) => s.to_string(),
-                        _ => return Err(Error::ParseError),
-                    };
-                    // problems.push(Problem{
-                    //     state: p["status"],
-                    //     id: p["stat"]["question_id"],
-                    //     fid: p["stat"]["frontend_question_id"],
-                    //     name: p["stat"]["question_title"],
-                    //     slug: p["stat"]["question_title_slug"],
-                    //     locked: p["paid_only"],
-                    //     percent: p["stat"]["total_acs"] * 100 / p["stat"]["total_submitted"],
-                    //     level: p["difficulty"]["level"],
-                    //     starred: p["is_favor"],
-                    //     category: p["category_slug"]
-                    // })
-                }                    
+            let res = parse_problem(&mut problems, json.unwrap());
+            if res.is_err() {
+                error!("{:?}", Error::DownloadError(format!("category {}", &i)));
+                return Err(Error::DownloadError(format!("category {}", &i)));
             }
         }
+                
         Ok(())
     }
     
@@ -166,10 +80,183 @@ impl Cache {
 
             res = problems.load::<Problem>(&self.conn);
             if res.is_err() {
-                panic!("Download error.");
+                error!("Select problems from cache failed");
             }
         }
 
         res.unwrap()
+    }
+}
+
+/// Leetcode data schemas
+mod schemas {
+    table! {
+        problems(id) {
+            category -> Text,
+            fid -> Integer,
+            id -> Integer,
+            level -> Integer,
+            locked -> Bool,
+            name -> Text,
+            percent -> Float,
+            slug -> Text,
+            starred -> Bool,
+            state -> Text,
+        }
+    }
+}
+
+/// Leetcode data models
+mod models {
+    #[derive(Queryable, Debug, Clone)]
+    pub struct Problem {
+        pub category: String,
+        pub fid: i32,    
+        pub id: i32,
+        pub level: i32,
+        pub locked: bool,
+        pub name: String,
+        pub percent: f32,
+        pub slug: String,
+        pub starred: bool,
+        pub state: String,
+    }
+}
+
+/// json parser
+mod parser {
+    use serde_json::{map::Map, Value};
+    use crate::err::Error;
+    use super::models::Problem;
+    pub fn parse_problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
+        if let Some(Value::Array(pairs)) = v.get("stat_status_pairs") {
+            for p in pairs {
+                let category: String = match v.get("category_slug") {
+                    Some(Value::String(s)) => s.to_string(),
+                    _ => {
+                        error!("{:?}", Error::ParseError("String category_slug"));
+                        return Err(Error::ParseError("String category_slug"));
+                    }
+                };
+
+                let level: i32 = match p.get("difficulty") {
+                    Some(Value::Object(o)) => {
+                        match o.get("level") {
+                            Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
+                            _ => {
+                                error!("{:?}", Error::ParseError("Integer level"));
+                                return Err(Error::ParseError("Integer level"));
+                            }
+                        }
+                    },
+                    _ => {
+                        error!("{:?}", Error::ParseError("Integer level"));
+                        return Err(Error::ParseError("Integer level"));
+                    }
+                };
+
+                let starred: bool = match p.get("is_favor") {
+                    Some(Value::Bool(b)) => *b,
+                    _ => {
+                        error!("{:?}", Error::ParseError("bool is_favor"));
+                        return Err(Error::ParseError("bool is_favor"));
+                    }
+                };
+
+                let locked: bool = match p.get("paid_only") {
+                    Some(Value::Bool(b)) => *b,
+                    _ => {
+                        error!("{:?}", Error::ParseError("Integer paid_only"));
+                        return Err(Error::ParseError("Integer paid_only"));
+                    }
+                };
+                
+                let state: String = match p.get("status") {
+                    Some(Value::Null) => "Null".to_string(),
+                    Some(Value::String(s)) => s.to_string(),
+                    _ => {
+                        error!("{:?}", Error::ParseError("String status"));
+                        return Err(Error::ParseError("String status"));
+                    }
+                };
+
+                // first cond with stat, and then no more.
+                let id: i32 = match p.get("stat") {
+                    Some(Value::Object(o)) => {
+                        match o.get("question_id") {
+                            Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
+                            _ => {
+                                error!("{:?}", Error::ParseError("Integer question_id"));
+                                return Err(Error::ParseError("Integer question_id"));
+                            }
+                        }
+                    },
+                    _ => {
+                        error!("{:?}", Error::ParseError("Integer question_id"));
+                        return Err(Error::ParseError("Integer question_id"));
+                    }
+                };
+
+                let fid: i32 = match p.get("stat").unwrap().get("frontend_question_id") {
+                    Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
+                    _ => {
+                        error!("{:?}", Error::ParseError("Integer frontend_question_id"));
+                        return Err(Error::ParseError("Integer frontend_question_id"));
+                    }
+                };
+
+                let name: String = match p.get("stat").unwrap().get("question__title") {
+                    Some(Value::String(s)) => s.to_string(),
+                    _ => {
+                        error!("{:?}", Error::ParseError("String question__title"));
+                        return Err(Error::ParseError("String question__title"));
+                    }
+                };
+
+                let slug: String = match p.get("stat").unwrap().get("question__title_slug") {
+                    Some(Value::String(s)) => s.to_string(),
+                    _ => {
+                        error!("{:?}", Error::ParseError("String question__title_slug"));
+                        return Err(Error::ParseError("String question__title_slug"));
+                    }
+                };
+
+                let total_acs: f32 = match p.get("stat").unwrap().get("total_acs") {
+                    Some(Value::Number(n)) => n.as_i64().unwrap() as f32,
+                    _ => {
+                        error!("{:?}", Error::ParseError("Float tatal_acs"));
+                        return Err(Error::ParseError("Float tatal_acs"));
+                    }
+                };
+
+                let total_submitted: f32 = match p.get("stat").unwrap().get("total_submitted") {
+                    Some(Value::Number(n)) => n.as_i64().unwrap() as f32,
+                    _ => {
+                        error!("{:?}", Error::ParseError("Float tatal_submitted"));
+                        return Err(Error::ParseError("Float tatal_submitted"));
+                    }
+                };
+
+                // push problems
+                problems.push(Problem{
+                    category,
+                    fid,
+                    id,
+                    level,
+                    locked,
+                    name,
+                    percent: total_acs / total_submitted * 100.0,
+                    slug,
+                    starred,
+                    state,
+                });
+                break;
+            }
+            
+            return Ok(());
+        }
+
+        error!("Response from leetcode.com doesn't content problem details");
+        Err(Error::ParseError("the resp of `https://leetcode.com/api/problems`"))
     }
 }

@@ -23,7 +23,7 @@ fn main() {
     if m.is_present("debug") {
         Debug::handler();
     } else {
-        env_logger::from_env(env_logger::Env::default().default_filter_or("info"))
+        env_logger::from_env(env_logger::Env::new().default_filter_or("info"))
         .format_timestamp(None)
         .init();
     }
