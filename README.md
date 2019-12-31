@@ -6,11 +6,24 @@
 
 ref to [leetcode-cli](https://github.com/skygragon/leetcode-cli), rust version, [spec](/spec.md)
 
-## Installation
+## Note
+> (only support OSX temporarily)
+
+Please make sure you have logined in `leetcode.com` with `chrome`.
+
+**Not Available for Now**
+
+If you need to, keep time on me...expect to launch at v0.3.0.
+
+## Building
 
 ```
 cargo install leetcode-cli
 ```
+
+## RoadMap
+
+<command>list</command> before the first weekend of 2020.
 
 ## Usage
 
@@ -32,7 +45,5 @@ SUBCOMMANDS:
     list    List problems
 ```
 
-## Note
-> (OS X support for now)
-
-Please make sure you have logined in `leetcode.com` with `chrome`.
+## LICENSE
+MIT
