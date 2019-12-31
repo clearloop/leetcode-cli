@@ -1,6 +1,7 @@
 use self::req::{Json, Mode, Req};
 use crate::{
-    conf::{self, Config},
+    cfg::{self, Config},
+    err::Error,
     plugins::chrome,
 };
 
@@ -22,15 +23,16 @@ use reqwest::{
 };
 
 /// Leet API set
+#[derive(Clone)]
 pub struct LeetCode {
-    conf: Config,
+    pub conf: Config,
     client: Client,
     default_headers: HeaderMap,
 }
 
 impl LeetCode {
     /// Parse reqwest headers
-    pub fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> HeaderMap {
+    fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> HeaderMap {
         for (k, v) in ts.into_iter() {
             headers.insert(
                 HeaderName::from_str(k).unwrap(),
@@ -44,7 +46,7 @@ impl LeetCode {
     /// New LeetCode client
     pub fn new() -> LeetCode {
         debug!("Building reqwest client...");
-        let conf = conf::locate();
+        let conf = cfg::locate();
         let cookies = chrome::cookies();
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
@@ -71,7 +73,7 @@ impl LeetCode {
     }
 
     /// Get user favorite problems
-    pub fn get_favorites(self) -> Response {
+    pub fn get_favorites(self) -> Result<Response, Error> {
         let url = &self.conf.sys.urls["favorites"];
 
         Req {
@@ -85,7 +87,7 @@ impl LeetCode {
     }
 
     /// Get category problems
-    pub fn get_category_problems(self, category: &'static str) -> Response {
+    pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         let pre_url = &self.conf.sys.urls["problems"];
         let url = &pre_url.replace("$category", category);
 
@@ -100,7 +102,7 @@ impl LeetCode {
     }
 
     /// Get user info
-    pub fn get_user_info(self) -> Response {
+    pub fn get_user_info(self) -> Result<Response, Error> {
         let url = &self.conf.sys.urls["graphql"];
         let mut json: Json = HashMap::new();
         json.insert(
@@ -128,6 +130,7 @@ impl LeetCode {
 /// Sub-module for leetcode, simplify requests
 mod req {
     use super::LeetCode;
+    use crate::err::Error;
     use std::collections::HashMap;
     use reqwest::{
         Client,
@@ -156,7 +159,7 @@ mod req {
     }
 
     impl Req {
-        pub fn send<'req>(self, client: &'req Client) -> Response {
+        pub fn send<'req>(self, client: &'req Client) -> Result<Response, Error> {
             debug!("Running leetcode::{}...", &self.name);
             if self.info {
                 info!("Downloading {} deps...", &self.name);
@@ -182,11 +185,11 @@ mod req {
                 .send();
 
             if res.is_err() {
-                error!("leetcode::{} went error.", &self.name);
-                panic!("leetcode::{} failed.", &self.name);
+                error!("Network request leetcode::{} failed, please try again", &self.name);
+                return Err(Error::NetworkError);
             }
 
-            res.unwrap()
+            Ok(res.unwrap())
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::store;
+use crate::cache;
 use diesel::prelude::*;
 use keyring::Keyring;
 use openssl::{
@@ -66,7 +66,7 @@ pub fn cookies() -> Ident {
         _ => home.join(".config/google-chrome/Default/Cookies"),
     };
     
-    let conn = store::conn(p.to_string_lossy().to_string());
+    let conn = cache::conn(p.to_string_lossy().to_string());
     let res = cookies
         .filter(host_key.like("%leetcode.com"))
         .load::<Cookies>(&conn)

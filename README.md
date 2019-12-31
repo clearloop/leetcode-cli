@@ -6,6 +6,33 @@
 
 ref to [leetcode-cli](https://github.com/skygragon/leetcode-cli), rust version, [spec](/spec.md)
 
+## Installation
+
+```
+cargo install leetcode-cli
+```
+
+## Usage
+
+```sh
+leetcode 0.1.1
+clearloop <udtrokia@163.com>
+Leet your code in command-line.
+
+USAGE:
+    leetcode [FLAGS] [SUBCOMMAND]
+
+FLAGS:
+    -d, --debug      debug mode
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    help    Prints this message or the help of the given subcommand(s)
+    list    List problems
+```
+
 ## Note
 > (OS X support for now)
+
 Please make sure you have logined in `leetcode.com` with `chrome`.

@@ -10,6 +10,15 @@
 //! > (OS X support for now)
 //! 
 //! Please make sure you have logined in `leetcode.com` with `chrome`.
+//!
+//!
+//! ## Installaion
+//!
+//! ```sh
+//! cargo install leetcode-cli
+//! ```
+//!
+//! ## Usage
 //! 
 //! ```sh
 //! leetcode 0.1.0
@@ -33,9 +42,9 @@ extern crate log;
 #[macro_use]
 extern crate diesel;
 
-mod conf;
-mod store;
+mod cache;
+mod cfg;
+mod err;
 mod plugins;
 pub mod cmds;
 pub mod flag;
-

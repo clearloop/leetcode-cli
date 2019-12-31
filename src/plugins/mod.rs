@@ -1,2 +1,4 @@
-pub mod chrome;
-pub mod leetcode;
+mod chrome;
+mod leetcode;
+
+pub use leetcode::LeetCode;

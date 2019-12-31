@@ -1,8 +1,15 @@
-### 1.Write down all leetcode api.
+## 4.Display
 
-### 0.Decrypt cookie from google chrome
+## 3.Make Commands
 
-#### First few words are strange.
+## 2.Serialize leetcode data
+1. Parse json Error handling, dead-lock, no panic.
+
+## 1.Write down all leetcode api.
+
+## 0.Decrypt cookie from google chrome
+
+### First few words are strange.
 1. check if the res can pass
 2. check bytes with other platform(node version)
 3. replace aes-128-cbc to try

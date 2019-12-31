@@ -16,11 +16,37 @@
 //!     -V, --version      Prints version information
 //! ```
 use clap::{SubCommand, App, Arg, ArgMatches};
-use crate::plugins::leetcode;
 use super::Command;
+use crate::cache::Cache;
 
-/// abstract `list` command in `leetcode-cli`.
+/// Abstract `list` command in `leetcode-cli`.
+///
+/// ## handler
+/// + try to request cache
+///   + prints the list
+/// + if chache doesn't exist, download problems list
+/// + ...
 pub struct ListCommand;
+
+static CATEGORY_HELP: &'static str = r#"Fliter problems by category name
+[alogrithms, database, shell]
+"#;
+
+static QUERY_HELP: &'static str = r#"Fliter questions by conditions:
+Uppercase means negative
+e = easy     E = m+h
+m = medium   M = e+h
+h = hard     H = e+m
+d = done     D = not done
+l = locked   L = not locked
+s = starred  S = not starred"#;
+
+static LIST_AFTER_HELP: &'static str = r#"EXAMPLES:
+    leetcode list               List all questions
+    leetcode list array         List questions that has "array" in name
+    leetcode list -c database   List questions that in database category
+    leetcode list -q eD         List questions that with easy level and not done    
+"#;
 
 /// implement Command trait for `list`
 impl Command for ListCommand {
@@ -28,29 +54,30 @@ impl Command for ListCommand {
     fn usage<'a, 'list>() -> App<'a, 'list> {
         SubCommand::with_name("list")
             .about("List problems")
-            .arg(Arg::with_name("all")
-                 .short("w")
-                 .long("all")
-                 .help("List all problems")
-                 .display_order(1)
+            .arg(Arg::with_name("category")
+                 .short("c")
+                 .long("category")
+                 .help(CATEGORY_HELP)
             )
-            .arg(Arg::with_name("algorithms")
-                 .short("a")
-                 .long("algorithm")
-                 .help("List algorithm problems")
-                 .display_order(2)
+            .arg(Arg::with_name("query")
+                 .short("q")
+                 .long("query")
+                 .help(QUERY_HELP)
             )
-            .arg(Arg::with_name("database")
-                 .short("d")
-                 .long("database")
-                 .help("List database problems")
-                 .display_order(3)
-            )
-            .arg(Arg::with_name("shell")
+            .after_help(LIST_AFTER_HELP)
+            .arg(Arg::with_name("stat")
                  .short("s")
-                 .long("shell")
-                 .help("List shell problems")
-                 .display_order(4)
+                 .long("stat")
+                 .help("Show statistics of listed problems")
+            )
+            .arg(Arg::with_name("tag")
+                 .short("t")
+                 .long("tag")
+                 .help("Fliter problems by tag")
+            )
+            .arg(Arg::with_name("key")
+                 .takes_value(true)
+                 .help("Keywords in select query")
             )
     }
 
@@ -59,19 +86,8 @@ impl Command for ListCommand {
     ///
     /// because of...leetcode content these three categories.
     fn handler(m: &ArgMatches) {
-        let cli = leetcode::LeetCode::new();
-        if m.is_present("algorithms") {
-            let mut res = cli.get_user_info();
-            info!("{:?}", res.text());
-        } else if m.is_present("database") {
-            let mut res = cli.get_user_info();
-            info!("{:?}", res.text());
-        } else if m.is_present("shell") {
-            let mut res = cli.get_user_info();
-            info!("{:?}", res.text());
-        } else {
-            let mut res = cli.get_user_info();
-            info!("{:?}", res.text());
-        }
+        let cache = Cache::new();
+        cache.download_problems();
+        // let cli = leetcode::LeetCode::new();
     }
 }

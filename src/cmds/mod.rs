@@ -1,6 +1,10 @@
-//! cmds mod contains all subcommands in leetcode-cli
+//! All subcommands in leetcode-cli
 //! 
-//! + list -> List problems
+//! ```sh
+//! SUBCOMMANDS:
+//!     help    Prints this message or the help of the given subcommand(s)
+//!     list    List problems
+//! ```
 use clap::{App, ArgMatches};
 
 /// Abstract commands' traits.

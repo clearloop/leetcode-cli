@@ -67,7 +67,7 @@ concurrency = 10
 delay = 1
 "#;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub sys: Sys,
     pub autologin: AutoLogin,
@@ -86,14 +86,14 @@ impl Config {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Sys {
     pub categories: [String; 3],
     pub langs: [String; 16],
     pub urls: HashMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Urls {
     pub base: String,
     pub graphql: String,
@@ -110,31 +110,31 @@ pub struct Urls {
     pub favorite_delete: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AutoLogin {
     pub enable: bool,
     pub retry: i32
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
     pub editor: String,
     pub lang: String
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct File {
     pub show: String,
     pub submission: String
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Color {
     pub enable: bool,
     pub theme: String
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Network {
     pub concurrency: i32,
     pub delay: i32
