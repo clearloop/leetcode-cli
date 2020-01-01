@@ -4,16 +4,66 @@
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-ref to [leetcode-cli](https://github.com/skygragon/leetcode-cli), rust version, [spec](/spec.md)
+## Not Available for Now
+
+If you need to, keep time on me...expect to launch at v0.3.0.
+
+and,
+
+the DEADLINE is `Sub Jan 5 23:59:59 CST 2020`.
+
 
 ## Note
 > (only support OSX temporarily)
 
 Please make sure you have logined in `leetcode.com` with `chrome`.
 
-**Not Available for Now**
+**What's the difference between `lc-rs`(this repo) and skygragon's [leetcode-cli](https://github.com/skygragon/leetcode-cli)?**
 
-If you need to, keep time on me...expect to launch at v0.3.0.
+Here two features in this `lc-rs`:
+
+1. the edit flow —— solution file will generate automatically!
+2. doc support, `lc-rs` can compile the annotation of your solutions to markdown!
+   1. btw, generate a site is easy for `lc-rs`!
+
+For example, if your config is:
+
+```toml
+[storage]
+code = "code"
+
+[code]
+lang = "rust"
+editor = "emacs"
+```
+
+After pick a question:
+
+```
+leetcode pick 1
+```
+
+`lc-rs` will generate `1.two-sum.alogrithms` at `~/.leetcode/code/1.two-sum.algorithms.rs`
+
+And you want to edit it, so:
+
+```
+leetcode edit 1
+```
+
+Emacs will be with you, and then, test and submit is just:
+
+
+```
+leetcode test 1
+leetcode submit 1
+```
+
+Enjoy Coding!
+
+## RoadMap
+
+[ROADMAP](/ROADMAP.md)
 
 ## Building
 

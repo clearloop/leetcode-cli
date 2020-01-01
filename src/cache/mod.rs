@@ -108,8 +108,8 @@ impl Cache {
 
     /// New cache
     pub fn new() -> Result<Self, Error> {
-        let p = cfg::root().join("lc.db");
-        let c = conn(p.to_string_lossy().to_string());
+        let conf = cfg::locate();
+        let c = conn(conf.storage.cache());
         let r = diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c);
         if r.is_err() {
             let err = r.err().unwrap();

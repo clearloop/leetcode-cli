@@ -6,7 +6,7 @@
 //! + Edit config.toml at `~/.leetcode/config.toml` directly
 //! + Use `leetcode config` to update it
 use toml;
-use std::{fs, collections::HashMap};
+use std::{fs, collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 const DEFAULT_CONFIG: &'static str = r#"
@@ -72,6 +72,10 @@ theme = "default"
 [network]
 concurrency = 10
 delay = 1
+
+[storage]
+cache = "cache.db"
+root = "~/.leetcode"
 "#;
 
 /// sync with `~/.leetcode/config.toml`
@@ -82,7 +86,8 @@ pub struct Config {
     pub code: Code,
     pub file: File,
     pub color: Color,
-    pub network: Network
+    pub network: Network,
+    pub storage: Storage
 }
 
 impl Config {
@@ -137,11 +142,11 @@ pub struct Code {
     pub lang: String
 }
 
-/// Storage address
+/// file config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct File {
     pub show: String,
-    pub submission: String
+    pub submission: String,
 }
 
 /// tui color
@@ -158,10 +163,47 @@ pub struct Network {
     pub delay: i32
 }
 
+/// storage
+///
+/// + cache -> the path to cache
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Storage {
+    cache: String,
+    config: String,
+    root: String
+}
+
+impl Storage {
+    /// convert root path
+    pub fn root(&self) -> String {
+        let home = dirs::home_dir().unwrap().to_string_lossy().to_string();
+        let path = self.root.replace("~", &home);
+        path
+    }
+
+    /// get cache path
+    pub fn cache(&self) -> String {
+        let root = &self.root();
+        PathBuf::from(root)
+            .join(&self.cache)
+            .to_string_lossy()
+            .to_string()
+    }
+
+    /// get config path
+    pub fn config(&self) -> String {
+        let root = &self.root();
+        PathBuf::from(root)
+            .join(&self.config)
+            .to_string_lossy()
+            .to_string()
+    }
+}
+
 
 /// Locate lc's config file
 pub fn locate() -> Config {
-    let conf = root().join("conf.toml");
+    let conf = root().join("leetcode.toml");
     if !conf.is_file() {
         fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
     }
