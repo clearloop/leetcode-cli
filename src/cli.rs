@@ -4,6 +4,7 @@ use crate::{
     cmds::{
         Command,
         ListCommand,
+        CacheCommand,
     },
     flag::{
         Flag,
@@ -15,9 +16,12 @@ use crate::{
 pub fn main() {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.1.4")
+        .version("0.1.5")
         .about("Leet your code in command-line.")
-        .subcommand(ListCommand::usage())
+        .subcommands(vec![
+            CacheCommand::usage().display_order(1),
+            ListCommand::usage().display_order(2),
+        ])
         .arg(Debug::usage())
         .setting(AppSettings::ArgRequiredElseHelp)
         .get_matches();
@@ -32,6 +36,7 @@ pub fn main() {
 
     match m.subcommand() {
         ("list", Some(sub_m)) => ListCommand::handler(sub_m),
+        ("cache", Some(sub_m)) => CacheCommand::handler(sub_m),
         _ => {}
     }
 }

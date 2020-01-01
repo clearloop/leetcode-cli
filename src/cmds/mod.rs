@@ -17,4 +17,6 @@ pub trait Command {
 }
 
 mod list;
+mod cache;
 pub use list::ListCommand;
+pub use cache::CacheCommand;

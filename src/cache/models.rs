@@ -4,7 +4,7 @@ use serde::Serialize;
 use super::schemas::problems;
 
 /// Problem model
-#[derive(Insertable, Queryable, Serialize)]
+#[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize)]
 #[table_name = "problems"]
 pub struct Problem {
     pub category: String,

@@ -1,31 +1,78 @@
-//! [![doc](https://img.shields.io/badge/0.1.0-docs-green.svg)](https://docs.rs/leetcode-cli/)
+//! # leetcode-cli
+//! [![doc](https://img.shields.io/badge/0.1.5-docs-green.svg)](https://docs.rs/leetcode-cli/)
 //! [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
-//!
-//! ref to [leetcode-cli](https://github.com/skygragon/leetcode-cli), rust version.
 //! 
-//! ## Note
-//! 
-//! > (OS X support for now)
-//! 
-//! Please make sure you have logined in `leetcode.com` with `chrome`.
-//!
-//! **Not Available for Now**
+//! ## Not Available for Now
 //! 
 //! If you need to, keep time on me...expect to launch at v0.3.0.
-//!
-//! ## Installaion
-//!
-//! ```sh
+//! 
+//! and,
+//! 
+//! the DEADLINE is `Sub Jan 5 23:59:59 CST 2020`.
+//! 
+//! 
+//! ## Note
+//! > (only support OSX temporarily)
+//! 
+//! Please make sure you have logined in `leetcode.com` with `chrome`.
+//! 
+//! ## Features
+//! 
+//! **What's the difference between `lc-rs`(this repo) and skygragon's [leetcode-cli](https://github.com/skygragon/leetcode-cli)?**
+//! 
+//! Here two features in this `lc-rs`:
+//! 
+//! 1. the edit flow —— solution file will generate automatically!
+//! 2. doc support, `lc-rs` can compile the annotation of your solutions to markdown!
+//!    1. btw, generate a site is easy for `lc-rs`!
+//! 
+//! For example, if your config is:
+//! 
+//! ```toml
+//! [storage]
+//! code = "code"
+//! 
+//! [code]
+//! lang = "rust"
+//! editor = "emacs"
+//! ```
+//! 
+//! After pick a question:
+//! 
+//! ```
+//! leetcode pick 1
+//! ```
+//! 
+//! `lc-rs` will generate `1.two-sum.alogrithms` at `~/.leetcode/code/1.two-sum.algorithms.rs`
+//! 
+//! And you want to edit it, so:
+//! 
+//! ```
+//! leetcode edit 1
+//! ```
+//! 
+//! Emacs will be with you, and then, test and submit is just:
+//! 
+//! 
+//! ```
+//! leetcode test 1
+//! leetcode submit 1
+//! ```
+//! 
+//! Enjoy Coding!
+//! 
+//! ## Building
+//! 
+//! ```
 //! cargo install leetcode-cli
 //! ```
-//!
+//! 
+//! 
 //! ## Usage
-//!
-//! ### leetcode
 //! ```sh
-//! leetcode 0.1.4
+//! leetcode 0.1.5
 //! clearloop <udtrokia@163.com>
 //! Leet your code in command-line.
 //! 
@@ -38,8 +85,9 @@
 //!     -V, --version    Prints version information
 //! 
 //! SUBCOMMANDS:
-//!     help    Prints this message or the help of the given subcommand(s)
-//!     list    List problems [aliases: ls]
+//!     cache    Manage cache [aliases: cc]
+//!     list     List problems [aliases: ls]
+//!     help     Prints this message or the help of the given subcommand(s)
 //! ```
 //! 
 //! ### leetcode-list
@@ -76,6 +124,25 @@
 //!     leetcode list -c database   List questions that in database category
 //!     leetcode list -q eD         List questions that with easy level and not done
 //! ```
+//! 
+//! ### leetcode-cache
+//! 
+//! ```
+//! leetcode-cache 
+//! Manage cache
+//! 
+//! USAGE:
+//!     leetcode cache [FLAGS]
+//! 
+//! FLAGS:
+//!     -d, --delete     Delete cache
+//!     -u, --update     Update cache
+//!     -h, --help       Prints help information
+//!     -V, --version    Prints version information
+//! ```
+//! 
+//! ## LICENSE
+//! MIT
 #[macro_use]
 extern crate log;
 #[macro_use]

@@ -8,13 +8,10 @@ use self::models::*;
 use self::schemas::problems::dsl::*;
 use self::sql::*;
 use crate::{cfg, err::Error, plugins::LeetCode};
-use diesel::{
-    Connection,
-    SqliteConnection,
-    RunQueryDsl,
-};
-use reqwest::Error as ReqwestError;
+use diesel::prelude::*;
 use serde_json::Value;
+use reqwest::Error as ReqwestError;
+
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
@@ -23,15 +20,17 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 /// req if data not download
-pub struct Cache {
-    conn: SqliteConnection,
-    leetcode: LeetCode
-}
+pub struct Cache(pub LeetCode);
 
 impl Cache {
+    /// ref to sqliteconnection
+    fn conn(&self) -> SqliteConnection {
+        conn(self.0.conf.storage.cache())
+    }
+    
     /// Clean cache
     pub fn clean(&self) -> Result<(), Error> {
-        let res = diesel::sql_query(DROP_PROBLEMS).execute(&self.conn);
+        let res = std::fs::remove_file(&self.0.conf.storage.cache());
         if res.is_err() {
             let err = res.err().unwrap();
             error!("{:?}", Error::CacheError(format!("clean local cache failed -> {}", &err)));
@@ -40,16 +39,35 @@ impl Cache {
         
         Ok(())
     }
+
+    /// ref to download probems
+    pub fn update(self) -> Result<(), Error> {
+        let c = conn((&self.0.conf.storage.cache()).to_owned());
+        let res = self.download_problems();
+        if res.is_err() {
+            return Err(res.err().unwrap());
+        }
+        
+        for i in res.unwrap().into_iter() {
+            let target = problems.filter(id.eq(i.id));
+            let u_res = diesel::update(target).set(i.to_owned()).execute(&c);
+            if u_res.is_err() {
+                let err = u_res.err().unwrap();
+                error!("{:?}", Error::CacheError(format!("Update cache failed -> {}", &err)));
+                return Err(Error::CacheError(format!("Update cache failed -> {}", &err)));
+            }
+        }
+        
+        Ok(())
+    }
     
     /// Download leetcode problems to db
     pub fn download_problems(self) -> Result<Vec<Problem>, Error> {
-        info!("Downloading leetcode categories...");
+        info!("Downloading leetcode problems...");
         let mut ps: Vec<Problem> = vec![];
 
-        for i in &self.leetcode.conf.sys.categories.to_owned() {
-            let res = self.leetcode
-                .clone()
-                .get_category_problems(&i);
+        for i in &self.0.conf.sys.categories.to_owned() {
+            let res = self.0.clone().get_category_problems(&i);
 
             if res.is_err() {
                 return Err(res.err().unwrap());
@@ -76,12 +94,15 @@ impl Cache {
             return Err(Error::ParseError("data from cache"));
         }
 
-        ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap());
-        let res = diesel::insert_into(problems).values(&ps).execute(&self.conn);
-        if res.is_err() {
-            let err = res.err().unwrap();
-            error!("{:?}", Error::CacheError(format!("Save to cache failed -> {}", &err)));
-            return Err(Error::CacheError(format!("Save to cache failed -> {}", &err)));
+        let count = self.get_problems().unwrap().len();
+        if count == 0 {
+            ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap());
+            let res = diesel::insert_into(problems).values(&ps).execute(&self.conn());
+            if res.is_err() {
+                let err = res.err().unwrap();
+                error!("{:?}", Error::CacheError(format!("Save to cache failed -> {}", &err)));
+                return Err(Error::CacheError(format!("Save to cache failed -> {}", &err)));
+            }
         }
 
         Ok(ps)
@@ -94,7 +115,7 @@ impl Cache {
     /// [TODO]:
     ///  1. make downloading async
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
-        let res = problems.load::<Problem>(&self.conn);
+        let res = problems.load::<Problem>(&self.conn());
         if res.is_err() {
             let err = res.err().unwrap();
             warn!("Select problems from cache failed -> {:?} -> try downloading", &err);
@@ -117,9 +138,6 @@ impl Cache {
             return Err(Error::CacheError(format!("Create local cache failed -> {}", &err)));
         }
         
-        Ok(Cache{
-            conn: c,
-            leetcode: LeetCode::new(),
-        })
+        Ok(Cache(LeetCode::new()))
     }
 }

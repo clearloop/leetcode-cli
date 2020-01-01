@@ -13,4 +13,4 @@ pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &'static str = r#"
   )
 "#;
 
-pub static DROP_PROBLEMS: &'static str = r#"DROP TABLE problems"#;
+// pub static DROP_PROBLEMS: &'static str = r#"DROP TABLE problems"#;

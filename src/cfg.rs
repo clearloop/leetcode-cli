@@ -1,4 +1,4 @@
-//! Soft-link with `config.tom`l
+//! Soft-link with `config.tom`
 //!
 //! leetcode-cli will generate a `config.toml` by default,
 //! if you wanna change to it, you can:
@@ -52,29 +52,15 @@ verify = "https://leetcode.com/submissions/detail/$id/check/"
 favorites = "https://leetcode.com/list/api/questions"
 favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
 
-# but you will want change these
-[autologin]
-enable = false
-retry = 2
-
 [code]
 editor = "vim"
 lang = "rust"
-
-[file]
-show = "${fid}.${slug}"
+pick = "${fid}.${slug}"
 submission = "${fid}.${slug}.${sid}.${ac}"
 
-[color]
-enable = true
-theme = "default"
-
-[network]
-concurrency = 10
-delay = 1
-
 [storage]
-cache = "cache.db"
+cache = "Problems"
+code = "code"
 root = "~/.leetcode"
 "#;
 
@@ -82,11 +68,7 @@ root = "~/.leetcode"
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub sys: Sys,
-    pub autologin: AutoLogin,
     pub code: Code,
-    pub file: File,
-    pub color: Color,
-    pub network: Network,
     pub storage: Storage
 }
 
@@ -125,13 +107,6 @@ pub struct Urls {
     pub favorite_delete: String,
 }
 
-/// depracted, leetcode-cli use chrome cookies directly, no need to login.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct AutoLogin {
-    pub enable: bool,
-    pub retry: i32
-}
-
 /// default editor and langs
 ///
 /// + support editor: [emacs, vim]
@@ -139,28 +114,9 @@ pub struct AutoLogin {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
     pub editor: String,
-    pub lang: String
-}
-
-/// file config
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct File {
-    pub show: String,
-    pub submission: String,
-}
-
-/// tui color
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Color {
-    pub enable: bool,
-    pub theme: String
-}
-
-/// cli network config
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Network {
-    pub concurrency: i32,
-    pub delay: i32
+    pub lang: String,
+    pub pick: String,
+    pub submission: String
 }
 
 /// storage
@@ -169,7 +125,7 @@ pub struct Network {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Storage {
     cache: String,
-    config: String,
+    code: String,
     root: String
 }
 
@@ -190,11 +146,11 @@ impl Storage {
             .to_string()
     }
 
-    /// get config path
-    pub fn config(&self) -> String {
+    /// get cache path
+    pub fn code(&self) -> String {
         let root = &self.root();
         PathBuf::from(root)
-            .join(&self.config)
+            .join(&self.code)
             .to_string_lossy()
             .to_string()
     }

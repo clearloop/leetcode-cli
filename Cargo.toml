@@ -1,10 +1,10 @@
 [[bin]]
 name = "leetcode"
-path = "src/bin/leetcode.rs"
+path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["clearloop <udtrokia@163.com>"]
 edition = "2018"
 description = "Leet your code in command-line."

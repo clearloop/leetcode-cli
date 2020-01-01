@@ -1,5 +1,5 @@
 # leetcode-cli
-[![doc](https://img.shields.io/badge/0.1.3-docs-green.svg)](https://docs.rs/leetcode-cli/)
+[![doc](https://img.shields.io/badge/0.1.5-docs-green.svg)](https://docs.rs/leetcode-cli/)
 [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
@@ -17,6 +17,8 @@ the DEADLINE is `Sub Jan 5 23:59:59 CST 2020`.
 > (only support OSX temporarily)
 
 Please make sure you have logined in `leetcode.com` with `chrome`.
+
+## Features
 
 **What's the difference between `lc-rs`(this repo) and skygragon's [leetcode-cli](https://github.com/skygragon/leetcode-cli)?**
 
@@ -61,23 +63,16 @@ leetcode submit 1
 
 Enjoy Coding!
 
-## RoadMap
-
-[ROADMAP](/ROADMAP.md)
-
 ## Building
 
 ```
 cargo install leetcode-cli
 ```
 
-## RoadMap
-
-<kbd>list</kbd> before the first weekend of 2020.
 
 ## Usage
 ```sh
-leetcode 0.1.4
+leetcode 0.1.5
 clearloop <udtrokia@163.com>
 Leet your code in command-line.
 
@@ -90,8 +85,9 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    help    Prints this message or the help of the given subcommand(s)
-    list    List problems [aliases: ls]
+    cache    Manage cache [aliases: cc]
+    list     List problems [aliases: ls]
+    help     Prints this message or the help of the given subcommand(s)
 ```
 
 ### leetcode-list
@@ -127,6 +123,22 @@ EXAMPLES:
     leetcode list array         List questions that has "array" in name
     leetcode list -c database   List questions that in database category
     leetcode list -q eD         List questions that with easy level and not done
+```
+
+### leetcode-cache
+
+```
+leetcode-cache 
+Manage cache
+
+USAGE:
+    leetcode cache [FLAGS]
+
+FLAGS:
+    -d, --delete     Delete cache
+    -u, --update     Update cache
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 ```
 
 ## LICENSE
