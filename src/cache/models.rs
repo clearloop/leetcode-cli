@@ -22,18 +22,24 @@ pub struct Problem {
 static DONE: &'static str = " ✔";
 static ETC: &'static str = "...";
 static LOCK: &'static str = "🔒";
+static NDONE: &'static str = "✘";
 static SPACE: &'static str = " ";
 impl std::fmt::Display for Problem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let space_2 = SPACE.repeat(2);
         let mut lock = space_2.as_str();
-        let mut done = space_2.as_str();
+        let mut done = space_2.normal();
         let mut id = "".to_string();
         let mut name = "".to_string();
         let mut level = "".normal();
 
         if self.locked { lock = LOCK };
-        if self.state == "Null".to_string() { done = DONE; }
+        if self.state == "ac".to_string() {
+            done = DONE.green().bold();
+        } else if self.state == "notac" {
+            done = NDONE.green().bold();
+        }
+
         match self.id.to_string().len() {
             1 => {
                 id.push_str(&SPACE.repeat(2));
@@ -63,7 +69,7 @@ impl std::fmt::Display for Problem {
             name.push_str(&SPACE.repeat(60 - &self.name.len()));
         } else {
             name.push_str(&self.name[..49]);
-            name = name.trim_right().to_string();
+            name = name.trim_end().to_string();
             name.push_str(ETC);
             name.push_str(&SPACE.repeat(60 - name.len()));
         }
@@ -72,17 +78,13 @@ impl std::fmt::Display for Problem {
             1 => "Easy  ".bright_green(),
             2 => "Medium".bright_yellow(),
             3 => "Hard  ".bright_red(),
-            _ => "".blink().bold(),
+            _ => level
         };
         
         write!(
             f,
             "    {} {} [{}] {} {} ({})",
-            lock,
-            done.green().bold(),
-            id,
-            name,
-            level,
+            lock, done, id, name, level,
             &self.percent.to_string()[0..5]
         )
     }

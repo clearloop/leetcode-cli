@@ -1,5 +1,5 @@
 //! Cache part - Save bad networks' ass.
-mod models;
+pub mod models;
 mod parser;
 mod sql;
 mod schemas;

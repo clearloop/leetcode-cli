@@ -13,7 +13,7 @@ use crate::{
 pub fn main() {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.1.0")
+        .version("0.1.3")
         .about("Leet your code in command-line.")
         .subcommand(ListCommand::usage())
         .arg(Debug::usage())
