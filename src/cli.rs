@@ -1,3 +1,4 @@
+//! Clap commander
 use clap::{App, AppSettings};
 use crate::{
     cmds::{
@@ -10,10 +11,11 @@ use crate::{
     }
 };
 
+/// get maches
 pub fn main() {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.1.3")
+        .version("0.1.4")
         .about("Leet your code in command-line.")
         .subcommand(ListCommand::usage())
         .arg(Debug::usage())

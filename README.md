@@ -26,9 +26,8 @@ cargo install leetcode-cli
 <kbd>list</kbd> before the first weekend of 2020.
 
 ## Usage
-
 ```sh
-leetcode 0.1.3
+leetcode 0.1.4
 clearloop <udtrokia@163.com>
 Leet your code in command-line.
 
@@ -43,6 +42,41 @@ FLAGS:
 SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
     list    List problems [aliases: ls]
+```
+
+### leetcode-list
+```
+leetcode-list 
+List problems
+
+USAGE:
+    leetcode list [FLAGS] [OPTIONS] [keyword]
+
+FLAGS:
+    -h, --help       Prints help information
+    -s, --stat       Show statistics of listed problems
+    -V, --version    Prints version information
+
+OPTIONS:
+    -c, --category <category>    Fliter problems by category name
+                                 [alogrithms, database, shell]
+    -q, --query <query>          Fliter questions by conditions:
+                                 Uppercase means negative
+                                 e = easy     E = m+h
+                                 m = medium   M = e+h
+                                 h = hard     H = e+m
+                                 d = done     D = not done
+                                 l = locked   L = not locked
+                                 s = starred  S = not starred
+
+ARGS:
+    <keyword>    Keyword in select query
+
+EXAMPLES:
+    leetcode list               List all questions
+    leetcode list array         List questions that has "array" in name
+    leetcode list -c database   List questions that in database category
+    leetcode list -q eD         List questions that with easy level and not done
 ```
 
 ## LICENSE

@@ -764,7 +764,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "leetcode-cli"
-version = "0.1.2"
+version = "0.1.4"
 dependencies = [
  "app_dirs 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",

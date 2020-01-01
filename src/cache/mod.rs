@@ -1,4 +1,4 @@
-//! Cache part - Save bad networks' ass.
+//! Save bad network\'s ass.
 pub mod models;
 mod parser;
 mod sql;
@@ -22,8 +22,7 @@ pub fn conn(p: String) -> SqliteConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {:?}", p))
 }
 
-
-/// req if data not download3
+/// req if data not download
 pub struct Cache {
     conn: SqliteConnection,
     leetcode: LeetCode

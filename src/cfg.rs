@@ -1,3 +1,10 @@
+//! Soft-link with `config.tom`l
+//!
+//! leetcode-cli will generate a `config.toml` by default,
+//! if you wanna change to it, you can:
+//! 
+//! + Edit config.toml at `~/.leetcode/config.toml` directly
+//! + Use `leetcode config` to update it
 use toml;
 use std::{fs, collections::HashMap};
 use serde::{Deserialize, Serialize};
@@ -67,6 +74,7 @@ concurrency = 10
 delay = 1
 "#;
 
+/// sync with `~/.leetcode/config.toml`
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub sys: Sys,
@@ -86,6 +94,7 @@ impl Config {
     }
 }
 
+/// System settings, for leetcode api mainly
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Sys {
     pub categories: [String; 3],
@@ -93,6 +102,7 @@ pub struct Sys {
     pub urls: HashMap<String, String>,
 }
 
+/// Leetcode API
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Urls {
     pub base: String,
@@ -110,30 +120,38 @@ pub struct Urls {
     pub favorite_delete: String,
 }
 
+/// depracted, leetcode-cli use chrome cookies directly, no need to login.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AutoLogin {
     pub enable: bool,
     pub retry: i32
 }
 
+/// default editor and langs
+///
+/// + support editor: [emacs, vim]
+/// + support langs: all in config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
     pub editor: String,
     pub lang: String
 }
 
+/// Storage address
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct File {
     pub show: String,
     pub submission: String
 }
 
+/// tui color
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Color {
     pub enable: bool,
     pub theme: String
 }
 
+/// cli network config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Network {
     pub concurrency: i32,
@@ -152,7 +170,7 @@ pub fn locate() -> Config {
     toml::from_str(&s).unwrap()
 }
 
-/// Get root path of lc
+/// Get root path of leetcode-cli
 pub fn root() -> std::path::PathBuf {
     let dir = dirs::home_dir().unwrap().join(".leetcode");
     if !dir.is_dir() {

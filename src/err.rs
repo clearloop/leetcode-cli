@@ -1,5 +1,12 @@
-/// leetcode-cli Errors
+//! Errors in leetcode-cli
+//!
+//! TODO:
+//! 
+//! + `Tryfrom`
 use std::fmt;
+// use core::convert::TryFrom;
+// use reqwest::Response;
+// use serde_json::Value;
 
 /// Error enum
 #[derive(Clone)]
@@ -28,3 +35,11 @@ impl std::fmt::Debug for Error {
         }
     }
 }
+
+// impl TryFrom<Response> for Value {
+//     type Error = Error;
+// 
+//     fn try_from(r: Response) -> Result<Self, Self::Error> {
+//         if 
+//     }
+// }

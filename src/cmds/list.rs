@@ -25,7 +25,7 @@
 //!                                  s = starred  S = not starred
 //! 
 //! ARGS:
-//!     <keyword>    Keyword in problems' name
+//!     <keyword>    Keyword in select query
 //! 
 //! EXAMPLES:
 //!     leetcode list               List all questions
@@ -92,7 +92,7 @@ impl Command for ListCommand {
             )
             .arg(Arg::with_name("keyword")
                  .takes_value(true)
-                 .help("Keyword in problems' name")
+                 .help("Keyword in select query")
             )
     }
 
@@ -111,7 +111,7 @@ impl Command for ListCommand {
                 Self::handler(m);
             }
         }
-        
+
         // filtering...
         // filter category
         if m.is_present("category") {
@@ -168,7 +168,7 @@ impl Command for ListCommand {
                     "notac" => notac += 1,
                     _ => {}
                 }
-                
+
                 match p.level {
                     1 => easy += 1,
                     2 => medium += 1,

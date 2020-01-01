@@ -25,7 +25,7 @@
 //!
 //! ### leetcode
 //! ```sh
-//! leetcode 0.1.3
+//! leetcode 0.1.4
 //! clearloop <udtrokia@163.com>
 //! Leet your code in command-line.
 //! 
@@ -68,7 +68,7 @@
 //!                                  s = starred  S = not starred
 //! 
 //! ARGS:
-//!     <keyword>    Keyword in problems' name
+//!     <keyword>    Keyword in select query
 //! 
 //! EXAMPLES:
 //!     leetcode list               List all questions
@@ -89,5 +89,3 @@ pub mod err;
 pub mod flag;
 pub mod helper;
 pub mod plugins;
-
-

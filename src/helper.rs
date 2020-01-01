@@ -1,4 +1,4 @@
-/// convert prints
+//! Convert i32 to specific digits string.
 pub trait Digit<T> {
     fn digit(self, e: T) -> String;
 }
