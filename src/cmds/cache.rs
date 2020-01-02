@@ -38,7 +38,7 @@ impl Command for CacheCommand {
     }
 
     /// `cache` handler
-    fn handler(m: &ArgMatches) {
+    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error>{
         use std::fs::File;
         use std::path::Path;
         
@@ -79,5 +79,7 @@ impl Command for CacheCommand {
             println!("{}", title.bright_black());
             println!("{}\n", out);
         }
+
+        Ok(())
     }
 }

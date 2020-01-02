@@ -8,11 +8,12 @@
 //! ```
 use clap::Arg;
 use env_logger::Env;
+use crate::err::Error;
 
 /// abstract flag traits
 pub trait Flag {
     fn usage<'a, 'f>() -> Arg<'a, 'f>;
-    fn handler();
+    fn handler() -> Result<(), Error>;
 }
 
 /// Debug logger
@@ -26,9 +27,11 @@ impl Flag for Debug {
             .help("debug mode")
     }
 
-    fn handler() {
+    fn handler() -> Result<(), Error>{
         env_logger::from_env(
             Env::default().default_filter_or("leetcode")
         ).init();
+
+        Ok(())
     }
 }

@@ -11,11 +11,12 @@ use crate::{
     flag::{
         Flag,
         Debug,
-    }
+    },
+    err::Error,
 };
 
 /// get maches
-pub fn main() {
+pub fn main() -> Result<(), Error>{
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
         .version("0.1.6")
@@ -31,7 +32,7 @@ pub fn main() {
         .get_matches();
 
     if m.is_present("debug") {
-        Debug::handler();
+        Debug::handler()?;
     } else {
         env_logger::from_env(env_logger::Env::new().default_filter_or("info"))
         .format_timestamp(None)
@@ -39,10 +40,10 @@ pub fn main() {
     }
 
     match m.subcommand() {
-        ("list", Some(sub_m)) => ListCommand::handler(sub_m),
-        ("pick", Some(sub_m)) => PickCommand::handler(sub_m),
-        ("stat", Some(sub_m)) => StatCommand::handler(sub_m),
-        ("cache", Some(sub_m)) => CacheCommand::handler(sub_m),
-        _ => {}
+        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m)?),
+        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m)?),
+        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m)?),
+        ("cache", Some(sub_m)) => Ok(CacheCommand::handler(sub_m)?),
+        _ => Err(Error::MatchError)
     }
 }

@@ -34,7 +34,7 @@
 //!     leetcode list -q eD         List questions that with easy level and not done
 //! ```
 use super::Command;
-use crate::{cache::Cache, helper::Digit};
+use crate::{cache::Cache, helper::Digit, err::Error};
 use clap::{SubCommand, App, Arg, ArgMatches};
 /// Abstract `list` command in `leetcode-cli`.
 ///
@@ -101,14 +101,14 @@ impl Command for ListCommand {
     /// List commands contains "-c", "-q", "-s" flags.
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs` 
-    fn handler(m: &ArgMatches) {
+    fn handler(m: &ArgMatches) -> Result<(), Error> {
         let cache = Cache::new().unwrap();
         let mut problems = cache.get_problems().unwrap();
 
         if problems.len() == 0 {
             let r = cache.download_problems();
             if r.is_ok() {
-                Self::handler(m);
+                Self::handler(m)?
             }
         }
 
@@ -139,6 +139,7 @@ impl Command for ListCommand {
                 }
             }
         }
+        
         
         // retain if keyword exists
         if let Some(keyword) =  m.value_of("keyword") {
@@ -187,5 +188,6 @@ impl Command for ListCommand {
                      easy.digit(4), medium.digit(4), hard.digit(4),
             );
         }
+        Ok(())
     }
 }

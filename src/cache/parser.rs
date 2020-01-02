@@ -3,7 +3,7 @@ use serde_json::Value;
 use crate::err::Error;
 use super::models::Problem;
 
-pub fn parse_problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
+pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
     let pairs = v.get("stat_status_pairs")?.as_array()?;
     for p in pairs {
         let category = v.get("category_slug")?.as_str()?.to_string();
@@ -35,3 +35,5 @@ pub fn parse_problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error>
 
     return Ok(());
 }
+
+// pub fn question()

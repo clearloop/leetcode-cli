@@ -34,7 +34,7 @@ impl Command for PickCommand {
     }
 
     /// `pick` handler
-    fn handler(m: &ArgMatches) {
+    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error>{
         use crate::cache::Cache;
         use rand::Rng;
         
@@ -43,8 +43,7 @@ impl Command for PickCommand {
         if problems.len() == 0 {
             let r = cache.clone().download_problems();
             if r.is_ok() {
-                Self::handler(m);
-                return;
+                Self::handler(m)?
             }
         }
 
@@ -77,5 +76,7 @@ impl Command for PickCommand {
 
         let r = cache.get_desc(problem.fid);
         println!("{:?}", r.unwrap());
+
+        Ok(())
     }
 }

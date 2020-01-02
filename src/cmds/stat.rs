@@ -15,7 +15,7 @@ impl Command for StatCommand {
     }
 
     /// `stat` handler
-    fn handler(_m: &ArgMatches) {
+    fn handler(_m: &ArgMatches) -> Result<(), crate::err::Error> {
         use crate::{
             cache::Cache,
             helper::Digit,
@@ -111,5 +111,6 @@ impl Command for StatCommand {
             println!("{}", udone);
         }
         println!("");
+        Ok(())
     }
 }

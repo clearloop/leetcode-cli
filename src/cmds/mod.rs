@@ -6,14 +6,14 @@
 //!     list    List problems
 //! ```
 use clap::{App, ArgMatches};
-
+use crate::err::Error;
 /// Abstract commands' traits.
 pub trait Command {
     /// Usage of the spefic command
     fn usage<'a, 'c>() -> App<'a, 'c>;
 
     /// The handler will deal [args, options,...] from the command-line
-    fn handler(m: &ArgMatches);
+    fn handler(m: &ArgMatches) -> Result<(), Error>;
 }
 
 mod list;
