@@ -17,8 +17,10 @@ pub trait Command {
 }
 
 mod list;
+mod pick;
 mod stat;
 mod cache;
-pub use cache::CacheCommand;
 pub use list::ListCommand;
+pub use pick::PickCommand;
 pub use stat::StatCommand;
+pub use cache::CacheCommand;

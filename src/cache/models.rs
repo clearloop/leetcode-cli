@@ -40,23 +40,23 @@ impl std::fmt::Display for Problem {
             done = NDONE.green().bold();
         }
 
-        match self.id.to_string().len() {
+        match self.fid.to_string().len() {
             1 => {
                 id.push_str(&SPACE.repeat(2));
-                id.push_str(&self.id.to_string());
+                id.push_str(&self.fid.to_string());
                 id.push_str(&SPACE.repeat(1));
             },
             2 => {
                 id.push_str(&SPACE.repeat(1));
-                id.push_str(&self.id.to_string());
+                id.push_str(&self.fid.to_string());
                 id.push_str(&SPACE.repeat(1));
             },
             3 => {
                 id.push_str(&SPACE.repeat(1));
-                id.push_str(&self.id.to_string());
+                id.push_str(&self.fid.to_string());
             },
             4 => {
-                id.push_str(&self.id.to_string());
+                id.push_str(&self.fid.to_string());
             },
             _ => {
                 id.push_str(&space_2);
@@ -83,7 +83,7 @@ impl std::fmt::Display for Problem {
         
         write!(
             f,
-            "    {} {} [{}] {} {} ({})",
+            "  {} {} [{}] {} {} ({} %)",
             lock, done, id, name, level,
             &self.percent.to_string()[0..5]
         )

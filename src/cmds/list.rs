@@ -71,7 +71,7 @@ impl Command for ListCommand {
     fn usage<'a, 'list>() -> App<'a, 'list> {
         SubCommand::with_name("list")
             .about("List problems")
-            .visible_alias("ls")
+            .visible_alias("l")
             .arg(Arg::with_name("category")
                  .short("c")
                  .long("category")

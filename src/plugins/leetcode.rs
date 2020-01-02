@@ -72,20 +72,6 @@ impl LeetCode {
         }
     }
 
-    /// Get user favorite problems
-    pub fn get_favorites(self) -> Result<Response, Error> {
-        let url = &self.conf.sys.urls["favorites"];
-
-        Req {
-            default_headers: self.default_headers,
-            info: false,
-            json: None,
-            mode: Mode::Get,
-            name: "get_favorites",
-            url: url.to_string(),
-        }.send(&self.client)
-    }
-
     /// Get category problems
     pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         let pre_url = &self.conf.sys.urls["problems"];
@@ -97,30 +83,6 @@ impl LeetCode {
             json: None,
             mode: Mode::Get,
             name: "get_category_problems",
-            url: url.to_string(),
-        }.send(&self.client)
-    }
-
-    /// Get user info
-    pub fn get_user_info(self) -> Result<Response, Error> {
-        let url = &self.conf.sys.urls["graphql"];
-        let mut json: Json = HashMap::new();
-        json.insert(
-            "query",
-            r#"{
-              user {
-                username,
-                isCurrentUserPremium
-              },
-            }"#,
-        );
-        
-        Req {
-            default_headers: self.default_headers,
-            info: false,
-            json: Some(json),
-            mode: Mode::Post,
-            name: "get_user_info",
             url: url.to_string(),
         }.send(&self.client)
     }
