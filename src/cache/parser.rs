@@ -4,132 +4,34 @@ use crate::err::Error;
 use super::models::Problem;
 
 pub fn parse_problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
-    if let Some(Value::Array(pairs)) = v.get("stat_status_pairs") {
-        for p in pairs {
-            let category: String = match v.get("category_slug") {
-                Some(Value::String(s)) => s.to_string(),
-                _ => {
-                    error!("{:?}", Error::ParseError("String category_slug"));
-                    return Err(Error::ParseError("String category_slug"));
-                }
-            };
+    let pairs = v.get("stat_status_pairs")?.as_array()?;
+    for p in pairs {
+        let category = v.get("category_slug")?.as_str()?.to_string();
+        let level = p.get("difficulty")?.as_object()?.get("level")?.as_i64()? as i32;
+        let starred = p.get("is_favor")?.as_bool()?;
+        let locked = p.get("paid_only")?.as_bool()?;
+        let state = p.get("status")?.as_str()?.to_string();
+        let stat = p.get("stat")?.as_object()?;
+        let id = stat.get("question_id")?.as_i64()? as i32;
+        let fid = stat.get("frontend_question_id")?.as_i64()? as i32;
+        let name = stat.get("question__title")?.as_str()?.to_string();
+        let slug = stat.get("question__title_slug")?.as_str()?.to_string();
+        let total_acs = stat.get("total_acs")?.as_f64()? as f32;
+        let total_submitted = stat.get("total_submitted")?.as_f64()? as f32;
 
-            let level: i32 = match p.get("difficulty") {
-                Some(Value::Object(o)) => {
-                    match o.get("level") {
-                        Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
-                        _ => {
-                            error!("{:?}", Error::ParseError("Integer level"));
-                            return Err(Error::ParseError("Integer level"));
-                        }
-                    }
-                },
-                _ => {
-                    error!("{:?}", Error::ParseError("Integer level"));
-                    return Err(Error::ParseError("Integer level"));
-                }
-            };
-
-            let starred: bool = match p.get("is_favor") {
-                Some(Value::Bool(b)) => *b,
-                _ => {
-                    error!("{:?}", Error::ParseError("bool is_favor"));
-                    return Err(Error::ParseError("bool is_favor"));
-                }
-            };
-
-            let locked: bool = match p.get("paid_only") {
-                Some(Value::Bool(b)) => *b,
-                _ => {
-                    error!("{:?}", Error::ParseError("Integer paid_only"));
-                    return Err(Error::ParseError("Integer paid_only"));
-                }
-            };
-            
-            let state: String = match p.get("status") {
-                Some(Value::Null) => "Null".to_string(),
-                Some(Value::String(s)) => s.to_string(),
-                _ => {
-                    error!("{:?}", Error::ParseError("String status"));
-                    return Err(Error::ParseError("String status"));
-                }
-            };
-
-            // first cond with stat, and then no more.
-            let id: i32 = match p.get("stat") {
-                Some(Value::Object(o)) => {
-                    match o.get("question_id") {
-                        Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
-                        _ => {
-                            error!("{:?}", Error::ParseError("Integer question_id"));
-                            return Err(Error::ParseError("Integer question_id"));
-                        }
-                    }
-                },
-                _ => {
-                    error!("{:?}", Error::ParseError("Integer question_id"));
-                    return Err(Error::ParseError("Integer question_id"));
-                }
-            };
-
-            let fid: i32 = match p.get("stat").unwrap().get("frontend_question_id") {
-                Some(Value::Number(n)) => n.as_i64().unwrap() as i32,
-                _ => {
-                    error!("{:?}", Error::ParseError("Integer frontend_question_id"));
-                    return Err(Error::ParseError("Integer frontend_question_id"));
-                }
-            };
-
-            let name: String = match p.get("stat").unwrap().get("question__title") {
-                Some(Value::String(s)) => s.to_string(),
-                _ => {
-                    error!("{:?}", Error::ParseError("String question__title"));
-                    return Err(Error::ParseError("String question__title"));
-                }
-            };
-
-            let slug: String = match p.get("stat").unwrap().get("question__title_slug") {
-                Some(Value::String(s)) => s.to_string(),
-                _ => {
-                    error!("{:?}", Error::ParseError("String question__title_slug"));
-                    return Err(Error::ParseError("String question__title_slug"));
-                }
-            };
-
-            let total_acs: f32 = match p.get("stat").unwrap().get("total_acs") {
-                Some(Value::Number(n)) => n.as_i64().unwrap() as f32,
-                _ => {
-                    error!("{:?}", Error::ParseError("Float tatal_acs"));
-                    return Err(Error::ParseError("Float tatal_acs"));
-                }
-            };
-
-            let total_submitted: f32 = match p.get("stat").unwrap().get("total_submitted") {
-                Some(Value::Number(n)) => n.as_i64().unwrap() as f32,
-                _ => {
-                    error!("{:?}", Error::ParseError("Float tatal_submitted"));
-                    return Err(Error::ParseError("Float tatal_submitted"));
-                }
-            };
-
-            // push problems
-            problems.push(Problem{
-                category,
-                fid,
-                id,
-                level,
-                locked,
-                name,
-                percent: total_acs / total_submitted * 100.0,
-                slug,
-                starred,
-                state,
-            });
-        }
-        
-        return Ok(());
+        problems.push(Problem{
+            category,
+            fid,
+            id,
+            level,
+            locked,
+            name,
+            percent: total_acs / total_submitted * 100.0,
+            slug,
+            starred,
+            state,
+        });
     }
 
-    error!("Response from https://leetcode.com doesn't content problem details");
-    Err(Error::ParseError("the resp of `https://leetcode.com`"))
+    return Ok(());
 }

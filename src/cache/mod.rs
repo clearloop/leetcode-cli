@@ -1,9 +1,8 @@
 //! Save bad network\'s ass.
-pub mod models;
 mod parser;
 mod sql;
-mod schemas;
-
+pub mod models;
+pub mod schemas;
 use self::models::*;
 use self::schemas::problems::dsl::*;
 use self::sql::*;
@@ -20,6 +19,7 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 /// req if data not download
+#[derive(Clone)]
 pub struct Cache(pub LeetCode);
 
 impl Cache {
@@ -108,6 +108,23 @@ impl Cache {
         Ok(ps)
     }
 
+    /// Get problem description
+    pub fn get_desc(&self, rfid: i32) -> Result<bool, Error> {
+        let rslug: String = problems
+            .select(slug)
+            .filter(fid.eq(rfid))
+            .first(&self.conn())
+            .unwrap();
+
+        let mut res = self.0.clone().get_question_detail(&rslug)?;
+        let json: Value = res.json()?;
+        println!("{:?}", json);
+        // let problem = diesel::select(
+        //     problems.filter(fid.eq(fid))
+        // ).execute(&self.conn());
+        Ok(true)
+    }
+    
     /// Get problems from cache
     ///
     /// if cache doesn't exist, request a new copy

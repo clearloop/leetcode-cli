@@ -89,3 +89,49 @@ impl std::fmt::Display for Problem {
         )
     }
 }
+
+
+/// Description Model
+pub struct DescData {
+    pub question: Question
+}
+
+/// desc.question
+pub struct Question {
+    pub content: String,
+    pub stat: QuestionStat,
+    pub code_defintion: Vec<CodeDefintion>,
+    pub sample_text_case: String,
+    pub enable_run_code: bool,
+    pub meta_data: MetaData,
+    pub translated_cotent: String
+}
+
+pub struct QuestionStat {
+    pub total_accepted: String,
+    pub total_submission: String,
+    pub total_accepted_aw: i64,
+    pub total_submission_raw: i64,
+    pub ac_rate: String
+}
+
+pub struct CodeDefintion {
+    pub value: String,
+    pub text: String,
+    pub default_code: String,
+}
+
+pub struct MetaData {
+    pub name: String,
+    pub params: Vec<Param>,
+    pub r#return: Return,
+}
+
+pub struct Param {
+    pub name: String,
+    pub r#type: String
+}
+
+pub struct Return {
+    pub r#type: String
+}

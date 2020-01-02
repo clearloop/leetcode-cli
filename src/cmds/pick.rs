@@ -41,7 +41,7 @@ impl Command for PickCommand {
         let cache = Cache::new().unwrap();
         let mut problems = cache.get_problems().unwrap();
         if problems.len() == 0 {
-            let r = cache.download_problems();
+            let r = cache.clone().download_problems();
             if r.is_ok() {
                 Self::handler(m);
                 return;
@@ -75,7 +75,7 @@ impl Command for PickCommand {
 
         let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
 
-        println!("rand problem{}", problem);
-        
+        let r = cache.get_desc(problem.fid);
+        println!("{:?}", r.unwrap());
     }
 }

@@ -79,11 +79,53 @@ impl LeetCode {
 
         Req {
             default_headers: self.default_headers,
+            refer: None,
             info: false,
             json: None,
             mode: Mode::Get,
             name: "get_category_problems",
             url: url.to_string(),
+        }.send(&self.client)
+    }
+
+    /// Get specific problem detail
+    pub fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
+        let pre_refer = &self.conf.sys.urls["problems"];
+        let refer = pre_refer.replace("$slug", slug);
+
+        let mut json: Json = HashMap::new();
+        json.insert(
+            "query",
+            vec![
+                "query getQuestionDetail($titleSlug: String!) {",
+                "  question(titleSlug: $titleSlug) {",
+                "    content",
+                "    stats",
+                "    codeDefinition",
+                "    sampleTestCase",
+                "    enableRunCode",
+                "    metaData",
+                "    translatedContent",
+                "  }",
+                "}"
+            ].join("\n")
+        );
+
+        json.insert(
+            "variables",
+            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", &slug)
+        );
+
+        json.insert("operationName", "getQuestionDetail".to_string());
+        
+        Req {
+            default_headers: self.default_headers,
+            refer: Some(refer),
+            info: false,
+            json: Some(json),
+            mode: Mode::Post,
+            name: "get_problem_detail",
+            url: (&self.conf.sys.urls["graphql"]).to_string(),
         }.send(&self.client)
     }
 }
@@ -97,12 +139,11 @@ mod req {
     use reqwest::{
         Client,
         header::HeaderMap,
-        RequestBuilder,
         Response,
     };
 
     /// Standardize json format
-    pub type Json = HashMap<&'static str, &'static str>;
+    pub type Json = HashMap<&'static str, String>;
 
     /// Standardize request mode
     pub enum Mode {
@@ -113,6 +154,7 @@ mod req {
     /// LeetCode request prototype
     pub struct Req {
         pub default_headers: HeaderMap,
+        pub refer: Option<String>,
         pub json: Option<Json>,
         pub info: bool,
         pub mode: Mode,
@@ -129,29 +171,15 @@ mod req {
             
             let headers = LeetCode::headers(
                 self.default_headers,
-                vec![("Referer", &self.url)],
+                vec![("Referer", &self.refer.unwrap_or(self.url.to_owned()))],
             );
 
-            let req: RequestBuilder;
-            match self.mode {
-                Mode::Get => {
-                    req = client.get(&self.url);
-                },
-                Mode::Post => {
-                    req = client.post(&self.url).json(&self.json);
-                }
-            }
+            let req = match self.mode {
+                Mode::Get => client.get(&self.url),
+                Mode::Post => client.post(&self.url).json(&self.json),
+            };
             
-            let res = req
-                .headers(headers)
-                .send();
-
-            if res.is_err() {
-                error!("{:?}", Error::NetworkError(&self.name));
-                return Err(Error::NetworkError(&self.name));
-            }
-
-            Ok(res.unwrap())
+            Ok(req.headers(headers).send()?)
         }
     }
 }

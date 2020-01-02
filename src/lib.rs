@@ -144,6 +144,7 @@
 //! 
 //! ## LICENSE
 //! MIT
+#![feature(try_trait)]
 #[macro_use]
 extern crate log;
 #[macro_use]

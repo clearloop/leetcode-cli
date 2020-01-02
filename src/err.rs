@@ -12,7 +12,7 @@ use std::fmt;
 #[derive(Clone)]
 pub enum Error {
     DownloadError(String),
-    NetworkError(&'static str),
+    NetworkError(String),
     ParseError(&'static str),
     CacheError(String),
 }
@@ -27,19 +27,30 @@ impl std::fmt::Debug for Error {
                 write!(f, "Download {} failed, please try again", s)
             },
             Error::NetworkError(s) => {
-                write!(f, "Network request leetcode::{} failed, please try again", s)
+                error!("Network request to {} failed, please try again", s);
+                write!(f, "Network request to {} failed, please try again", s)
             },
             Error::ParseError(s) => {
+                error!("Parse {} failed, please try again", s);
                 write!(f, "Parse {} failed, please try again", s)
             },
         }
     }
 }
 
-// impl TryFrom<Response> for Value {
-//     type Error = Error;
-// 
-//     fn try_from(r: Response) -> Result<Self, Self::Error> {
-//         if 
-//     }
-// }
+impl std::convert::From<reqwest::Error> for Error {
+    fn from(err: reqwest::Error) -> Self {
+        let url = err.url();
+        if url.is_none() {
+            return Error::NetworkError("https://leetcode.com".to_string());
+        }
+        
+        Error::NetworkError(url.unwrap().to_string())
+    }
+}
+
+impl std::convert::From<std::option::NoneError> for Error {
+    fn from(_: std::option::NoneError) -> Self {
+        Error::ParseError("json from response")
+    }
+}
