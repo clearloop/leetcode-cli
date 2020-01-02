@@ -12,7 +12,7 @@ repository = "https://github.com/clearloop/leetcode-cli"
 license = "MIT"
 documentation = "https://docs.rs/leetcode_cli"
 homepage = "https://github.com/clearloop/leetcode-cli"
-keywords = ["games"]
+keywords = ["cli", "games", "leetcode"]
 readme = './README.md'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

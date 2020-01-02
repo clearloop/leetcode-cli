@@ -48,19 +48,19 @@ impl Command for CacheCommand {
         let len = format!("{}K", f.metadata().unwrap().len() / 1000);
 
         let out = format!(
-            "{}{}",
+            "  {}{}",
             Path::new(&path)
                 .file_name().unwrap()
                 .to_string_lossy()
-                .to_string().digit(70 - (len.len() as i32))
+                .to_string().digit(65 - (len.len() as i32))
                 .bright_green(),
             len
         );
 
-        let mut title = "Cache".digit(66);
+        let mut title = "\n  Cache".digit(63);
         title.push_str("Size");
-        title.push_str("\n");
-        title.push_str(&"-".repeat(70).to_string());
+        title.push_str("\n  ");
+        title.push_str(&"-".repeat(65).to_string());
 
         let mut flags = 0;
         if m.is_present("delete") {
@@ -77,7 +77,7 @@ impl Command for CacheCommand {
 
         if flags == 0 {
             println!("{}", title.bright_black());
-            println!("{}", out);
+            println!("{}\n", out);
         }
     }
 }

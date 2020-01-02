@@ -1,4 +1,5 @@
-//! leetcode-cil plugins
+//! Leetcode-cil plugins
+//! 
 //! + chrome cookie parser
 //! + leetcode API
 //!

@@ -1,4 +1,4 @@
-//! flags in leetcode-cli
+//! Flags in leetcode-cli
 //!
 //! ```sh
 //! FLAGS:
