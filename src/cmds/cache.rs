@@ -21,7 +21,7 @@ impl Command for CacheCommand {
     /// `cache` command usage
     fn usage<'a, 'cache>() -> App<'a, 'cache> {
         SubCommand::with_name("cache")
-            .about("Manage cache")
+            .about("Manage Cache")
             .visible_alias("cc")
             .arg(Arg::with_name("delete")
                  .display_order(1)

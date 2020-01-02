@@ -72,7 +72,7 @@ cargo install leetcode-cli
 
 ## Usage
 ```sh
-leetcode 0.1.5
+leetcode 0.1.6
 clearloop <udtrokia@163.com>
 Leet your code in command-line.
 
@@ -85,8 +85,9 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    cache    Manage cache [aliases: cc]
+    cache    Manage Cache [aliases: cc]
     list     List problems [aliases: ls]
+    stat     Show simple chart about submissions [aliases: st]
     help     Prints this message or the help of the given subcommand(s)
 ```
 

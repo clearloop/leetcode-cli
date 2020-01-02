@@ -1,11 +1,17 @@
-### 1.Write down all leetcode api.
+## v0.1.6
+complete `stat` command
 
-### 0.Decrypt cookie from google chrome
+## v0.1.5
+complete `cache` command
 
-#### First few words are strange.
-1. check if the res can pass
-2. check bytes with other platform(node version)
-3. replace aes-128-cbc to try
-4. follow crypto guide to implement decrypt
-5. check line by line
-6. find the iv bug
+## v0.1.3
+complete `list` command
+
+## v0.1.2
+abstract data cache
+
+## v0.1.1
+add list command
+
+## v0.1.0
+chrome cookie

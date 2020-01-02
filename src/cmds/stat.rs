@@ -10,7 +10,8 @@ impl Command for StatCommand {
     /// `stat` usage
     fn usage<'a, 'stat>() -> App<'a, 'stat> {
         SubCommand::with_name("stat")
-            .about("Account status")
+            .about("Show simple chart about submissions")
+            .visible_alias("st")
     }
 
     /// `stat` handler

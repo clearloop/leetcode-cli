@@ -17,7 +17,7 @@ use crate::{
 pub fn main() {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.1.5")
+        .version("0.1.6")
         .about("Leet your code in command-line.")
         .subcommands(vec![
             CacheCommand::usage().display_order(1),
