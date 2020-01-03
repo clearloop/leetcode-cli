@@ -104,6 +104,69 @@ pub struct Question {
     pub t_content: String,
 }
 
+/// ## Convert table
+/// "&lt" -> "<"
+/// "&gt" -> ">"
+/// "&amp" -> "&"
+/// "&quot" -> "\""
+/// "&copy" -> ©
+impl std::fmt::Display for Question {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut content = (&self.content).replace(r#"\t"#, "").normal();
+
+        // empty characters
+        for i in vec![
+            r#"\n"#, r#"\r"#,
+            r#"<p>"#, r#"</p>"#,
+            r#"<pre>"#, r#"</pre>"#,
+            r#"<div>"#, r#"</div>"#,
+            r#"</span>"#, 
+        ] {
+            content = content.replace(i, "").normal();
+        }
+
+        // delete <span...>
+        {
+            let mut ptr = 0;
+            let mut output: Vec<&str> = vec![];
+            let mut style = "";
+            for (i, e) in content.chars().enumerate() {
+                match e {
+                    '<' => {
+                        output.push(&content[ptr..i]);
+                        ptr = i;
+                    },
+                    '>' => {
+                        ptr = i + 1;
+                    },
+                    _ => {},
+                }
+            };
+            output.push(&content[ptr..content.len()]);
+            content = output.join("").normal();
+        }
+        
+        // converting symbols
+        content = content.replace(r#"&lt;"#, "<").normal();
+        content = content.replace(r#"&gt;"#, ">").normal();
+        content = content.replace(r#"&amp;"#, "&").normal();
+        content = content.replace(r#"&quot;"#, "\"").normal();
+        content = content.replace(r#"&nbsp;"#, " ").normal();
+
+        // decorates
+        // loop {
+        //     let mut tmp = &mut content;
+        //     if let Some(start) = tmp.find("<b>") {
+        //         tmp.insert(start, ',');
+        //         tmp = &mut tmp[(start + 4)..].to_string();
+        //     } else {
+        //         break;
+        //     }
+        // }
+        write!(f, "{}", &content)
+    }
+}
+
 /// deps of Question
 mod question {
     use serde::{Serialize, Deserialize};

@@ -20,13 +20,16 @@ Please make sure you have logined in `leetcode.com` with `chrome`.
 
 ## Features
 
-**What's the difference between `lc-rs`(this repo) and skygragon's [leetcode-cli](https://github.com/skygragon/leetcode-cli)?**
+What's the difference between `lc-rs` and skygragon's [leetcode-cli][sky]?
 
-Here two features in this `lc-rs`:
+**Here are three features in `lc-rs`**:
 
 1. the edit flow —— solution file will generate automatically!
 2. doc support, `lc-rs` can compile the annotation of your solutions to markdown!
    1. btw, generate a site is easy for `lc-rs`!
+3. support local signal to keep coding as longer as you want.
+
+## Example
 
 For example, if your config is:
 
@@ -39,7 +42,7 @@ lang = "rust"
 editor = "emacs"
 ```
 
-After pick a question:
+### 1. <kbd>pick</kbd> a question:
 
 ```
 leetcode pick 1
@@ -47,21 +50,32 @@ leetcode pick 1
 
 `lc-rs` will generate `1.two-sum.alogrithms` at `~/.leetcode/code/1.two-sum.algorithms.rs`
 
-And you want to edit it, so:
+### 2. <kbd>edit</kbd> it
 
 ```
 leetcode edit 1
 ```
 
-Emacs will be with you, and then, test and submit is just:
+#### 3. The `emacs` will be with you
 
+```
+coding...
+```
+
+#### 4. <kbd>test</kbd> it.
 
 ```
 leetcode test 1
+```
+
+#### 5. <kbd>submit</kbd> it
+
+```
 leetcode submit 1
 ```
 
 Enjoy Coding!
+
 
 ## Building
 
@@ -91,56 +105,13 @@ SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
 ```
 
-### leetcode-list
-```
-leetcode-list 
-List problems
+## PR
 
-USAGE:
-    leetcode list [FLAGS] [OPTIONS] [keyword]
-
-FLAGS:
-    -h, --help       Prints help information
-    -s, --stat       Show statistics of listed problems
-    -V, --version    Prints version information
-
-OPTIONS:
-    -c, --category <category>    Fliter problems by category name
-                                 [alogrithms, database, shell]
-    -q, --query <query>          Fliter questions by conditions:
-                                 Uppercase means negative
-                                 e = easy     E = m+h
-                                 m = medium   M = e+h
-                                 h = hard     H = e+m
-                                 d = done     D = not done
-                                 l = locked   L = not locked
-                                 s = starred  S = not starred
-
-ARGS:
-    <keyword>    Keyword in select query
-
-EXAMPLES:
-    leetcode list               List all questions
-    leetcode list array         List questions that has "array" in name
-    leetcode list -c database   List questions that in database category
-    leetcode list -q eD         List questions that with easy level and not done
-```
-
-### leetcode-cache
-
-```
-leetcode-cache 
-Manage cache
-
-USAGE:
-    leetcode cache [FLAGS]
-
-FLAGS:
-    -d, --delete     Delete cache
-    -u, --update     Update cache
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-```
+PR is welcome to the repo, [here][pr] it is.
 
 ## LICENSE
 MIT
+
+
+[pr]: https://github.com/clearloop/leetcode-cli/pulls
+[sky]: https://github.com/skygragon/leetcode-cli

@@ -74,11 +74,13 @@ impl Command for PickCommand {
 
         let r = cache.get_desc(problem.fid);
         if r.is_err() {
-            if let Error::FeatureError(_) = r.err()? {
+            let e = r.err()?;
+            eprintln!("{:?}", &e);
+            if let Error::FeatureError(_) = e {
                 Self::handler(m)?;
-            }
+            } 
         } else {
-            println!("{:#?}", r);
+            println!("{}", r?);
         }
 
         Ok(())

@@ -9,6 +9,7 @@ use self::sql::*;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use diesel::prelude::*;
 use serde_json::Value;
+use colored::Colorize;
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
@@ -45,7 +46,7 @@ impl Cache {
     
     /// Download leetcode problems to db
     pub fn download_problems(self) -> Result<Vec<Problem>, Error> {
-        info!("Downloading leetcode problems...");
+        info!("Fetching leetcode problems...");
         let mut ps: Vec<Problem> = vec![];
 
         for i in &self.0.conf.sys.categories.to_owned() {
@@ -68,7 +69,12 @@ impl Cache {
             .filter(fid.eq(rfid))
             .first(&self.conn())?;
 
-        info!("fetching {}...", &target.name);
+        println!(
+            "\n[{}] {} {}\n\n",
+            &target.fid.to_string().green(),
+            &target.name.bold().underline(),
+            "is on the run...".dimmed()
+        );
         if target.category != "algorithms".to_string() {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string()

@@ -150,11 +150,14 @@ extern crate log;
 #[macro_use]
 extern crate diesel;
 
+mod err;
 pub mod cache;
 pub mod cfg;
 pub mod cli;
 pub mod cmds;
-pub mod err;
 pub mod flag;
 pub mod helper;
 pub mod plugins;
+
+/// re-exports
+pub use err::Error;

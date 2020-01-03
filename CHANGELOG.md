@@ -1,3 +1,6 @@
+## v0.1.7
+render html in command-line
+
 ## v0.1.6
 complete `stat` command
 

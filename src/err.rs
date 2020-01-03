@@ -1,4 +1,3 @@
-
 //! Errors in leetcode-cli
 use std::fmt;
 use std::error::Error as StdError;
