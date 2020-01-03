@@ -10,6 +10,6 @@ table! {
         percent -> Float,
         slug -> Text,
         starred -> Bool,
-        state -> Text,
+        status -> Text,
     }
 }

@@ -9,7 +9,7 @@ pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &'static str = r#"
     percent FLOAT NOT NULL,
     slug TEXT NOT NULL,
     starred BOOLEAN NOT NULL DEFAULT 0,
-    state TEXT NOT NULL
+    status TEXT NOT NULL
   )
 "#;
 

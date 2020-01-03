@@ -50,7 +50,7 @@ impl Cache {
 
         for i in &self.0.conf.sys.categories.to_owned() {
             let json = self.0.clone().get_category_problems(&i)?.json()?;
-            parser::problem(&mut ps, json)?
+            parser::problem(&mut ps, json)?;
         }
 
         let count = self.get_problems()?.len();
@@ -67,16 +67,13 @@ impl Cache {
         let rslug: String = problems
             .select(slug)
             .filter(fid.eq(rfid))
-            .first(&self.conn())
-            .unwrap();
+            .first(&self.conn())?;
 
-        let mut res = self.0.clone().get_question_detail(&rslug)?;
-        let json: Value = res.json()?;
-        println!("{:?}", json);
-        // let problem = diesel::select(
-        //     problems.filter(fid.eq(fid))
-        // ).execute(&self.conn());
-        Ok(true)
+        let mut desc = Question::default();
+        let json: Value = self.0.clone().get_question_detail(&rslug)?.json()?;
+        parser::desc(&mut desc, json)?;
+
+        Ok(desc)
     }
     
     /// Get problems from cache

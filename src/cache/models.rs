@@ -1,6 +1,7 @@
-//! Leetcode data models
+//! Leetcode data modelsA
 use colored::Colorize;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
+pub use self::question::*;
 use super::schemas::problems;
 
 /// Problem model
@@ -16,7 +17,7 @@ pub struct Problem {
     pub percent: f32,
     pub slug: String,
     pub starred: bool,
-    pub state: String,
+    pub status: String,
 }
 
 static DONE: &'static str = " ✔";
@@ -34,9 +35,9 @@ impl std::fmt::Display for Problem {
         let mut level = "".normal();
 
         if self.locked { lock = LOCK };
-        if self.state == "ac".to_string() {
+        if self.status == "ac".to_string() {
             done = DONE.green().bold();
-        } else if self.state == "notac" {
+        } else if self.status == "notac" {
             done = NDONE.green().bold();
         }
 
@@ -90,48 +91,144 @@ impl std::fmt::Display for Problem {
     }
 }
 
-
-/// Description Model
-pub struct DescData {
-    pub question: Question
-}
-
-/// desc.question
+/// desc model
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Question {
-    pub content: String,
-    pub stat: QuestionStat,
-    pub code_defintion: Vec<CodeDefintion>,
-    pub sample_text_case: String,
-    pub enable_run_code: bool,
-    pub meta_data: MetaData,
-    pub translated_cotent: String
+    pub content: Option<String>,
+    #[serde(deserialize_with = "string_struct")]
+    pub stats: Stats,
+    #[serde(alias = "codeDefinition", deserialize_with = "string_struct")]
+    pub defs: CodeDefintion,
+    #[serde(alias = "sampleTestCase")]
+    pub case: String,
+    #[serde(alias = "metaData", deserialize_with = "string_struct")]
+    pub metadata: MetaData,
+    #[serde(alias = "enableRunCode")]
+    pub test: bool,
+    #[serde(alias = "translatedContent")]
+    pub t_content: Option<String>,
 }
 
-pub struct QuestionStat {
-    pub total_accepted: String,
-    pub total_submission: String,
-    pub total_accepted_aw: i64,
-    pub total_submission_raw: i64,
-    pub ac_rate: String
-}
+/// deps of Question
+mod question {
+    use crate::err::Error;
+    use serde::{
+        Serialize,
+        Deserialize,
+        Deserializer,
+        de::{
+            self,
+            Visitor
+        }
+    };
+    use std::{
+        fmt,
+        str::FromStr,
+        marker::PhantomData,
+    };
 
-pub struct CodeDefintion {
-    pub value: String,
-    pub text: String,
-    pub default_code: String,
-}
+    /// Code samples
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct CodeDefintion(pub Vec<CodeDefintionInner>);
 
-pub struct MetaData {
-    pub name: String,
-    pub params: Vec<Param>,
-    pub r#return: Return,
-}
+    /// CodeDefinition Inner struct
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct CodeDefintionInner {
+        pub value: String,
+        pub text: String,
+        #[serde(alias = "defaultCode")]
+        pub code: String,
+    }
 
-pub struct Param {
-    pub name: String,
-    pub r#type: String
-}
+    /// Question status
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct Stats {
+        #[serde(alias = "totalAccepted")]
+        tac: String,
+        #[serde(alias = "totalSubmission")]
+        tsm: String,
+        #[serde(alias = "totalAcceptedRaw")]
+        tacr: i32,
+        #[serde(alias = "totalSubmissionRaw")]
+        tsmr: i32,
+        #[serde(alias = "acRate")]
+        rate: String
+    }
+    
+    /// Algorithm metadata
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct MetaData {
+        pub name: String,
+        pub params: Vec<Param>,
+        pub r#return: Return,
+    }
 
-pub struct Return {
-    pub r#type: String
+    /// Deserialize CodedeFintion from str
+    impl std::str::FromStr for CodeDefintion {
+        type Err = Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(serde_json::from_str(s)?)
+        }
+    }
+
+    /// Deserialize Stats from str
+    impl std::str::FromStr for Stats {
+        type Err = crate::err::Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(serde_json::from_str(s)?)
+        }
+    }
+
+    /// Deserialize MetaData from str
+    impl std::str::FromStr for MetaData {
+        type Err = Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(serde_json::from_str(s)?)
+        }
+    }
+
+    /// MetaData nested fields
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct Param {
+        pub name: String,
+        pub r#type: String
+    }
+
+    /// MetaData nested fields
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    pub struct Return {
+        pub r#type: String
+    }
+
+    /// Master serde_json
+    pub fn string_struct<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+    where
+        T: Deserialize<'de> + FromStr<Err = Error>,
+        D: Deserializer<'de>,
+    {
+        struct StringStruct<T>(PhantomData<fn() -> T>);
+        impl<'de, T> Visitor<'de> for StringStruct<T>
+        where
+            T: Deserialize<'de> + FromStr<Err = Error>,
+        {
+            type Value = T;
+            
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("string")
+            }
+            
+            fn visit_str<E>(self, value: &str) -> Result<T, E>
+            where
+                E: de::Error,
+            {
+                Ok(FromStr::from_str(value).unwrap())
+            }
+        }
+
+        
+        deserializer.deserialize_str(StringStruct(PhantomData))
+    }
 }

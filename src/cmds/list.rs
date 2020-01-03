@@ -103,19 +103,17 @@ impl Command for ListCommand {
     /// + `-qs` 
     fn handler(m: &ArgMatches) -> Result<(), Error> {
         let cache = Cache::new().unwrap();
-        let mut problems = cache.get_problems().unwrap();
+        let mut ps = cache.get_problems()?;
 
-        if problems.len() == 0 {
-            let r = cache.download_problems();
-            if r.is_ok() {
-                Self::handler(m)?
-            }
+        if ps.len() == 0 {
+            cache.download_problems()?;
+            Self::handler(m)?
         }
 
         // filtering...
         // filter category
         if m.is_present("category") {
-            problems.retain(|x| x.category == m.value_of("category").unwrap());
+            ps.retain(|x| x.category == m.value_of("category").unwrap());
         }
 
         // filter query
@@ -123,18 +121,18 @@ impl Command for ListCommand {
             let query = m.value_of("query").unwrap();
             for p in query.chars() {
                 match p {
-                    'l' => problems.retain(|x| x.locked),
-                    'L' => problems.retain(|x| !x.locked),
-                    's' => problems.retain(|x| x.starred),
-                    'S' => problems.retain(|x| !x.starred),
-                    'e' => problems.retain(|x| x.level == 1),
-                    'E' => problems.retain(|x| x.level != 1),
-                    'm' => problems.retain(|x| x.level == 2),
-                    'M' => problems.retain(|x| x.level != 2),
-                    'h' => problems.retain(|x| x.level == 3),
-                    'H' => problems.retain(|x| x.level != 3),
-                    'd' => problems.retain(|x| x.state == "ac".to_string()),
-                    'D' => problems.retain(|x| x.state != "ac".to_string()),
+                    'l' => ps.retain(|x| x.locked),
+                    'L' => ps.retain(|x| !x.locked),
+                    's' => ps.retain(|x| x.starred),
+                    'S' => ps.retain(|x| !x.starred),
+                    'e' => ps.retain(|x| x.level == 1),
+                    'E' => ps.retain(|x| x.level != 1),
+                    'm' => ps.retain(|x| x.level == 2),
+                    'M' => ps.retain(|x| x.level != 2),
+                    'h' => ps.retain(|x| x.level == 3),
+                    'H' => ps.retain(|x| x.level != 3),
+                    'd' => ps.retain(|x| x.status == "ac".to_string()),
+                    'D' => ps.retain(|x| x.status != "ac".to_string()),
                     _ => {}
                 }
             }
@@ -143,10 +141,10 @@ impl Command for ListCommand {
         
         // retain if keyword exists
         if let Some(keyword) =  m.value_of("keyword") {
-            problems.retain(|x| x.name.contains(&keyword));
+            ps.retain(|x| x.name.contains(&keyword));
         }
         
-        for p in &problems { println!("{}", p); }
+        for p in &ps { println!("{}", p); }
         
         // one more thing, filter stat
         if m.is_present("stat") {
@@ -159,12 +157,12 @@ impl Command for ListCommand {
             let mut medium = 0;
             let mut hard = 0;
 
-            for p in problems {
+            for p in ps {
                 listed += 1;
                 if p.starred {starred += 1;}
                 if p.locked {locked += 1;}
 
-                match p.state.as_str() {
+                match p.status.as_str() {
                     "ac" => ac += 1,
                     "notac" => notac += 1,
                     _ => {}

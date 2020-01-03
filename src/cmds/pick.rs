@@ -39,16 +39,14 @@ impl Command for PickCommand {
         use rand::Rng;
         
         let cache = Cache::new().unwrap();
-        let mut problems = cache.get_problems().unwrap();
+        let mut problems = cache.get_problems()?;
         if problems.len() == 0 {
-            let r = cache.clone().download_problems();
-            if r.is_ok() {
-                Self::handler(m)?
-            }
+            cache.clone().download_problems()?;
+            Self::handler(m)?
         }
 
         if m.is_present("query") {
-            let query = m.value_of("query").unwrap();
+            let query = m.value_of("query")?;
             for p in query.chars() {
                 match p {
                     'l' => problems.retain(|x| x.locked),
@@ -61,8 +59,8 @@ impl Command for PickCommand {
                     'M' => problems.retain(|x| x.level != 2),
                     'h' => problems.retain(|x| x.level == 3),
                     'H' => problems.retain(|x| x.level != 3),
-                    'd' => problems.retain(|x| x.state == "ac".to_string()),
-                    'D' => problems.retain(|x| x.state != "ac".to_string()),
+                    'd' => problems.retain(|x| x.status == "ac".to_string()),
+                    'D' => problems.retain(|x| x.status != "ac".to_string()),
                     _ => {}
                 }
             }

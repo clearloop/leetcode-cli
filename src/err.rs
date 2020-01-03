@@ -8,7 +8,7 @@ pub enum Error {
     MatchError,
     DownloadError(String),
     NetworkError(String),
-    ParseError(&'static str),
+    ParseError(String),
     CacheError(String),
 }
 
@@ -23,12 +23,12 @@ impl std::fmt::Debug for Error {
                 write!(f, "Download {} failed, please try again", s)
             },
             Error::NetworkError(s) => {
-                error!("Network request to {} failed, please try again", s);
-                write!(f, "Network request to {} failed, please try again", s)
+                error!("Network request {}, please try again", s);
+                write!(f, "Network request {}, please try again", s)
             },
             Error::ParseError(s) => {
-                error!("Parse {} failed, please try again", s);
-                write!(f, "Parse {} failed, please try again", s)
+                error!("{}, please try again", s);
+                write!(f, "{}, please try again", s)
             },
             Error::MatchError => {
                 error!("Nothing matches");
@@ -52,6 +52,12 @@ impl std::convert::From<diesel::result::Error> for Error {
     }
 }
 
+impl std::convert::From<serde_json::error::Error> for Error {
+    fn from(err: serde_json::Error) -> Self {
+        Error::ParseError(err.description().to_string())
+    }
+}
+
 // io
 impl std::convert::From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
@@ -62,6 +68,6 @@ impl std::convert::From<std::io::Error> for Error {
 // options
 impl std::convert::From<std::option::NoneError> for Error {
     fn from(_: std::option::NoneError) -> Self {
-        Error::ParseError("json from response")
+        Error::ParseError("json from response".to_string())
     }
 }

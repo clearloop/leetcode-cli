@@ -20,8 +20,8 @@ impl Command for StatCommand {
             cache::Cache,
             helper::Digit,
         };
-        let cache = Cache::new().unwrap();
-        let res = cache.get_problems().unwrap();
+        let cache = Cache::new()?;
+        let res = cache.get_problems()?;
         
         let mut easy: f64 = 0.00;
         let mut easy_ac: f64 = 0.00;
@@ -34,19 +34,19 @@ impl Command for StatCommand {
             match i.level {
                 1 => {
                     easy += 1.00;
-                    if i.state == "ac".to_string() {
+                    if i.status == "ac".to_string() {
                         easy_ac += 1.00;
                     }
                 },
                 2 => {
                     medium += 1.00;
-                    if i.state == "ac".to_string() {
+                    if i.status == "ac".to_string() {
                         medium_ac += 1.00;
                     }
                 },
                 3 => {
                     hard += 1.00;
-                    if i.state == "ac".to_string() {
+                    if i.status == "ac".to_string() {
                         hard_ac += 1.00;
                     }
                 },
