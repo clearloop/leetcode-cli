@@ -5,7 +5,7 @@ pub use self::question::*;
 use super::schemas::problems;
 
 /// Problem model
-#[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize)]
+#[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
 #[table_name = "problems"]
 pub struct Problem {
     pub category: String,
@@ -18,6 +18,7 @@ pub struct Problem {
     pub slug: String,
     pub starred: bool,
     pub status: String,
+    pub desc: String,
 }
 
 static DONE: &'static str = " ✔";
@@ -94,38 +95,18 @@ impl std::fmt::Display for Problem {
 /// desc model
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Question {
-    pub content: Option<String>,
-    #[serde(deserialize_with = "string_struct")]
+    pub content: String,
     pub stats: Stats,
-    #[serde(alias = "codeDefinition", deserialize_with = "string_struct")]
     pub defs: CodeDefintion,
-    #[serde(alias = "sampleTestCase")]
     pub case: String,
-    #[serde(alias = "metaData", deserialize_with = "string_struct")]
     pub metadata: MetaData,
-    #[serde(alias = "enableRunCode")]
     pub test: bool,
-    #[serde(alias = "translatedContent")]
-    pub t_content: Option<String>,
+    pub t_content: String,
 }
 
 /// deps of Question
 mod question {
-    use crate::err::Error;
-    use serde::{
-        Serialize,
-        Deserialize,
-        Deserializer,
-        de::{
-            self,
-            Visitor
-        }
-    };
-    use std::{
-        fmt,
-        str::FromStr,
-        marker::PhantomData,
-    };
+    use serde::{Serialize, Deserialize};
 
     /// Code samples
     #[derive(Debug, Default, Serialize, Deserialize)]
@@ -163,33 +144,6 @@ mod question {
         pub r#return: Return,
     }
 
-    /// Deserialize CodedeFintion from str
-    impl std::str::FromStr for CodeDefintion {
-        type Err = Error;
-
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            Ok(serde_json::from_str(s)?)
-        }
-    }
-
-    /// Deserialize Stats from str
-    impl std::str::FromStr for Stats {
-        type Err = crate::err::Error;
-
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            Ok(serde_json::from_str(s)?)
-        }
-    }
-
-    /// Deserialize MetaData from str
-    impl std::str::FromStr for MetaData {
-        type Err = Error;
-
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            Ok(serde_json::from_str(s)?)
-        }
-    }
-
     /// MetaData nested fields
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct Param {
@@ -201,34 +155,5 @@ mod question {
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct Return {
         pub r#type: String
-    }
-
-    /// Master serde_json
-    pub fn string_struct<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-    where
-        T: Deserialize<'de> + FromStr<Err = Error>,
-        D: Deserializer<'de>,
-    {
-        struct StringStruct<T>(PhantomData<fn() -> T>);
-        impl<'de, T> Visitor<'de> for StringStruct<T>
-        where
-            T: Deserialize<'de> + FromStr<Err = Error>,
-        {
-            type Value = T;
-            
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("string")
-            }
-            
-            fn visit_str<E>(self, value: &str) -> Result<T, E>
-            where
-                E: de::Error,
-            {
-                Ok(FromStr::from_str(value).unwrap())
-            }
-        }
-
-        
-        deserializer.deserialize_str(StringStruct(PhantomData))
     }
 }

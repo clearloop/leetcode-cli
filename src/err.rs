@@ -1,3 +1,4 @@
+
 //! Errors in leetcode-cli
 use std::fmt;
 use std::error::Error as StdError;
@@ -10,6 +11,7 @@ pub enum Error {
     NetworkError(String),
     ParseError(String),
     CacheError(String),
+    FeatureError(String),
 }
 
 impl std::fmt::Debug for Error {
@@ -30,10 +32,14 @@ impl std::fmt::Debug for Error {
                 error!("{}, please try again", s);
                 write!(f, "{}, please try again", s)
             },
+            Error::FeatureError(s) => {
+                error!("{}", s);
+                write!(f, "{}", s)
+            }
             Error::MatchError => {
                 error!("Nothing matches");
                 write!(f, "Nothing matches")
-            }
+            },
         }
     }
 }

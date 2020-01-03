@@ -1,7 +1,7 @@
 //! mod for parse resp data
-use serde_json::Value;
 use crate::err::Error;
 use super::models::*;
+use serde_json::Value;
 
 /// problem parser
 pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
@@ -22,6 +22,7 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
             slug: stat.get("question__title_slug")?.as_str()?.to_string(),
             starred: p.get("is_favor")?.as_bool()?,
             status: p.get("status")?.as_str().unwrap_or("Null").to_string(),
+            desc: String::new(),
         });
     }
 
@@ -30,9 +31,17 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
 
 /// desc parser
 pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
-    *q = serde_json::from_str(
-        &v.as_object()?.get("data")?.as_object()?.get("question")?.to_string()
-    )?;
+    let o = &v.as_object()?.get("data")?.as_object()?.get("question")?.as_object()?;
+
+    *q = Question {
+        content: o.get("content")?.as_str().unwrap_or("").to_string(),
+        stats: serde_json::from_str(o.get("stats")?.as_str()?)?,
+        defs: serde_json::from_str(o.get("codeDefinition")?.as_str()?)?,
+        case: o.get("sampleTestCase")?.as_str()?.to_string(),
+        metadata: serde_json::from_str(o.get("metaData")?.as_str()?)?,
+        test: o.get("enableRunCode")?.as_bool()?,
+        t_content: o.get("translatedContent")?.as_str().unwrap_or("").to_string(),
+    };
 
     Ok(())
 }

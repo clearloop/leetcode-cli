@@ -63,17 +63,37 @@ impl Cache {
     }
 
     /// Get problem description
-    pub fn get_desc(&self, rfid: i32) -> Result<bool, Error> {
-        let rslug: String = problems
-            .select(slug)
+    pub fn get_desc(&self, rfid: i32) -> Result<Question, Error> {
+        let target: Problem = problems
             .filter(fid.eq(rfid))
             .first(&self.conn())?;
 
-        let mut desc = Question::default();
-        let json: Value = self.0.clone().get_question_detail(&rslug)?.json()?;
-        parser::desc(&mut desc, json)?;
+        info!("fetching {}...", &target.name);
+        if target.category != "algorithms".to_string() {
+            return Err(Error::FeatureError(
+                "Not support database and shell questions for now".to_string()
+            ));
+        }
 
-        Ok(desc)
+        if target.locked  {
+            return Err(Error::FeatureError(
+                "Not support premium question for now".to_string()
+            ));
+        }
+
+        let mut rdesc = Question::default();
+        if target.desc.len() > 0 {
+            rdesc = serde_json::from_str(&target.desc)?;
+        } else {
+            let json: Value = self.0.clone().get_question_detail(&target.slug)?.json()?;
+            parser::desc(&mut rdesc, json)?;
+
+            // update the question
+            let sdesc = serde_json::to_string(&rdesc)?;
+            diesel::update(&target).set(desc.eq(sdesc)).execute(&self.conn())?;
+        }
+
+        Ok(rdesc)
     }
     
     /// Get problems from cache

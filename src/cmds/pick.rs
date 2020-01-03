@@ -1,6 +1,7 @@
-//! Pick command
+//! Pick commandA
 use super::Command;
 // use crate::{cache::Cache, helper::Digit};
+use crate::err::Error;
 use clap::{SubCommand, App, Arg, ArgMatches};
 
 /// Abstract pick command
@@ -30,11 +31,10 @@ impl Command for PickCommand {
                   .takes_value(true)
                   .help(QUERY_HELP)
             )
-            
     }
 
     /// `pick` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error>{
+    fn handler(m: &ArgMatches) -> Result<(), Error>{
         use crate::cache::Cache;
         use rand::Rng;
         
@@ -73,7 +73,13 @@ impl Command for PickCommand {
         let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
 
         let r = cache.get_desc(problem.fid);
-        println!("{:?}", r.unwrap());
+        if r.is_err() {
+            if let Error::FeatureError(_) = r.err()? {
+                Self::handler(m)?;
+            }
+        } else {
+            println!("{:#?}", r);
+        }
 
         Ok(())
     }

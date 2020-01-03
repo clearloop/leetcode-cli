@@ -11,5 +11,6 @@ table! {
         slug -> Text,
         starred -> Bool,
         status -> Text,
+        desc -> Text,
     }
 }
