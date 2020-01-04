@@ -1,5 +1,5 @@
 # leetcode-cli
-[![doc](https://img.shields.io/badge/0.1.5-docs-green.svg)](https://docs.rs/leetcode-cli/)
+[![doc](https://img.shields.io/badge/0.1.7-docs-green.svg)](https://docs.rs/leetcode-cli/)
 [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
@@ -26,6 +26,35 @@ Please make sure you have logined in `leetcode.com` with `chrome`.
    1. btw, generate a site is easy for `lc-rs`!
 3. support local signal to keep coding as longer as you want.
 
+
+## Building
+
+```
+cargo install leetcode-cli
+```
+
+
+## Usage
+```sh
+leetcode 0.1.7
+clearloop <udtrokia@163.com>
+Leet your code in command-line.
+
+USAGE:
+    leetcode [FLAGS] [SUBCOMMAND]
+
+FLAGS:
+    -d, --debug      debug mode
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    cache    Manage Cache [aliases: c]
+    list     List problems [aliases: l]
+    pick     Pick a problem [aliases: p]
+    stat     Show simple chart about submissions [aliases: s]
+    help     Prints this message or the help of the given subcommand(s)
+```
 
 ## Example
 
@@ -73,37 +102,9 @@ leetcode submit 1
 ```
 
 
-## Building
-
-```
-cargo install leetcode-cli
-```
-
-
-## Usage
-```sh
-leetcode 0.1.6
-clearloop <udtrokia@163.com>
-Leet your code in command-line.
-
-USAGE:
-    leetcode [FLAGS] [SUBCOMMAND]
-
-FLAGS:
-    -d, --debug      debug mode
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-SUBCOMMANDS:
-    cache    Manage Cache [aliases: cc]
-    list     List problems [aliases: ls]
-    stat     Show simple chart about submissions [aliases: st]
-    help     Prints this message or the help of the given subcommand(s)
-```
-
 ## PR
 
-PR is welcome to the repo, [here][pr] it is.
+PR is welcome, [here][pr] it is.
 
 ## LICENSE
 MIT

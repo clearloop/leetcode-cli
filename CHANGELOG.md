@@ -1,5 +1,5 @@
 ## v0.1.7
-render html in command-line
+render html in command-line, and `pick` command
 
 ## v0.1.6
 complete `stat` command

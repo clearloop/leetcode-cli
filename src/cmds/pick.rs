@@ -75,6 +75,7 @@ impl Command for PickCommand {
         let r = cache.get_desc(problem.fid);
         if r.is_err() {
             let e = r.err()?;
+            eprintln!("{:?}", &e);
             if let Error::FeatureError(_) | Error::NetworkError(_) = e {
                 Self::handler(m)?;
             }

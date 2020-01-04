@@ -120,7 +120,12 @@ mod html {
                             let mut br = "-".repeat(50).dimmed().to_string();
                             br.push_str("\n\n");
                             tks.push(br);
+                        } else if s.contains("Note") {
+                            let mut br = "* ".repeat(25).dimmed().to_string();
+                            br.push_str("\n\n");
+                            tks.push(br);
                         }
+                        
                         tks.push(s.bold().to_string());
                     }
                     Token::Eof(s) => tks.push(s.normal().to_string()),
