@@ -18,16 +18,14 @@ the DEADLINE is `Sub Jan 5 23:59:59 CST 2020`.
 
 Please make sure you have logined in `leetcode.com` with `chrome`.
 
+
 ## Features
 
-What's the difference between `lc-rs` and skygragon's [leetcode-cli][sky]?
-
-**Here are three features in `lc-rs`**:
-
-1. the edit flow —— solution file will generate automatically!
+1. the edit flow —— solution files will generate automatically!
 2. doc support, `lc-rs` can compile the annotation of your solutions to markdown!
    1. btw, generate a site is easy for `lc-rs`!
 3. support local signal to keep coding as longer as you want.
+
 
 ## Example
 
@@ -42,7 +40,7 @@ lang = "rust"
 editor = "emacs"
 ```
 
-### 1. <kbd>pick</kbd> a question:
+#### 1. <kbd>pick</kbd> a question:
 
 ```
 leetcode pick 1
@@ -50,7 +48,7 @@ leetcode pick 1
 
 `lc-rs` will generate `1.two-sum.alogrithms` at `~/.leetcode/code/1.two-sum.algorithms.rs`
 
-### 2. <kbd>edit</kbd> it
+#### 2. <kbd>edit</kbd> it
 
 ```
 leetcode edit 1
@@ -73,8 +71,6 @@ leetcode test 1
 ```
 leetcode submit 1
 ```
-
-Enjoy Coding!
 
 
 ## Building

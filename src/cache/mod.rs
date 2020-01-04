@@ -69,9 +69,16 @@ impl Cache {
             .filter(fid.eq(rfid))
             .first(&self.conn())?;
 
+        let ids = match target.level {
+            1 => target.fid.to_string().green(),
+            2 => target.fid.to_string().yellow(),
+            3 => target.fid.to_string().red(),
+            _ => target.fid.to_string().dimmed(),
+        };
+        
         println!(
             "\n[{}] {} {}\n\n",
-            &target.fid.to_string().green(),
+            &ids,
             &target.name.bold().underline(),
             "is on the run...".dimmed()
         );

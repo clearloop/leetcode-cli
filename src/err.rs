@@ -17,27 +17,22 @@ impl std::fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::CacheError(s) => {
-                error!("{}, please try again", s);
-                write!(f, "{}, please try again", s)
+                write!(f, "{:?}", error!("{}, please try again", s))
             },
             Error::DownloadError(s) => {
                 write!(f, "Download {} failed, please try again", s)
             },
             Error::NetworkError(s) => {
-                error!("Network request {}, please try again", s);
-                write!(f, "Network request {}, please try again", s)
+                write!(f, "{:?}", error!("Network request {}, please try again", s))
             },
             Error::ParseError(s) => {
-                error!("{}, please try again", s);
-                write!(f, "{}, please try again", s)
+                write!(f, "{:?}", error!("{}, please try again", s))
             },
             Error::FeatureError(s) => {
-                error!("{}", s);
-                write!(f, "{}", s)
+                write!(f, "{:?}", error!("{}", s))
             }
             Error::MatchError => {
-                error!("Nothing matches");
-                write!(f, "Nothing matches")
+                write!(f, "{:?}", error!("Nothing matches"))
             },
         }
     }
