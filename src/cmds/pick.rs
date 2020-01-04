@@ -1,4 +1,4 @@
-//! Pick commandA
+//! Pick command
 use super::Command;
 // use crate::{cache::Cache, helper::Digit};
 use crate::err::Error;

@@ -16,13 +16,15 @@ pub trait Command {
     fn handler(m: &ArgMatches) -> Result<(), Error>;
 }
 
+mod data;
 mod edit;
 mod list;
 mod pick;
 mod stat;
-mod data;
+mod test;
+pub use data::DataCommand;
+pub use edit::EditCommand;
 pub use list::ListCommand;
 pub use pick::PickCommand;
 pub use stat::StatCommand;
-pub use edit::EditCommand;
-pub use data::DataCommand;
+pub use test::TestCommand;

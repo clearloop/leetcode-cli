@@ -9,6 +9,7 @@ use crate::{
         ListCommand,
         PickCommand,
         StatCommand,
+        TestCommand,
     },
     flag::{
         Flag,
@@ -29,6 +30,7 @@ pub fn main() -> Result<(), Error>{
             ListCommand::usage().display_order(3),
             PickCommand::usage().display_order(4),
             StatCommand::usage().display_order(5),
+            TestCommand::usage().display_order(6),
         ])
         .arg(Debug::usage())
         .setting(AppSettings::ArgRequiredElseHelp)
@@ -48,6 +50,7 @@ pub fn main() -> Result<(), Error>{
         ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m)?),
         ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m)?),
         ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m)?),
+        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m)?),
         _ => Err(Error::MatchError)
     }
 }

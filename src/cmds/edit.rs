@@ -28,23 +28,14 @@ impl Command for EditCommand {
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
         let target = cache.get_problem(id)?;
-        let lang = cache.0.conf.code.lang;
-        let mut path = format!(
-            "{}/{}.{}",
-            cache.0.conf.storage.code()?,
-            cache.0.conf.code.pick,
-            &crate::helper::suffix(&lang)?,
-        );
-
-        path = path.replace("${fid}", &target.fid.to_string());
-        path = path.replace("${slug}", &target.slug.to_string());
+        let path = crate::helper::code_path(&target)?;
 
         if !Path::new(&path).exists() {
             let mut f = File::create(&path)?;
             let question: Question = serde_json::from_str(&target.desc)?;
             let mut flag = false;
             for d in question.defs.0 {
-                if d.value == lang.to_string() {
+                if d.value == cache.0.conf.code.lang {
                     flag = true;
                     f.write_all(d.code.to_string().as_bytes())?;
                 }
@@ -52,7 +43,10 @@ impl Command for EditCommand {
 
             if !flag {
                 return Err(crate::Error::FeatureError(
-                    format!("This question doesn't support {}, please try another", &lang)
+                    format!(
+                        "This question doesn't support {}, please try another",
+                        &cache.0.conf.code.lang
+                    )
                 ));
             }
         }

@@ -3,14 +3,13 @@ use colored::Colorize;
 use serde::{Serialize, Deserialize};
 use super::schemas::problems;
 use crate::helper::HTML;
-pub use self::question::*;
 
 /// Problem model
 #[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
 #[table_name = "problems"]
 pub struct Problem {
     pub category: String,
-    pub fid: i32,    
+    pub fid: i32,
     pub id: i32,
     pub level: i32,
     pub locked: bool,
@@ -111,6 +110,8 @@ impl std::fmt::Display for Question {
     }
 }
 
+
+use question::*;
 /// deps of Question
 mod question {
     use serde::{Serialize, Deserialize};
@@ -162,5 +163,105 @@ mod question {
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct Return {
         pub r#type: String
+    }
+}
+
+
+/// run_code Result
+#[derive(Debug, Deserialize)]
+pub struct RunCode {
+    pub interpret_id: String,
+    pub test_case: String
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub struct VerifyReslut {
+    pub state: String,
+    #[serde(default)]
+    lang: String,
+    #[serde(default)]
+    pretty_lang: String,
+    #[serde(default)]
+    submission_id: String,
+    #[serde(default)]
+    run_success: bool,
+    #[serde(default)]
+    correct_answer: bool,
+
+    // flatten
+    #[serde(flatten, default)]
+    error: CompileError,
+    #[serde(flatten, default)]
+    status: VerifyStatus,
+    #[serde(flatten, default)]
+    expected: Expected,
+
+    // info
+    #[serde(default)]
+    memory: i64,
+    #[serde(default)]
+    code_answer: Vec<String>,
+    #[serde(default)]
+    code_output: Vec<String>,
+    #[serde(default)]
+    elapsed_time: i64,
+    #[serde(default)]
+    task_finish_time: i64,
+
+    // analyze
+    #[serde(default)]
+    total_correct: Option<String>,
+    #[serde(default)]
+    total_testcases: Option<String>,
+    #[serde(default)]
+    runtime_percentile: Option<String>,
+    #[serde(default)]
+    memory_percentile: Option<String>,
+}
+
+use verify::*;
+mod verify {
+    use serde::Deserialize;
+
+    #[derive(Debug, Default, Deserialize)]
+    pub struct VerifyStatus {
+        #[serde(default)]
+        status_msg: String,
+        #[serde(default)]
+        status_code: i32,
+        #[serde(default)]
+        status_memory: String,
+        #[serde(default)]
+        status_runtime: String,
+    }
+    
+    #[derive(Debug, Default, Deserialize)]
+    pub struct CompileError {
+        #[serde(default)]
+        compile_error: String,
+        #[serde(default)]
+        full_compile_error: String,
+    }
+    
+    #[derive(Debug, Default, Deserialize)]
+    pub struct Expected {
+        #[serde(default)]
+        expected_status_code: i32,
+        #[serde(default)]
+        expected_lang: String,
+        #[serde(default)]
+        expected_run_success: bool,
+        #[serde(default)]
+        expected_status_runtime: String,
+        #[serde(default)]
+        expected_memory: i64,
+        #[serde(default)]
+        expected_code_answer: Vec<String>,
+        #[serde(default)]
+        expected_code_output: Vec<String>,
+        #[serde(default)]
+        expected_elapsed_time: i64,
+        #[serde(default)]
+        expected_task_finish_time: i64,
     }
 }

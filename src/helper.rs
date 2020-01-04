@@ -1,4 +1,5 @@
 //! A set of helper traits
+pub use self::file::code_path;
 pub use self::digit::Digit;
 pub use self::html::HTML;
 pub use self::filter::filter;
@@ -170,34 +171,46 @@ mod html {
     }
 }
 
-pub fn open_or_create(p: &'static str) -> Result<std::fs::File, crate::Error> {
-    use std::fs::File;
-    if std::path::Path::new(p).exists() {
-        Ok(File::open(p)?)
-    } else {
-        Ok(File::create(p)?)
+mod file {
+    /// convert file suffix from language type
+    pub fn suffix(l: &str) -> Result<&'static str, crate::Error> {
+        match l {
+            "bash" => Ok("sh"),
+            "c" => Ok("c"),
+            "cpp" => Ok("c"),
+            "csharp" => Ok("c"),
+            "golang" => Ok("go"),
+            "java" => Ok("java"),
+            "javascript" => Ok("js"),
+            "kotlin" => Ok("kt"),
+            "mysql" => Ok("sql"),
+            "php" => Ok("php"),
+            "python" => Ok("py"),
+            "python3" => Ok("py"),
+            "ruby" => Ok("rb"),
+            "rust" => Ok("rs"),
+            "scala" => Ok("scala"),
+            "swift" => Ok("swift"),
+            _ => Ok("c")
+        }    
     }
-}
 
+    /// generate code path by fid
+    use crate::cache::models::Problem;
+    pub fn code_path(target: &Problem) -> Result<String, crate::Error> {
+        let conf = crate::cfg::locate();
+        
+        let lang = conf.code.lang;
+        let mut path = format!(
+            "{}/{}.{}",
+            conf.storage.code()?,
+            conf.code.pick,
+            suffix(&lang)?,
+        );
 
-pub fn suffix(l: &str) -> Result<&'static str, crate::Error> {
-    match l {
-        "bash" => Ok("sh"),
-        "c" => Ok("c"),
-        "cpp" => Ok("c"),
-        "csharp" => Ok("c"),
-        "golang" => Ok("go"),
-        "java" => Ok("java"),
-        "javascript" => Ok("js"),
-        "kotlin" => Ok("kt"),
-        "mysql" => Ok("sql"),
-        "php" => Ok("php"),
-        "python" => Ok("py"),
-        "python3" => Ok("py"),
-        "ruby" => Ok("rb"),
-        "rust" => Ok("rs"),
-        "scala" => Ok("scala"),
-        "swift" => Ok("swift"),
-        _ => Ok("c")
-    }    
+        path = path.replace("${fid}", &target.fid.to_string());
+        path = path.replace("${slug}", &target.slug.to_string());
+
+        Ok(path)
+    }
 }

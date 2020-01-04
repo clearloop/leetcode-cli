@@ -1,15 +1,16 @@
-//! Save OAbad network\'s ass.
+//! Save OAbad network\'OAs ass.
 mod sql;
 pub mod parser;
 pub mod models;
 pub mod schemas;
-use self::models::*;
-use self::schemas::problems::dsl::*;
-use self::sql::*;
-use crate::{cfg, err::Error, plugins::LeetCode};
 use diesel::prelude::*;
 use serde_json::Value;
 use colored::Colorize;
+use std::collections::HashMap;
+use self::sql::*;
+use self::models::*;
+use self::schemas::problems::dsl::*;
+use crate::{cfg, err::Error, plugins::LeetCode};
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
@@ -20,6 +21,11 @@ pub fn conn(p: String) -> SqliteConnection {
 /// req if data not download
 #[derive(Clone)]
 pub struct Cache(pub LeetCode);
+
+enum Run {
+    Test,
+    Submit,
+}
 
 impl Cache {
     /// ref to sqliteconnection
@@ -81,6 +87,13 @@ impl Cache {
 
         Ok(p)
     }
+
+    /// Get problems from cache
+    ///
+    /// if cache doesn't exist, request a new copy
+    pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
+        Ok(problems.load::<Problem>(&self.conn())?)
+    }
     
     /// Get question
     pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
@@ -127,12 +140,84 @@ impl Cache {
 
         Ok(rdesc)
     }
+
+
+    /// run_code data
+    fn pre_run_code(&self, run: Run, rfid: i32) ->
+        Result<(HashMap<&'static str, String>, [String; 2]), Error>
+    {
+        use std::fs::File;
+        use std::io::Read;
+        use crate::helper::code_path;
+
+        let p = &self.get_problem(rfid)?;
+        let d: Question = serde_json::from_str(&p.desc)?;
+        let conf = &self.0.conf;
+        let mut json: HashMap<&'static str, String> = HashMap::new();
+        let mut code: String = "".to_string();
+        
+        File::open(code_path(&p)?)?.read_to_string(&mut code)?;
+        
+        json.insert("lang", conf.code.lang.to_string());
+        json.insert("question_id", p.id.to_string());
+        json.insert("test_mode", false.to_string());
+        json.insert("typed_code", code);
+        json.insert("data_input", d.case.to_string());
+
+        let url = match run {
+            Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),
+            Run::Submit => conf.sys.urls.get("submit")?.replace("$slug", &p.slug),
+        };
+        
+        Ok((
+            json,
+            [
+                url,
+                conf.sys.urls.get("problems")?.replace("$slug", &p.slug),
+            ]
+        ))
+    }
+
+    fn recur_verify(&self, rid: String) -> Result<VerifyReslut, Error> {
+        use std::time::Duration;
+        let mut res: VerifyReslut = self.clone().0.verify_result(rid.clone())?.json()?;
+
+        // res = match res.state.as_str() {
+        //     "" => self.recur_verify(rid)?,
+        //     "PENDING" => self.recur_verify(rid)?,
+        //     "STARTED" => self.recur_verify(rid)?,
+        //     _ => res
+        // };
+
+        while res.state != "SUCCESS" {
+            std::thread::sleep(Duration::from_micros(3000));
+            let tmp = self.clone().0.verify_result(rid.clone())?.text()?;
+            let j: Result<VerifyReslut, serde_json::Error> = serde_json::from_str(&tmp);
+
+            if j.is_err() {
+                println!("{:?}", tmp);
+            } else {
+                res = j.unwrap();
+            }
+        }
+
+        Ok(res)
+    }
     
-    /// Get problems from cache
-    ///
-    /// if cache doesn't exist, request a new copy
-    pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
-        Ok(problems.load::<Problem>(&self.conn())?)
+    /// test problem
+    pub fn test_problem(&self, rfid: i32) -> Result<(), Error> {
+        let pre = self.pre_run_code(Run::Test, rfid)?;
+        let json = pre.0;
+        let run_res: RunCode = self.0.clone().run_code(
+            json,
+            pre.1[0].clone(),
+            pre.1[1].clone()
+        )?.json()?;
+
+        let verify_res = self.recur_verify(run_res.interpret_id);
+        println!("{:?}", verify_res);
+        // println!("res: {:?}", verify_res);
+        Ok(())
     }
 
     /// New cache
