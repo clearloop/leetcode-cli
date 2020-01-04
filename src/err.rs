@@ -15,24 +15,26 @@ pub enum Error {
 
 impl std::fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use colored::Colorize;
+        let e = "error:".bold().red();
         match self {
             Error::CacheError(s) => {
-                write!(f, "{:?}", error!("{}, please try again", s))
+                write!(f, "{} {}, please try again", e, s)
             },
             Error::DownloadError(s) => {
-                write!(f, "Download {} failed, please try again", s)
+                write!(f, "{} Download {} failed, please try again", e, s)
             },
             Error::NetworkError(s) => {
-                write!(f, "{:?}", error!("Network request {}, please try again", s))
+                write!(f, "{} Network request {}, please try again", e, s)
             },
             Error::ParseError(s) => {
-                write!(f, "{:?}", error!("{}, please try again", s))
+                write!(f, "{} {}, please try again", e, s)
             },
             Error::FeatureError(s) => {
-                write!(f, "{:?}", error!("{}", s))
+                write!(f, "{} {}", e, s)
             }
             Error::MatchError => {
-                write!(f, "{:?}", error!("Nothing matches"))
+                write!(f, "{} Nothing matches", e)
             },
         }
     }
@@ -45,6 +47,12 @@ impl std::convert::From<reqwest::Error> for Error {
     }
 }
 
+impl std::convert::From<std::num::ParseIntError> for Error {
+    fn from(err: std::num::ParseIntError) -> Self {
+        Error::ParseError(err.description().to_string())
+    }
+}
+
 // sql
 impl std::convert::From<diesel::result::Error> for Error {
     fn from(err: diesel::result::Error) -> Self {
@@ -52,6 +60,7 @@ impl std::convert::From<diesel::result::Error> for Error {
     }
 }
 
+// serde
 impl std::convert::From<serde_json::error::Error> for Error {
     fn from(err: serde_json::Error) -> Self {
         Error::ParseError(err.description().to_string())

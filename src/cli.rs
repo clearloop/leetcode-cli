@@ -1,12 +1,14 @@
+
 //! Clap commander
 use clap::{App, AppSettings};
 use crate::{
     cmds::{
         Command,
+        DataCommand,
+        EditCommand,
         ListCommand,
         PickCommand,
         StatCommand,
-        CacheCommand,
     },
     flag::{
         Flag,
@@ -22,10 +24,11 @@ pub fn main() -> Result<(), Error>{
         .version("0.1.7")
         .about("Leet your code in command-line.")
         .subcommands(vec![
-            CacheCommand::usage().display_order(1),
-            ListCommand::usage().display_order(2),
-            PickCommand::usage().display_order(3),
-            StatCommand::usage().display_order(4),
+            DataCommand::usage().display_order(1),
+            EditCommand::usage().display_order(2),
+            ListCommand::usage().display_order(3),
+            PickCommand::usage().display_order(4),
+            StatCommand::usage().display_order(5),
         ])
         .arg(Debug::usage())
         .setting(AppSettings::ArgRequiredElseHelp)
@@ -40,10 +43,11 @@ pub fn main() -> Result<(), Error>{
     }
 
     match m.subcommand() {
+        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m)?),
+        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m)?),
         ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m)?),
         ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m)?),
         ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m)?),
-        ("cache", Some(sub_m)) => Ok(CacheCommand::handler(sub_m)?),
         _ => Err(Error::MatchError)
     }
 }

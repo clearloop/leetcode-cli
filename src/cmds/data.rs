@@ -4,7 +4,7 @@ use crate::{cache::Cache, helper::Digit};
 use colored::Colorize;
 use clap::{SubCommand, App, Arg, ArgMatches};
 
-/// Abstract `cache` command in `leetcode-cli`.
+/// Abstract `data` command in `leetcode-cli`.
 ///
 /// ## Handler
 /// + update cache
@@ -15,14 +15,14 @@ use clap::{SubCommand, App, Arg, ArgMatches};
 /// + cache -> Problems db
 /// + code -> code storage dir
 /// + root -> root path of `leetcode-cli`
-pub struct CacheCommand;
+pub struct DataCommand;
 
-impl Command for CacheCommand {
-    /// `cache` command usage
+impl Command for DataCommand {
+    /// `data` command usage
     fn usage<'a, 'cache>() -> App<'a, 'cache> {
-        SubCommand::with_name("cache")
+        SubCommand::with_name("data")
             .about("Manage Cache")
-            .visible_alias("c")
+            .visible_alias("d")
             .arg(Arg::with_name("delete")
                  .display_order(1)
                  .short("d")
@@ -37,7 +37,7 @@ impl Command for CacheCommand {
             )
     }
 
-    /// `cache` handler
+    /// `data` handler
     fn handler(m: &ArgMatches) -> Result<(), crate::err::Error>{
         use std::fs::File;
         use std::path::Path;

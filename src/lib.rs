@@ -118,14 +118,19 @@ extern crate log;
 #[macro_use]
 extern crate diesel;
 
-mod err;
-pub mod cache;
+/// show docs
 pub mod cfg;
-pub mod cli;
+pub mod err;
 pub mod cmds;
 pub mod flag;
+pub mod cache;
 pub mod helper;
 pub mod plugins;
+/// really pub
+pub mod cli;
 
 /// re-exports
+pub use cfg::Config;
 pub use err::Error;
+pub use cache::Cache;
+

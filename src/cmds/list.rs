@@ -119,23 +119,7 @@ impl Command for ListCommand {
         // filter query
         if m.is_present("query") {
             let query = m.value_of("query").unwrap();
-            for p in query.chars() {
-                match p {
-                    'l' => ps.retain(|x| x.locked),
-                    'L' => ps.retain(|x| !x.locked),
-                    's' => ps.retain(|x| x.starred),
-                    'S' => ps.retain(|x| !x.starred),
-                    'e' => ps.retain(|x| x.level == 1),
-                    'E' => ps.retain(|x| x.level != 1),
-                    'm' => ps.retain(|x| x.level == 2),
-                    'M' => ps.retain(|x| x.level != 2),
-                    'h' => ps.retain(|x| x.level == 3),
-                    'H' => ps.retain(|x| x.level != 3),
-                    'd' => ps.retain(|x| x.status == "ac".to_string()),
-                    'D' => ps.retain(|x| x.status != "ac".to_string()),
-                    _ => {}
-                }
-            }
+            crate::helper::filter(&mut ps, query.to_string());
         }
         
         

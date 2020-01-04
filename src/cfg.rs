@@ -147,12 +147,14 @@ impl Storage {
     }
 
     /// get cache path
-    pub fn code(&self) -> String {
+    pub fn code(&self) -> Result<String, crate::Error> {
         let root = &self.root();
-        PathBuf::from(root)
-            .join(&self.code)
-            .to_string_lossy()
-            .to_string()
+        let p = PathBuf::from(root).join(&self.code);
+        if !PathBuf::from(&p).exists() {
+            std::fs::create_dir(&p)?
+        }
+        
+        Ok(p.to_string_lossy().to_string())
     }
 }
 

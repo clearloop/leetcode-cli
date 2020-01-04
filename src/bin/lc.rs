@@ -1,5 +1,8 @@
 use leetcode_cli::cli;
 
 fn main() {
-    cli::main().expect("runtime error");
+    let r = cli::main();
+    if r.is_err() {
+        println!("{:?}", r.err().expect("This won't happend."));
+    }
 }

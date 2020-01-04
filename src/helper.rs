@@ -1,6 +1,7 @@
 //! A set of helper traits
 pub use self::digit::Digit;
 pub use self::html::HTML;
+pub use self::filter::filter;
 
 /// Convert i32 to specific digits string.
 mod digit {
@@ -36,6 +37,38 @@ mod digit {
             s.push_str(&space);
 
             s
+        }
+    }
+}
+
+/// question filter tool
+mod filter {
+    use crate::cache::models::Problem;
+    ///     -q, --query <query>          Fliter questions by conditions:
+    ///                                  Uppercase means negative
+    ///                                  e = easy     E = m+h
+    ///                                  m = medium   M = e+h
+    ///                                  h = hard     H = e+m
+    ///                                  d = done     D = not done
+    ///                                  l = locked   L = not locked
+    ///                                  s = starred  S = not starred
+    pub fn filter(ps: &mut Vec<Problem>, query: String) {
+        for p in query.chars() {
+            match p {
+                'l' => ps.retain(|x| x.locked),
+                'L' => ps.retain(|x| !x.locked),
+                's' => ps.retain(|x| x.starred),
+                'S' => ps.retain(|x| !x.starred),
+                'e' => ps.retain(|x| x.level == 1),
+                'E' => ps.retain(|x| x.level != 1),
+                'm' => ps.retain(|x| x.level == 2),
+                'M' => ps.retain(|x| x.level != 2),
+                'h' => ps.retain(|x| x.level == 3),
+                'H' => ps.retain(|x| x.level != 3),
+                'd' => ps.retain(|x| x.status == "ac".to_string()),
+                'D' => ps.retain(|x| x.status != "ac".to_string()),
+                _ => {}
+            }
         }
     }
 }
@@ -135,4 +168,36 @@ mod html {
             tks.join("")
         }
     }
+}
+
+pub fn open_or_create(p: &'static str) -> Result<std::fs::File, crate::Error> {
+    use std::fs::File;
+    if std::path::Path::new(p).exists() {
+        Ok(File::open(p)?)
+    } else {
+        Ok(File::create(p)?)
+    }
+}
+
+
+pub fn suffix(l: &str) -> Result<&'static str, crate::Error> {
+    match l {
+        "bash" => Ok("sh"),
+        "c" => Ok("c"),
+        "cpp" => Ok("c"),
+        "csharp" => Ok("c"),
+        "golang" => Ok("go"),
+        "java" => Ok("java"),
+        "javascript" => Ok("js"),
+        "kotlin" => Ok("kt"),
+        "mysql" => Ok("sql"),
+        "php" => Ok("php"),
+        "python" => Ok("py"),
+        "python3" => Ok("py"),
+        "ruby" => Ok("rb"),
+        "rust" => Ok("rs"),
+        "scala" => Ok("scala"),
+        "swift" => Ok("swift"),
+        _ => Ok("c")
+    }    
 }

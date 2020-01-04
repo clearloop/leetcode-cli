@@ -1,6 +1,6 @@
-//! Save bad network\'s ass.
-mod parser;
+//! Save OAbad network\'s ass.
 mod sql;
+pub mod parser;
 pub mod models;
 pub mod schemas;
 use self::models::*;
@@ -63,8 +63,27 @@ impl Cache {
         Ok(ps)
     }
 
-    /// Get problem description
-    pub fn get_desc(&self, rfid: i32) -> Result<Question, Error> {
+
+    /// Get problem
+    pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
+        let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn())?;
+        if p.category != "algorithms".to_string() {
+            return Err(Error::FeatureError(
+                "Not support database and shell questions for now".to_string()
+            ));
+        }
+
+        if p.locked  {
+            return Err(Error::FeatureError(
+                "Not support premium question for now".to_string()
+            ));
+        }
+
+        Ok(p)
+    }
+    
+    /// Get question
+    pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
         let target: Problem = problems
             .filter(fid.eq(rfid))
             .first(&self.conn())?;

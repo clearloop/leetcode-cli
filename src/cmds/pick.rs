@@ -72,7 +72,7 @@ impl Command for PickCommand {
 
         let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
 
-        let r = cache.get_desc(problem.fid);
+        let r = cache.get_question(problem.fid);
         if r.is_err() {
             let e = r.err()?;
             eprintln!("{:?}", &e);

@@ -4,16 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-## Not Available for Now
-
-If you need to, keep time on me...expect to launch at v0.3.0.
-
-and,
-
-the DEADLINE is `Sub Jan 5 23:59:59 CST 2020`.
-
-
-## Note
+## Note - Not Available for Now
 > (only support OSX temporarily)
 
 Please make sure you have logined in `leetcode.com` with `chrome`.
