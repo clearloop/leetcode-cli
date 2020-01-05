@@ -1,20 +1,24 @@
-//! cache managger
+//! Cache managger
 use super::Command;
 use crate::{cache::Cache, helper::Digit};
 use colored::Colorize;
 use clap::{SubCommand, App, Arg, ArgMatches};
 
-/// Abstract `data` command in `leetcode-cli`.
+/// Abstract `data` command
 ///
-/// ## Handler
-/// + update cache
-/// + delete cache
-/// + show the location of cache.
-///
-/// ## Storage Config
-/// + cache -> Problems db
-/// + code -> code storage dir
-/// + root -> root path of `leetcode-cli`
+/// ```sh
+/// leetcode-data 
+/// Manage Cache
+/// 
+/// USAGE:
+///     leetcode data [FLAGS]
+/// 
+/// FLAGS:
+///     -d, --delete     Delete cache
+///     -u, --update     Update cache
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// ```
 pub struct DataCommand;
 
 impl Command for DataCommand {

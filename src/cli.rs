@@ -18,11 +18,11 @@ use crate::{
     err::Error,
 };
 
-/// get maches
+/// Get maches
 pub fn main() -> Result<(), Error>{
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.1.9")
+        .version("0.2.0")
         .about("Here's to the crazy ones 👻")
         .subcommands(vec![
             DataCommand::usage().display_order(1),

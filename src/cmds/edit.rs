@@ -1,7 +1,23 @@
-//! edit command
+//! Edit command
 use super::Command;
 use clap::{App, ArgMatches};
 
+/// Abstract `edit` command
+///
+/// ```sh
+/// leetcode-edit 
+/// Edit question by id
+/// 
+/// USAGE:
+///     leetcode edit <id>
+/// 
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// 
+/// ARGS:
+///     <id>    question id
+/// ```
 pub struct EditCommand;
 
 impl Command for EditCommand {

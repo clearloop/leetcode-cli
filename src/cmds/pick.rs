@@ -5,6 +5,31 @@ use crate::err::Error;
 use clap::{SubCommand, App, Arg, ArgMatches};
 
 /// Abstract pick command
+///
+/// ```sh
+/// leetcode-pick 
+/// Pick a problem
+/// 
+/// USAGE:
+///     leetcode pick [OPTIONS] [id]
+/// 
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// 
+/// OPTIONS:
+///     -q, --query <query>    Fliter questions by conditions:
+///                            Uppercase means negative
+///                            e = easy     E = m+h
+///                            m = medium   M = e+h
+///                            h = hard     H = e+m
+///                            d = done     D = not done
+///                            l = locked   L = not locked
+///                            s = starred  S = not starred
+/// 
+/// ARGS:
+///     <id>    Problem id
+/// ```
 pub struct PickCommand;
 
 static QUERY_HELP: &'static str = r#"Fliter questions by conditions:

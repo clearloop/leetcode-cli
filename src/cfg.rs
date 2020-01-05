@@ -1,9 +1,9 @@
 //! Soft-link with `config.toml`
 //!
-//! leetcode-cli will generate a `config.toml` by default,
+//! leetcode-cli will generate a `leetcode.toml` by default,
 //! if you wanna change to it, you can:
 //! 
-//! + Edit config.toml at `~/.leetcode/config.toml` directly
+//! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
 //! + Use `leetcode config` to update it
 use toml;
 use std::{fs, collections::HashMap, path::PathBuf};
@@ -64,7 +64,7 @@ code = "code"
 root = "~/.leetcode"
 "#;
 
-/// sync with `~/.leetcode/config.toml`
+/// Sync with `~/.leetcode/config.toml`
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub sys: Sys,
@@ -119,7 +119,7 @@ pub struct Code {
     pub submission: String
 }
 
-/// storage
+/// Locate code files
 ///
 /// + cache -> the path to cache
 #[derive(Clone, Debug, Deserialize, Serialize)]

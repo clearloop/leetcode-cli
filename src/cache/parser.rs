@@ -1,4 +1,4 @@
-//! mod for parse resp data
+//! Sub-Module for parsing resp data
 use crate::err::Error;
 use super::models::*;
 use serde_json::Value;

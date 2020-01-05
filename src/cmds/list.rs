@@ -36,7 +36,7 @@
 use super::Command;
 use crate::{cache::Cache, helper::Digit, err::Error};
 use clap::{SubCommand, App, Arg, ArgMatches};
-/// Abstract `list` command in `leetcode-cli`.
+/// Abstract `list` command
 ///
 /// ## handler
 /// + try to request cache

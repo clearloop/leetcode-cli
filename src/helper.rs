@@ -42,9 +42,12 @@ mod digit {
     }
 }
 
-/// question filter tool
+/// Question filter tool
 mod filter {
     use crate::cache::models::Problem;
+    /// Abstract query filter
+    /// 
+    /// ```sh
     ///     -q, --query <query>          Fliter questions by conditions:
     ///                                  Uppercase means negative
     ///                                  e = easy     E = m+h
@@ -53,6 +56,7 @@ mod filter {
     ///                                  d = done     D = not done
     ///                                  l = locked   L = not locked
     ///                                  s = starred  S = not starred
+    /// ```
     pub fn filter(ps: &mut Vec<Problem>, query: String) {
         for p in query.chars() {
             match p {
@@ -84,7 +88,7 @@ mod html {
         Eof(String)
     }
 
-    /// html render plugin
+    /// Html render plugin
     pub trait HTML {
         fn ser(&self) -> Vec<Token>;
         fn render(&self) -> String;
@@ -172,7 +176,7 @@ mod html {
 }
 
 mod file {
-    /// convert file suffix from language type
+    /// Convert file suffix from language type
     pub fn suffix(l: &str) -> Result<&'static str, crate::Error> {
         match l {
             "bash" => Ok("sh"),
@@ -196,7 +200,7 @@ mod file {
     }
 
     use crate::cache::models::Problem;
-    /// generate code path by fid
+    /// Generate code path by fid
     pub fn code_path(target: &Problem) -> Result<String, crate::Error> {
         let conf = crate::cfg::locate();
         

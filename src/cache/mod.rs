@@ -25,12 +25,12 @@ pub enum Run {
     Submit,
 }
 
-/// req if data not download
+/// Requests if data not download
 #[derive(Clone)]
 pub struct Cache(pub LeetCode);
 
 impl Cache {
-    /// ref to sqliteconnection
+    /// Ref to sqliteconnection
     fn conn(&self) -> SqliteConnection {
         conn(self.0.conf.storage.cache())
     }

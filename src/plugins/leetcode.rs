@@ -22,7 +22,7 @@ use reqwest::{
     }
 };
 
-/// Leet API set
+/// LeetCode API set
 #[derive(Clone)]
 pub struct LeetCode {
     pub conf: Config,
@@ -127,7 +127,7 @@ impl LeetCode {
         }.send(&self.client)
     }
 
-    /// test problem
+    /// Send code to judge
     pub fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
         info!("Sending code to leetcode.com...");
         Req {
@@ -141,6 +141,7 @@ impl LeetCode {
         }.send(&self.client)
     }
 
+    /// Get the result of submission / testing
     pub fn verify_result(self, id: String) -> Result<Response, Error> {
         let url = self.conf.sys.urls.get("verify")?.replace("$id", &id);
         Req {

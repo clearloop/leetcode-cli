@@ -1,8 +1,23 @@
-//! exec command
+//! Exec command
 use super::Command;
 use clap::{App, ArgMatches};
 
-/// Exec Command
+/// Abstract Exec Command
+///
+/// ```sh
+/// leetcode-exec 
+/// Submit solution
+/// 
+/// USAGE:
+///     leetcode exec <id>
+/// 
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// 
+/// ARGS:
+///     <id>    question id
+/// ```
 pub struct ExecCommand;
 
 impl Command for ExecCommand {

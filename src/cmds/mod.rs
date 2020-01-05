@@ -12,7 +12,7 @@
 //! ```
 use clap::{App, ArgMatches};
 use crate::err::Error;
-/// Abstract commands' traits.
+/// Abstract commands' trait.
 pub trait Command {
     /// Usage of the spefic command
     fn usage<'a, 'c>() -> App<'a, 'c>;

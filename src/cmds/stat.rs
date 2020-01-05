@@ -4,6 +4,18 @@ use colored::Colorize;
 use clap::{SubCommand, App, ArgMatches};
 
 /// Abstract statues command
+///
+/// ```sh
+/// leetcode-stat 
+/// Show simple chart about submissions
+/// 
+/// USAGE:
+///     leetcode stat
+/// 
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// ```
 pub struct StatCommand;
 
 impl Command for StatCommand {

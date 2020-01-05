@@ -54,16 +54,8 @@ pub fn cookies() -> Ident {
     let home = dirs::home_dir().unwrap();
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
-        "windows" => {
-            let mut appd = std::path::PathBuf::new();
-            let dir = app_dirs::get_data_root(app_dirs::AppDataType::SharedData);
-            if dir.is_ok() {
-                appd = dir.unwrap();
-            }
-            
-            appd.join("../Local/Google/Chrome/User Data/Default/Cookies")
-        },
-        _ => home.join(".config/google-chrome/Default/Cookies"),
+        "linux" => home.join(".config/google-chrome/Default/Cookies"),
+        _ => panic!("Opps...only works on OSX or Linux now...")
     };
     
     let conn = cache::conn(p.to_string_lossy().to_string());
@@ -98,14 +90,27 @@ pub fn cookies() -> Ident {
 /// Decode cookies from chrome
 fn decode_cookies(pass: &str, v: Vec<u8>) -> String {
     let mut key = [0_u8; 16];
-    pkcs5::pbkdf2_hmac(
-        pass.as_bytes(),
-        b"saltysalt",
-        1003,
-        hash::MessageDigest::sha1(),
-        &mut key
-    ).expect("pbkdf2 hmac went error.");
-    
+    match std::env::consts::OS {
+        "macos" => {
+            pkcs5::pbkdf2_hmac(
+                pass.as_bytes(),
+                b"saltysalt",
+                1003,
+                hash::MessageDigest::sha1(),
+                &mut key
+            ).expect("pbkdf2 hmac went error.");
+        },
+        "linux" => {
+            pkcs5::pbkdf2_hmac(
+                b"peanuts",
+                b"saltysalt",
+                1,
+                hash::MessageDigest::sha1(),
+                &mut key
+            ).expect("pbkdf2 hmac went error.");
+        },
+        _ => panic!("Opps...only works on OSX or Linux now...")
+    }
     chrome_decrypt(v, key)
 }
 

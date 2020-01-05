@@ -3,12 +3,11 @@
 //! [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
-//! 
-//! ## Note - Not Available for Now
-//! > (only support OSX temporarily) [#1][#1]
+//!
+//! ## Note
 //! 
 //! Please make sure you have logined in `leetcode.com` with `chrome`.
-//! 
+//!
 //! 
 //! ## Features
 //! 
@@ -27,7 +26,7 @@
 //! 
 //! ## Usage
 //! ```sh
-//! leetcode 0.1.9
+//! leetcode 0.2.0
 //! clearloop <udtrokia@163.com>
 //! Here's to the crazy ones 👻
 //! 
@@ -163,7 +162,7 @@ extern crate log;
 #[macro_use]
 extern crate diesel;
 
-/// show docs
+// show docs
 pub mod cfg;
 pub mod err;
 pub mod cmds;
@@ -171,11 +170,10 @@ pub mod flag;
 pub mod cache;
 pub mod helper;
 pub mod plugins;
-/// really pub
+// really pub
 pub mod cli;
 
-/// re-exports
+// re-exports
 pub use cfg::Config;
 pub use err::Error;
 pub use cache::Cache;
-

@@ -10,7 +10,7 @@ use clap::Arg;
 use env_logger::Env;
 use crate::err::Error;
 
-/// abstract flag traits
+/// Abstract flag trait
 pub trait Flag {
     fn usage<'a, 'f>() -> Arg<'a, 'f>;
     fn handler() -> Result<(), Error>;

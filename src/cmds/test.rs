@@ -1,8 +1,23 @@
-//! test command
+//! Test command
 use super::Command;
 use clap::{App, ArgMatches};
 
-//// Test Command
+/// Abstract Test Command
+///
+/// ```sh
+/// leetcode-test 
+/// Edit question by id
+/// 
+/// USAGE:
+///     leetcode test <id>
+/// 
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+/// 
+/// ARGS:
+///     <id>    question id
+/// ```
 pub struct TestCommand;
 
 impl Command for TestCommand {

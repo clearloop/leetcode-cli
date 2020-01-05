@@ -1,3 +1,6 @@
+## v0.2.0
+1. Add Linux Support
+
 ## v0.1.9
 1. release submit command
 2. deserialize json using outter funcs
