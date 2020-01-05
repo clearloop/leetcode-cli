@@ -36,7 +36,7 @@
 //! 
 //! ## Usage
 //! ```sh
-//! leetcode 0.1.7
+//! leetcode 0.1.8
 //! clearloop <udtrokia@163.com>
 //! Leet your code in command-line.
 //! 
@@ -49,11 +49,13 @@
 //!     -V, --version    Prints version information
 //! 
 //! SUBCOMMANDS:
-//!     cache    Manage Cache [aliases: c]
-//!     list     List problems [aliases: l]
-//!     pick     Pick a problem [aliases: p]
-//!     stat     Show simple chart about submissions [aliases: s]
-//!     help     Prints this message or the help of the given subcommand(s)
+//!     data    Manage Cache [aliases: d]
+//!     edit    Edit question by id [aliases: e]
+//!     list    List problems [aliases: l]
+//!     pick    Pick a problem [aliases: p]
+//!     stat    Show simple chart about submissions [aliases: s]
+//!     test    Edit question by id [aliases: t]
+//!     help    Prints this message or the help of the given subcommand(s)
 //! ```
 //! 
 //! ## Example

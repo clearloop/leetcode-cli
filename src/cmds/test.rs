@@ -24,11 +24,9 @@ impl Command for TestCommand {
 
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
-        let res = cache.test_problem(id);
-        if res.is_err() {
-            return Err(res.err()?);
-        }
+        let res = cache.test_problem(id)?;
 
+        println!("{}", res);
         Ok(())
     }
 }

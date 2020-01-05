@@ -2,8 +2,13 @@
 //! 
 //! ```sh
 //! SUBCOMMANDS:
+//!     data    Manage Cache [aliases: d]
+//!     edit    Edit question by id [aliases: e]
+//!     list    List problems [aliases: l]
+//!     pick    Pick a problem [aliases: p]
+//!     stat    Show simple chart about submissions [aliases: s]
+//!     test    Edit question by id [aliases: t]
 //!     help    Prints this message or the help of the given subcommand(s)
-//!     list    List problems
 //! ```
 use clap::{App, ArgMatches};
 use crate::err::Error;

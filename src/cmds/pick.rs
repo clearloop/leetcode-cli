@@ -47,23 +47,7 @@ impl Command for PickCommand {
 
         if m.is_present("query") {
             let query = m.value_of("query")?;
-            for p in query.chars() {
-                match p {
-                    'l' => problems.retain(|x| x.locked),
-                    'L' => problems.retain(|x| !x.locked),
-                    's' => problems.retain(|x| x.starred),
-                    'S' => problems.retain(|x| !x.starred),
-                    'e' => problems.retain(|x| x.level == 1),
-                    'E' => problems.retain(|x| x.level != 1),
-                    'm' => problems.retain(|x| x.level == 2),
-                    'M' => problems.retain(|x| x.level != 2),
-                    'h' => problems.retain(|x| x.level == 3),
-                    'H' => problems.retain(|x| x.level != 3),
-                    'd' => problems.retain(|x| x.status == "ac".to_string()),
-                    'D' => problems.retain(|x| x.status != "ac".to_string()),
-                    _ => {}
-                }
-            }
+            crate::helper::filter(&mut problems, query.to_string());
         }
 
         if let Some(id) =  m.value_of("id") {

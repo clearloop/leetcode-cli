@@ -142,7 +142,6 @@ impl LeetCode {
     }
 
     pub fn verify_result(self, id: String) -> Result<Response, Error> {
-        info!("verify result from leetcode.com...");
         let url = self.conf.sys.urls.get("verify")?.replace("$id", &id);
         Req {
             default_headers: self.default_headers,

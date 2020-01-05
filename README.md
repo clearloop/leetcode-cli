@@ -1,5 +1,5 @@
 # leetcode-cli
-[![doc](https://img.shields.io/badge/0.1.7-docs-green.svg)](https://docs.rs/leetcode-cli/)
+[![doc](https://img.shields.io/badge/0.1.8-docs-green.svg)](https://docs.rs/leetcode-cli/)
 [![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
@@ -27,7 +27,7 @@ cargo install leetcode-cli
 
 ## Usage
 ```sh
-leetcode 0.1.7
+leetcode 0.1.8
 clearloop <udtrokia@163.com>
 Leet your code in command-line.
 
@@ -40,11 +40,13 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    cache    Manage Cache [aliases: c]
-    list     List problems [aliases: l]
-    pick     Pick a problem [aliases: p]
-    stat     Show simple chart about submissions [aliases: s]
-    help     Prints this message or the help of the given subcommand(s)
+    data    Manage Cache [aliases: d]
+    edit    Edit question by id [aliases: e]
+    list    List problems [aliases: l]
+    pick    Pick a problem [aliases: p]
+    stat    Show simple chart about submissions [aliases: s]
+    test    Edit question by id [aliases: t]
+    help    Prints this message or the help of the given subcommand(s)
 ```
 
 ## Example

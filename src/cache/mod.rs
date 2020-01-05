@@ -178,46 +178,35 @@ impl Cache {
         ))
     }
 
-    fn recur_verify(&self, rid: String) -> Result<VerifyReslut, Error> {
+    fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
         use std::time::Duration;
-        let mut res: VerifyReslut = self.clone().0.verify_result(rid.clone())?.json()?;
-
-        // res = match res.state.as_str() {
-        //     "" => self.recur_verify(rid)?,
-        //     "PENDING" => self.recur_verify(rid)?,
-        //     "STARTED" => self.recur_verify(rid)?,
-        //     _ => res
-        // };
-
-        while res.state != "SUCCESS" {
-            std::thread::sleep(Duration::from_micros(3000));
-            let tmp = self.clone().0.verify_result(rid.clone())?.text()?;
-            let j: Result<VerifyReslut, serde_json::Error> = serde_json::from_str(&tmp);
-
-            if j.is_err() {
-                println!("{:?}", tmp);
-            } else {
-                res = j.unwrap();
-            }
-        }
-
+        std::thread::sleep(Duration::from_micros(3000));
+        
+        let mut res: VerifyResult = self.clone().0.verify_result(rid.clone())?.json()?;
+        res = match res.state.as_str() {
+            "SUCCESS" => res,
+            _ => self.recur_verify(rid)?,
+        };
+        
         Ok(res)
     }
     
     /// test problem
-    pub fn test_problem(&self, rfid: i32) -> Result<(), Error> {
+    pub fn test_problem(&self, rfid: i32) -> Result<VerifyResult, Error> {
         let pre = self.pre_run_code(Run::Test, rfid)?;
         let json = pre.0;
         let run_res: RunCode = self.0.clone().run_code(
-            json,
+            json.clone(),
             pre.1[0].clone(),
             pre.1[1].clone()
         )?.json()?;
 
-        let verify_res = self.recur_verify(run_res.interpret_id);
-        println!("{:?}", verify_res);
-        // println!("res: {:?}", verify_res);
-        Ok(())
+        info!("verify result from leetcode.com...");
+        
+        let mut res = self.recur_verify(run_res.interpret_id)?;
+        res.data_input = json.get("data_input")?.to_string();
+
+        Ok(res)
     }
 
     /// New cache

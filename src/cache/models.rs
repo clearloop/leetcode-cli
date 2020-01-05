@@ -174,9 +174,12 @@ pub struct RunCode {
     pub test_case: String
 }
 
+/// verify result model
 #[derive(Debug, Default, Deserialize)]
-pub struct VerifyReslut {
+pub struct VerifyResult {
     pub state: String,
+    #[serde(skip)]
+    pub data_input: String,
     #[serde(default)]
     lang: String,
     #[serde(default)]
@@ -187,36 +190,79 @@ pub struct VerifyReslut {
     run_success: bool,
     #[serde(default)]
     correct_answer: bool,
-
-    // flatten
-    #[serde(flatten, default)]
-    error: CompileError,
-    #[serde(flatten, default)]
-    status: VerifyStatus,
-    #[serde(flatten, default)]
-    expected: Expected,
-
-    // info
-    #[serde(default)]
-    memory: i64,
     #[serde(default)]
     code_answer: Vec<String>,
     #[serde(default)]
     code_output: Vec<String>,
-    #[serde(default)]
-    elapsed_time: i64,
-    #[serde(default)]
-    task_finish_time: i64,
+    
+    // flatten
+    #[serde(flatten, default)]
+    info: VerifyInfo,
+    #[serde(flatten, default)]
+    status: VerifyStatus,
+    #[serde(flatten, default)]
+    analyse: Analyse,
+    #[serde(flatten, default)]
+    expected: Expected,
+    #[serde(flatten, default)]
+    error: CompileError,
+}
 
-    // analyze
-    #[serde(default)]
-    total_correct: Option<String>,
-    #[serde(default)]
-    total_testcases: Option<String>,
-    #[serde(default)]
-    runtime_percentile: Option<String>,
-    #[serde(default)]
-    memory_percentile: Option<String>,
+impl std::fmt::Display for VerifyResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ca = match &self.code_answer.len() {
+            1 => self.code_answer[0].to_string(),
+            _ => self.code_answer.join(""),
+        };
+
+        let eca = match &self.expected.expected_code_answer.len() {
+            1 => self.expected.expected_code_answer[0].to_string(),
+            _ => self.expected.expected_code_answer.join(""),
+        };
+
+        debug!("{:#?}", &self);
+        match self.correct_answer {
+            true => {
+                write!(
+                    f,
+                    "\n  {}{}{}\n{}{}{}{}{}{}\n",
+                    &self.status.status_msg.green().bold(),
+                    "       Runtime: ".dimmed(),
+                    &self.status.status_runtime.dimmed(),
+                    "\n  Your input:    ",
+                    &self.data_input.replace("\n", ", "),
+                    "\n  Output:        ",
+                    ca,
+                    "\n  Expected:      ",
+                    eca,
+                )
+            },
+            false => {
+                match &self.status.status_code {
+                    20 => write!(
+                        f,
+                        "\n{}:\n{}\n",
+                        &self.status.status_msg.red().bold(),
+                        &self.error.full_compile_error
+                    ),
+                    10 => write!(
+                        f,
+                        "\n{}{}{}\n{}{}{}{}{}{}\n",
+                        "  Wrong Answer".red().bold(),
+                        "   Runtime: ".dimmed(),
+                        &self.status.status_runtime.dimmed(),
+                        "\n  Your input:    ",
+                        &self.data_input.replace("\n", ", "),
+                        "\n  Output:        ",
+                        ca,
+                        "\n  Expected:      ",
+                        eca,
+                    ),
+                    _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold())
+                }
+            }
+        }
+    }
 }
 
 use verify::*;
@@ -224,15 +270,37 @@ mod verify {
     use serde::Deserialize;
 
     #[derive(Debug, Default, Deserialize)]
+    pub struct VerifyInfo {
+        #[serde(default)]
+        memory: i64,
+        #[serde(default)]
+        elapsed_time: i64,
+        #[serde(default)]
+        task_finish_time: i64,
+    }
+    
+    #[derive(Debug, Default, Deserialize)]
+    pub struct Analyse {
+        #[serde(default)]
+        total_correct: Option<String>,
+        #[serde(default)]
+        total_testcases: Option<String>,
+        #[serde(default)]
+        runtime_percentile: Option<String>,
+        #[serde(default)]
+        memory_percentile: Option<String>,
+    }
+    
+    #[derive(Debug, Default, Deserialize)]
     pub struct VerifyStatus {
         #[serde(default)]
-        status_msg: String,
+        pub status_code: i32,
         #[serde(default)]
-        status_code: i32,
+        pub status_msg: String,
         #[serde(default)]
-        status_memory: String,
+        pub status_memory: String,
         #[serde(default)]
-        status_runtime: String,
+        pub status_runtime: String,
     }
     
     #[derive(Debug, Default, Deserialize)]
@@ -240,7 +308,7 @@ mod verify {
         #[serde(default)]
         compile_error: String,
         #[serde(default)]
-        full_compile_error: String,
+        pub full_compile_error: String,
     }
     
     #[derive(Debug, Default, Deserialize)]
@@ -256,12 +324,12 @@ mod verify {
         #[serde(default)]
         expected_memory: i64,
         #[serde(default)]
-        expected_code_answer: Vec<String>,
-        #[serde(default)]
         expected_code_output: Vec<String>,
         #[serde(default)]
         expected_elapsed_time: i64,
         #[serde(default)]
         expected_task_finish_time: i64,
+        #[serde(default)]
+        pub expected_code_answer: Vec<String>,
     }
 }

@@ -1,5 +1,7 @@
 ## v0.1.8
 1. pack mod exports
+2. add edit command
+3. add test command
 
 ## v0.1.7
 render html in command-line, and `pick` command
