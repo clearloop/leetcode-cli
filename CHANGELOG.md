@@ -1,3 +1,7 @@
+## v0.1.9
+1. release submit command
+2. deserialize json using outter funcs
+
 ## v0.1.8
 1. pack mod exports
 2. add edit command
