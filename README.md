@@ -5,7 +5,7 @@
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Note - Not Available for Now
-> (only support OSX temporarily)
+> (only support OSX temporarily) [#1][#1]
 
 Please make sure you have logined in `leetcode.com` with `chrome`.
 
@@ -27,9 +27,9 @@ cargo install leetcode-cli
 
 ## Usage
 ```sh
-leetcode 0.1.8
+leetcode 0.1.9
 clearloop <udtrokia@163.com>
-Leet your code in command-line.
+Here's to the crazy ones 👻
 
 USAGE:
     leetcode [FLAGS] [SUBCOMMAND]
@@ -42,6 +42,7 @@ FLAGS:
 SUBCOMMANDS:
     data    Manage Cache [aliases: d]
     edit    Edit question by id [aliases: e]
+    exec    Submit solution [aliases: x]
     list    List problems [aliases: l]
     pick    Pick a problem [aliases: p]
     stat    Show simple chart about submissions [aliases: s]
@@ -62,38 +63,88 @@ lang = "rust"
 editor = "emacs"
 ```
 
-#### 1. <kbd>pick</kbd> a question:
+#### 1. <kbd>pick</kbd>
 
-```
+```sh
 leetcode pick 1
 ```
 
-`lc-rs` will generate `1.two-sum.alogrithms` at `~/.leetcode/code/1.two-sum.algorithms.rs`
+```sh
+[1] Two Sum is on the run...
 
-#### 2. <kbd>edit</kbd> it
 
+Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+--------------------------------------------------
+
+Example:
+
+
+Given nums = [2, 7, 11, 15], target = 9,
+
+Because nums[0] + nums[1] = 2 + 7 = 9,
+return [0, 1].
 ```
+
+#### 2. <kbd>edit</kbd>
+
+```sh
 leetcode edit 1
 ```
 
-#### 3. The `emacs` will be with you
+```rust
+impl Solution {
+    pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+        use std::collections::HashMap;
+        let mut m: HashMap<i32, i32> = HashMap::new();
 
-```
-coding...
+        for (i, e) in nums.iter().enumerate() {
+            if let Some(v) = m.get(&(target - e)) {
+                return vec![*v, i as i32];
+            }
+
+            m.insert(*e, i as i32).unwrap_or_default();
+        }
+
+        return vec![];
+    }
+}
 ```
 
-#### 4. <kbd>test</kbd> it.
+#### 3. <kbd>test</kbd>
 
-```
+```sh
 leetcode test 1
 ```
 
-#### 5. <kbd>submit</kbd> it
+```sh
+
+  Accepted       Runtime: 0 ms
+
+  Your input:    [2,7,11,15], 9
+  Output:        [0,1]
+  Expected:      [0,1]
 
 ```
+
+#### 4. <kbd>submit</kbd>
+
+```sh
 leetcode submit 1
 ```
 
+```
+
+  Success
+
+  Runtime: 0 ms, faster than 100% of Rustonline submissions for Two Sum.
+
+  Memory Usage: 2.4 MB, less than 100% of Rustonline submissions for Two Sum.
+
+
+```
 
 ## PR
 
@@ -104,4 +155,4 @@ MIT
 
 
 [pr]: https://github.com/clearloop/leetcode-cli/pulls
-[sky]: https://github.com/skygragon/leetcode-cli
+[#1]: https://github.com/clearloop/leetcode-cli/issues/1

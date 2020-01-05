@@ -195,8 +195,8 @@ mod file {
         }    
     }
 
-    /// generate code path by fid
     use crate::cache::models::Problem;
+    /// generate code path by fid
     pub fn code_path(target: &Problem) -> Result<String, crate::Error> {
         let conf = crate::cfg::locate();
         

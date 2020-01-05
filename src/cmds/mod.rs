@@ -23,12 +23,14 @@ pub trait Command {
 
 mod data;
 mod edit;
+mod exec;
 mod list;
 mod pick;
 mod stat;
 mod test;
 pub use data::DataCommand;
 pub use edit::EditCommand;
+pub use exec::ExecCommand;
 pub use list::ListCommand;
 pub use pick::PickCommand;
 pub use stat::StatCommand;

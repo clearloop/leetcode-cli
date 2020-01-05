@@ -1,6 +1,6 @@
 //! list subcomAmand - List leetcode problems
 //!
-//! ```
+//! ```sh
 //! leetcode-list 
 //! List problems
 //! 

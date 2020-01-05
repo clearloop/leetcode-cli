@@ -1,4 +1,4 @@
-//! Save OAbad network\'OAs ass.
+//! Save bad network\'s ass.
 mod sql;
 pub mod parser;
 pub mod models;
@@ -18,14 +18,16 @@ pub fn conn(p: String) -> SqliteConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {:?}", p))
 }
 
-/// req if data not download
+/// Condition submit or test
 #[derive(Clone)]
-pub struct Cache(pub LeetCode);
-
-enum Run {
+pub enum Run {
     Test,
     Submit,
 }
+
+/// req if data not download
+#[derive(Clone)]
+pub struct Cache(pub LeetCode);
 
 impl Cache {
     /// ref to sqliteconnection
@@ -114,6 +116,7 @@ impl Cache {
             &target.name.bold().underline(),
             "is on the run...".dimmed()
         );
+        
         if target.category != "algorithms".to_string() {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string()
@@ -162,11 +165,17 @@ impl Cache {
         json.insert("question_id", p.id.to_string());
         json.insert("test_mode", false.to_string());
         json.insert("typed_code", code);
+
+        // pass manually data
+        json.insert("name", p.name.to_string());
         json.insert("data_input", d.case.to_string());
 
         let url = match run {
             Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),
-            Run::Submit => conf.sys.urls.get("submit")?.replace("$slug", &p.slug),
+            Run::Submit => {
+                json.insert("judge_type", "large".to_string());
+                conf.sys.urls.get("submit")?.replace("$slug", &p.slug)
+            }
         };
         
         Ok((
@@ -178,11 +187,23 @@ impl Cache {
         ))
     }
 
+    /// TODO: The real delay
     fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
         use std::time::Duration;
-        std::thread::sleep(Duration::from_micros(3000));
+        use serde_json::{Error as SJError, from_str};
         
-        let mut res: VerifyResult = self.clone().0.verify_result(rid.clone())?.json()?;
+        trace!("Run veriy recursion...");
+        std::thread::sleep(Duration::from_micros(3000));
+
+        // debug resp raw text
+        let debug_raw = self.clone().0.verify_result(rid.clone())?.text()?;
+        debug!("debug resp raw text: \n{:#?}", &debug_raw);
+
+        // debug json deserializing
+        let debug_json: Result<VerifyResult, SJError> = from_str(&debug_raw);
+        debug!("debug json deserializing: \n{:#?}", &debug_json);
+
+        let mut res = debug_json?;
         res = match res.state.as_str() {
             "SUCCESS" => res,
             _ => self.recur_verify(rid)?,
@@ -191,10 +212,12 @@ impl Cache {
         Ok(res)
     }
     
-    /// test problem
-    pub fn test_problem(&self, rfid: i32) -> Result<VerifyResult, Error> {
-        let pre = self.pre_run_code(Run::Test, rfid)?;
+    /// Exec problem fliter —— Test or Submit
+    pub fn exec_problem(&self, rfid: i32, run: Run) -> Result<VerifyResult, Error> {
+        trace!("Exec problem fliter —— Test or Submit");
+        let pre = self.pre_run_code(run.clone(), rfid)?;
         let json = pre.0;
+
         let run_res: RunCode = self.0.clone().run_code(
             json.clone(),
             pre.1[0].clone(),
@@ -202,10 +225,13 @@ impl Cache {
         )?.json()?;
 
         info!("verify result from leetcode.com...");
-        
-        let mut res = self.recur_verify(run_res.interpret_id)?;
-        res.data_input = json.get("data_input")?.to_string();
+        let mut res = match run {
+            Run::Test => self.recur_verify(run_res.interpret_id)?,
+            Run::Submit => self.recur_verify(run_res.submission_id.to_string())?,
+        };
 
+        res.name = json.get("name")?.to_string();
+        res.data_input = json.get("data_input")?.to_string();
         Ok(res)
     }
 

@@ -1,4 +1,4 @@
-//! Soft-link with `config.tom`
+//! Soft-link with `config.toml`
 //!
 //! leetcode-cli will generate a `config.toml` by default,
 //! if you wanna change to it, you can:

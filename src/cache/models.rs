@@ -1,4 +1,4 @@
-//! Leetcode data modelsA
+//! Leetcode data models
 use colored::Colorize;
 use serde::{Serialize, Deserialize};
 use super::schemas::problems;
@@ -170,14 +170,21 @@ mod question {
 /// run_code Result
 #[derive(Debug, Deserialize)]
 pub struct RunCode {
+    #[serde(default)]
     pub interpret_id: String,
-    pub test_case: String
+    #[serde(default)]
+    pub test_case: String,
+    #[serde(default)]
+    pub submission_id: i64,
 }
 
+use super::parser::ssr;
 /// verify result model
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct VerifyResult {
     pub state: String,
+    #[serde(skip)]
+    pub name: String,
     #[serde(skip)]
     pub data_input: String,
     #[serde(default)]
@@ -190,10 +197,12 @@ pub struct VerifyResult {
     run_success: bool,
     #[serde(default)]
     correct_answer: bool,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ssr")]
     code_answer: Vec<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ssr")]
     code_output: Vec<String>,
+    #[serde(default)]
+    std_output: String,
     
     // flatten
     #[serde(flatten, default)]
@@ -206,6 +215,8 @@ pub struct VerifyResult {
     expected: Expected,
     #[serde(flatten, default)]
     error: CompileError,
+    #[serde(flatten, default)]
+    submit: Submit,
 }
 
 impl std::fmt::Display for VerifyResult {
@@ -221,9 +232,11 @@ impl std::fmt::Display for VerifyResult {
         };
 
         debug!("{:#?}", &self);
-        match self.correct_answer {
-            true => {
-                write!(
+
+        match &self.status.status_code {
+            10 => match self.correct_answer {
+                // Pass Test
+                true => write!(
                     f,
                     "\n  {}{}{}\n{}{}{}{}{}{}\n",
                     &self.status.status_msg.green().bold(),
@@ -235,17 +248,35 @@ impl std::fmt::Display for VerifyResult {
                     ca,
                     "\n  Expected:      ",
                     eca,
-                )
-            },
-            false => {
-                match &self.status.status_code {
-                    20 => write!(
+                ),
+                false => match &self.submit.compare_result.len() > &0 {
+                    // Submit Successfully
+                    true => write!(
                         f,
-                        "\n{}:\n{}\n",
-                        &self.status.status_msg.red().bold(),
-                        &self.error.full_compile_error
+                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n",
+                        "  Success\n\n".green().bold(),
+                        "  Runtime: ".dimmed(),
+                        &self.status.status_runtime.bold(),
+                        ", faster than ",
+                        &self.analyse.runtime_percentile.unwrap().to_string().bold(),
+                        "% ".bold(),
+                        "of ",
+                        &self.pretty_lang,
+                        "online submissions for ",
+                        &self.name,
+                        ".\n\n",
+                        "  Memory Usage: ".dimmed(),
+                        &self.status.status_memory.bold(),
+                        ", less than ",
+                        &self.analyse.memory_percentile.unwrap().to_string().bold(),
+                        "% ".bold(),
+                        "of ",
+                        &self.pretty_lang,
+                        "online submissions for ",
+                        &self.name,
                     ),
-                    10 => write!(
+                    // Wrong Answer
+                    false => write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
                         "  Wrong Answer".red().bold(),
@@ -258,9 +289,23 @@ impl std::fmt::Display for VerifyResult {
                         "\n  Expected:      ",
                         eca,
                     ),
-                    _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold())
                 }
-            }
+            },
+            // Output Timeout Exceeded
+            13 => write!(
+                f,
+                "\n{}:\n\n{:?}\n",
+                &self.status.status_msg.yellow().bold(),
+                &self.code_output,
+            ),
+            // Compile Error
+            20 => write!(
+                f,
+                "\n{}:\n\n{}\n",
+                &self.status.status_msg.red().bold(),
+                &self.error.full_compile_error
+            ),
+            _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold())
         }
     }
 }
@@ -268,7 +313,18 @@ impl std::fmt::Display for VerifyResult {
 use verify::*;
 mod verify {
     use serde::Deserialize;
-
+    use super::super::parser::ssr;
+    
+    #[derive(Debug, Default, Deserialize)]
+    pub struct Submit {
+        #[serde(default)]
+        question_id: String,
+        #[serde(default)]
+        last_testcase: String,
+        #[serde(default)]
+        pub compare_result: String,
+    }
+    
     #[derive(Debug, Default, Deserialize)]
     pub struct VerifyInfo {
         #[serde(default)]
@@ -282,13 +338,13 @@ mod verify {
     #[derive(Debug, Default, Deserialize)]
     pub struct Analyse {
         #[serde(default)]
-        total_correct: Option<String>,
+        pub total_correct: Option<i32>,
         #[serde(default)]
-        total_testcases: Option<String>,
+        pub total_testcases: Option<i32>,
         #[serde(default)]
-        runtime_percentile: Option<String>,
+        pub runtime_percentile: Option<i32>,
         #[serde(default)]
-        memory_percentile: Option<String>,
+        pub memory_percentile: Option<i32>,
     }
     
     #[derive(Debug, Default, Deserialize)]
@@ -323,13 +379,13 @@ mod verify {
         expected_status_runtime: String,
         #[serde(default)]
         expected_memory: i64,
-        #[serde(default)]
+        #[serde(default, deserialize_with = "ssr")]
         expected_code_output: Vec<String>,
         #[serde(default)]
         expected_elapsed_time: i64,
         #[serde(default)]
         expected_task_finish_time: i64,
-        #[serde(default)]
-        pub expected_code_answer: Vec<String>,
+        #[serde(default, deserialize_with = "ssr")]
+        pub expected_code_answer: Vec<String>
     }
 }

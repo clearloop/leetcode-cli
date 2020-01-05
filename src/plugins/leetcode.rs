@@ -129,7 +129,7 @@ impl LeetCode {
 
     /// test problem
     pub fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
-        info!("sending code to leetcode.com...");
+        info!("Sending code to leetcode.com...");
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),

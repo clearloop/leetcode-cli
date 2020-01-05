@@ -25,7 +25,7 @@ impl std::fmt::Debug for Error {
                 write!(f, "{} Download {} failed, please try again", e, s)
             },
             Error::NetworkError(s) => {
-                write!(f, "{} Network request {}, please try again", e, s)
+                write!(f, "{} {}, please try again", e, s)
             },
             Error::ParseError(s) => {
                 write!(f, "{} {}, please try again", e, s)
