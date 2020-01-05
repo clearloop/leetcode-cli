@@ -48,22 +48,32 @@ impl std::string::ToString for Ident {
 
 /// Get cookies from chrome storage
 pub fn cookies() -> Result<Ident, crate::Error> {
-    use self::schema::cookies::dsl::*;
-    debug!("Derive cookies from google chrome...");
+    trace!("Derive cookies from google chrome...");
+    let ccfg = crate::cfg::locate()?.cookies;
+    if ccfg.csrf.len() > 0 && ccfg.session.len() > 0 {
+        return Ok(Ident {
+            csrf: ccfg.csrf,
+            session: ccfg.session,
+        });
+    }
     
+    // if doesn't config SESSION and csrftoken
+    use self::schema::cookies::dsl::*;
     let home = dirs::home_dir()?;
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
         "linux" => home.join(".config/google-chrome/Default/Cookies"),
         _ => panic!("Opps...only works on OSX or Linux now...")
     };
-    
+
+    debug!("Chrome Cookies path is {:?}", &p);
     let conn = cache::conn(p.to_string_lossy().to_string());
     let res = cookies
         .filter(host_key.like("%leetcode.com"))
         .load::<Cookies>(&conn)
         .expect("Loading cookies from google chrome failed.");
 
+    println!("res {:?}", &res);
     if &res.len() == &(0 as usize) {
         return Err(crate::Error::CookieError);
     }
@@ -80,7 +90,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         ) || (
             c.name == "LEETCODE_SESSION".to_string()
         ) {
-            m.insert(c.name, decode_cookies(&pass, c.encrypted_value));
+            m.insert(c.name, decode_cookies(&pass, c.encrypted_value)?);
         }
     }
     
@@ -92,7 +102,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 
 
 /// Decode cookies from chrome
-fn decode_cookies(pass: &str, v: Vec<u8>) -> String {
+fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
     let mut key = [0_u8; 16];
     match std::env::consts::OS {
         "macos" => {
@@ -113,14 +123,17 @@ fn decode_cookies(pass: &str, v: Vec<u8>) -> String {
                 &mut key
             ).expect("pbkdf2 hmac went error.");
         },
-        _ => panic!("Opps...only works on OSX or Linux now...")
+        _ => return Err(crate::Error::FeatureError(
+            "only supports OSX or Linux for now".to_string()
+        ))
     }
+
     chrome_decrypt(v, key)
 }
 
 
 /// Decrypt chrome cookie value with aes-128-cbc
-fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> String {
+fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> Result<String, crate::Error> {
     // <space>: \u16
     let iv = vec![32_u8; 16];
     let mut decrypter = symm::Crypter::new(
@@ -128,7 +141,7 @@ fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> String {
         symm::Mode::Decrypt,
         &key,
         Some(&iv)
-    ).unwrap();
+    )?;
 
     
     let data_len = v.len() - 3;
@@ -137,9 +150,9 @@ fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> String {
     
     decrypter.pad(false);
 
-    let count = decrypter.update(&v[3..], &mut plaintext).unwrap();
-    decrypter.finalize(&mut plaintext[count..]).unwrap();
+    let count = decrypter.update(&v[3..], &mut plaintext)?;
+    decrypter.finalize(&mut plaintext[count..])?;
     plaintext.retain(|x| x >= &20_u8);
 
-    String::from_utf8_lossy(&plaintext.to_vec()).to_string()
+    Ok(String::from_utf8_lossy(&plaintext.to_vec()).to_string())
 }

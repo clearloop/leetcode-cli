@@ -32,21 +32,24 @@ pub struct LeetCode {
 
 impl LeetCode {
     /// Parse reqwest headers
-    fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> HeaderMap {
+    fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> Result<HeaderMap, Error> {
         for (k, v) in ts.into_iter() {
-            headers.insert(
-                HeaderName::from_str(k).unwrap(),
-                HeaderValue::from_str(v).unwrap(),
-            );
+            let name = HeaderName::from_str(k);
+            let value = HeaderValue::from_str(v);
+            if name.is_err() || value.is_err() {
+                return Err(Error::ParseError("http header parse failed".to_string()));
+            }
+                
+            headers.insert(name.unwrap(), value.unwrap());
         }
 
-        headers
+        Ok(headers)
     }
 
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
         debug!("Building reqwest client...");
-        let conf = cfg::locate();
+        let conf = cfg::locate()?;
         let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
@@ -56,14 +59,13 @@ impl LeetCode {
                 ("x-requested-with", "XMLHttpRequest"),
                 ("Origin", &conf.sys.urls["base"])
             ],
-        );
+        )?;
         
         let client = ClientBuilder::new()
             .gzip(true)
             .connect_timeout(Duration::from_secs(30))
             .cookie_store(true)
-            .build()
-            .expect("Reqwest client build failed");
+            .build()?;
 
         Ok(LeetCode {
             conf,
@@ -198,7 +200,7 @@ mod req {
             let headers = LeetCode::headers(
                 self.default_headers,
                 vec![("Referer", &self.refer.unwrap_or(self.url.to_owned()))],
-            );
+            )?;
 
             let req = match self.mode {
                 Mode::Get => client.get(&self.url),

@@ -12,6 +12,7 @@ pub enum Error {
     CacheError(String),
     FeatureError(String),
     CookieError,
+    DecryptError
 }
 
 impl std::fmt::Debug for Error {
@@ -25,10 +26,13 @@ impl std::fmt::Debug for Error {
             Error::CookieError => {
                 write!(
                     f,
-                    "{} {}{}",
+                    "{} {}{}{}{}{}",
                     e,
-                    "cannot get leetcode cookies from chrome, ",
-                    "please make sure you have logined in leetcode.com with chrome.".bold()
+                    "Cannot get leetcode cookies from chrome, ",
+                    "please make sure you have logined in leetcode.com with chrome. ".bold(),
+                    "Either you can handwrite your LEETCODE_SESSION and csrf to leetcode.toml, ",
+                    "more info please checkout this: ",
+                    "https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies"
                 )
             },
             Error::DownloadError(s) => {
@@ -46,6 +50,9 @@ impl std::fmt::Debug for Error {
             Error::MatchError => {
                 write!(f, "{} Nothing matches", e)
             },
+            Error::DecryptError => {
+                write!(f, "{} openssl decrypt failed", e)
+            }
         }
     }
 }
@@ -57,6 +64,7 @@ impl std::convert::From<reqwest::Error> for Error {
     }
 }
 
+// nums
 impl std::convert::From<std::num::ParseIntError> for Error {
     fn from(err: std::num::ParseIntError) -> Self {
         Error::ParseError(err.description().to_string())
@@ -77,6 +85,19 @@ impl std::convert::From<serde_json::error::Error> for Error {
     }
 }
 
+// toml
+impl std::convert::From<toml::de::Error> for Error {
+    fn from(err: toml::de::Error) -> Self {
+        Error::ParseError(err.description().to_string())
+    }
+}
+
+impl std::convert::From<toml::ser::Error> for Error {
+    fn from(err: toml::ser::Error) -> Self {
+        Error::ParseError(err.description().to_string())
+    }
+}
+
 // io
 impl std::convert::From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
@@ -88,5 +109,12 @@ impl std::convert::From<std::io::Error> for Error {
 impl std::convert::From<std::option::NoneError> for Error {
     fn from(_: std::option::NoneError) -> Self {
         Error::ParseError("json from response".to_string())
+    }
+}
+
+// openssl
+impl std::convert::From<openssl::error::ErrorStack> for Error {
+    fn from(_: openssl::error::ErrorStack) -> Self {
+        Error::DecryptError
     }
 }

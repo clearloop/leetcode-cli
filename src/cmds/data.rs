@@ -46,15 +46,15 @@ impl Command for DataCommand {
         use std::fs::File;
         use std::path::Path;
         
-        let cache = Cache::new().unwrap();
-        let path = cache.0.conf.storage.cache();
-        let f = File::open(&path).unwrap();
-        let len = format!("{}K", f.metadata().unwrap().len() / 1000);
+        let cache = Cache::new()?;
+        let path = cache.0.conf.storage.cache()?;
+        let f = File::open(&path)?;
+        let len = format!("{}K", f.metadata()?.len() / 1000);
 
         let out = format!(
             "  {}{}",
             Path::new(&path)
-                .file_name().unwrap()
+                .file_name()?
                 .to_string_lossy()
                 .to_string().digit(65 - (len.len() as i32))
                 .bright_green(),
@@ -69,13 +69,13 @@ impl Command for DataCommand {
         let mut flags = 0;
         if m.is_present("delete") {
             flags += 1;
-            cache.clean().unwrap();
+            cache.clean()?;
             println!("{}", "ok!".bright_green());
         }
 
         if m.is_present("update") {
             flags += 1;
-            cache.update().unwrap();
+            cache.update()?;
             println!("{}", "ok!".bright_green());
         }
 

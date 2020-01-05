@@ -1,6 +1,7 @@
 ## v0.2.1
 1. fix cookies error handling
 2. dismiss all `unwrap`, `expect` and `panic`
+3. add cookie configs
 
 ## v0.2.0
 1. Add Linux Support

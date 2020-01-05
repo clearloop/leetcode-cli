@@ -31,18 +31,18 @@ pub struct Cache(pub LeetCode);
 
 impl Cache {
     /// Ref to sqliteconnection
-    fn conn(&self) -> SqliteConnection {
-        conn(self.0.conf.storage.cache())
+    fn conn(&self) -> Result<SqliteConnection, Error> {
+        Ok(conn(self.0.conf.storage.cache()?))
     }
     
     /// Clean cache
     pub fn clean(&self) -> Result<(), Error> {
-        Ok(std::fs::remove_file(&self.0.conf.storage.cache())?)
+        Ok(std::fs::remove_file(&self.0.conf.storage.cache()?)?)
     }
 
     /// ref to download probems
     pub fn update(self) -> Result<(), Error> {
-        let c = conn((&self.0.conf.storage.cache()).to_owned());
+        let c = conn((&self.0.conf.storage.cache()?).to_owned());
         let ps = self.download_problems()?;
         for i in ps.into_iter() {
             let target = problems.filter(id.eq(i.id));
@@ -65,7 +65,7 @@ impl Cache {
         let count = self.get_problems()?.len();
         if count == 0 {
             ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap_or(std::cmp::Ordering::Equal));
-            diesel::insert_into(problems).values(&ps).execute(&self.conn())?;
+            diesel::insert_into(problems).values(&ps).execute(&self.conn()?)?;
         }
 
         Ok(ps)
@@ -74,7 +74,7 @@ impl Cache {
 
     /// Get problem
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
-        let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn())?;
+        let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
         if p.category != "algorithms".to_string() {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string()
@@ -94,14 +94,14 @@ impl Cache {
     ///
     /// if cache doesn't exist, request a new copy
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
-        Ok(problems.load::<Problem>(&self.conn())?)
+        Ok(problems.load::<Problem>(&self.conn()?)?)
     }
     
     /// Get question
     pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
         let target: Problem = problems
             .filter(fid.eq(rfid))
-            .first(&self.conn())?;
+            .first(&self.conn()?)?;
 
         let ids = match target.level {
             1 => target.fid.to_string().green(),
@@ -138,7 +138,7 @@ impl Cache {
 
             // update the question
             let sdesc = serde_json::to_string(&rdesc)?;
-            diesel::update(&target).set(desc.eq(sdesc)).execute(&self.conn())?;
+            diesel::update(&target).set(desc.eq(sdesc)).execute(&self.conn()?)?;
         }
 
         Ok(rdesc)
@@ -237,8 +237,8 @@ impl Cache {
 
     /// New cache
     pub fn new() -> Result<Self, Error> {
-        let conf = cfg::locate();
-        let c = conn(conf.storage.cache());
+        let conf = cfg::locate()?;
+        let c = conn(conf.storage.cache()?);
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
         
         Ok(Cache(LeetCode::new()?))

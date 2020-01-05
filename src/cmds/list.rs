@@ -102,7 +102,7 @@ impl Command for ListCommand {
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs` 
     fn handler(m: &ArgMatches) -> Result<(), Error> {
-        let cache = Cache::new().unwrap();
+        let cache = Cache::new()?;
         let mut ps = cache.get_problems()?;
 
         if ps.len() == 0 {
@@ -113,12 +113,12 @@ impl Command for ListCommand {
         // filtering...
         // filter category
         if m.is_present("category") {
-            ps.retain(|x| x.category == m.value_of("category").unwrap());
+            ps.retain(|x| x.category == m.value_of("category").unwrap_or("algorithms"));
         }
 
         // filter query
         if m.is_present("query") {
-            let query = m.value_of("query").unwrap();
+            let query = m.value_of("query")?;
             crate::helper::filter(&mut ps, query.to_string());
         }
         

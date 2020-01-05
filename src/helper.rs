@@ -202,7 +202,7 @@ mod file {
     use crate::cache::models::Problem;
     /// Generate code path by fid
     pub fn code_path(target: &Problem) -> Result<String, crate::Error> {
-        let conf = crate::cfg::locate();
+        let conf = crate::cfg::locate()?;
         
         let lang = conf.code.lang;
         let mut path = format!(

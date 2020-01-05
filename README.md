@@ -4,29 +4,59 @@
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-## Note
+## Cookies
 
-Please make sure you have logined in `leetcode.com` with `chrome`.
+The cookie plugin of leetcode-cil can work on OSX and [Linux][#1], If you are on other platforms or your cookies just don't want to be catched, you can **handwrite your LeetCode Cookies to `~/.leetcode/leetcode.toml`**
+
+```toml
+# Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
+[cookies]
+csrf = "..."
+session = "..."
+```
+
+### How to find LeetCode Cookies?
+
+For Example, if you're using chrome to login to leetcode.com.
 
 
-## Features
+#### Step 1
 
-1. the edit flow —— solution files will generate automatically!
-2. doc support, `lc-rs` can compile the annotation of your solutions to markdown!
-   1. btw, generate a site is easy for `lc-rs`!
-3. support local signal to keep coding as longer as you want.
+Open chrome and paste the link below to the `chrome linkbar`.
+
+```sh
+chrome://settings/cookies/detail?site=leetcode.com
+```
+
+#### Step 2
+
+Copy the contents of `LEETCODE_SESSION` and `csrftoken`.
+
+#### Step 3
+
+Paste them to `session` and `csrf`.
+
+```toml
+# Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
+[cookies]
+csrf = "${LEETCODE_SESSION}"
+session = "${csrf}"
+```
+
 
 
 ## Building
 
-```
+```sh
 cargo install leetcode-cli
 ```
 
-
 ## Usage
+
+Please make sure you have logined in `leetcode.com` with `chrome`, more info plz checkout [this](#cookies)
+
 ```sh
-leetcode 0.2.0
+leetcode 0.2.1
 clearloop <udtrokia@163.com>
 Here's to the crazy ones 👻
 
@@ -54,9 +84,6 @@ SUBCOMMANDS:
 For example, if your config is:
 
 ```toml
-[storage]
-code = "code"
-
 [code]
 lang = "rust"
 editor = "emacs"
@@ -144,6 +171,13 @@ leetcode submit 1
 
 
 ```
+
+## Features
+
++ [x] the edit flow —— solution files will generate automatically!
++ [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
+   + [ ] btw, generate a site is easy for `lc-rs`!
++ [ ]  support local signal to keep coding as longer as you want.
 
 ## PR
 

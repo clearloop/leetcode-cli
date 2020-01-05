@@ -58,6 +58,10 @@ lang = "rust"
 pick = "${fid}.${slug}"
 submission = "${fid}.${slug}.${sid}.${ac}"
 
+[cookies]
+csrf = ""
+session = ""
+
 [storage]
 cache = "Problems"
 code = "code"
@@ -69,16 +73,26 @@ root = "~/.leetcode"
 pub struct Config {
     pub sys: Sys,
     pub code: Code,
+    pub cookies: Cookies,
     pub storage: Storage
 }
 
 impl Config {
     /// Sync new config to config.toml
-    pub fn sync(&self) {
-        let home = dirs::home_dir().unwrap();
+    pub fn sync(&self) -> Result<(), crate::Error> {
+        let home = dirs::home_dir()?;
         let conf = home.join(".leetcode/conf.toml");
-        fs::write(conf, toml::ser::to_string_pretty(&self).unwrap()).unwrap();
+        fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
+
+        Ok(())
     }
+}
+
+/// Cookie settings
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Cookies {
+    pub csrf: String,
+    pub session: String
 }
 
 /// System settings, for leetcode api mainly
@@ -131,24 +145,24 @@ pub struct Storage {
 
 impl Storage {
     /// convert root path
-    pub fn root(&self) -> String {
-        let home = dirs::home_dir().unwrap().to_string_lossy().to_string();
+    pub fn root(&self) -> Result<String, crate::Error> {
+        let home = dirs::home_dir()?.to_string_lossy().to_string();
         let path = self.root.replace("~", &home);
-        path
+        Ok(path)
     }
 
     /// get cache path
-    pub fn cache(&self) -> String {
-        let root = &self.root();
-        PathBuf::from(root)
+    pub fn cache(&self) -> Result<String, crate::Error> {
+        let root = &self.root()?;
+        Ok(PathBuf::from(root)
             .join(&self.cache)
             .to_string_lossy()
-            .to_string()
+            .to_string())
     }
 
     /// get cache path
     pub fn code(&self) -> Result<String, crate::Error> {
-        let root = &self.root();
+        let root = &self.root()?;
         let p = PathBuf::from(root).join(&self.code);
         if !PathBuf::from(&p).exists() {
             std::fs::create_dir(&p)?
@@ -160,26 +174,30 @@ impl Storage {
 
 
 /// Locate lc's config file
-pub fn locate() -> Config {
-    let conf = root().join("leetcode.toml");
+pub fn locate() -> Result<Config, crate::Error> {
+    let conf = root()?.join("leetcode.toml");
     if !conf.is_file() {
-        fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
+        fs::write(&conf, &DEFAULT_CONFIG[1..])?;
     }
 
-    let s = fs::read_to_string(&conf).unwrap();
-    toml::from_str(&s).unwrap()
+    let s = fs::read_to_string(&conf)?;
+    let r = toml::from_str(&s);
+    if r.is_err() {
+        return Err(crate::Error::ParseError("toml parsed failed".to_string()))
+    }
+
+    Ok(r.unwrap())
 }
 
 /// Get root path of leetcode-cli
-pub fn root() -> std::path::PathBuf {
-    let dir = dirs::home_dir().unwrap().join(".leetcode");
+pub fn root() -> Result<std::path::PathBuf, crate::Error> {
+    let dir = dirs::home_dir()?.join(".leetcode");
     if !dir.is_dir() {
         info!("Generate root dir at {:?}.", &dir);
         fs::DirBuilder::new()
             .recursive(true)
-            .create(&dir)
-            .unwrap();
+            .create(&dir)?;
     }
 
-    dir
+    Ok(dir)
 }
