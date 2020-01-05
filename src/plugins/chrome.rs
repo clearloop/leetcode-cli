@@ -47,11 +47,11 @@ impl std::string::ToString for Ident {
 }
 
 /// Get cookies from chrome storage
-pub fn cookies() -> Ident {
+pub fn cookies() -> Result<Ident, crate::Error> {
     use self::schema::cookies::dsl::*;
     debug!("Derive cookies from google chrome...");
     
-    let home = dirs::home_dir().unwrap();
+    let home = dirs::home_dir()?;
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
         "linux" => home.join(".config/google-chrome/Default/Cookies"),
@@ -64,6 +64,10 @@ pub fn cookies() -> Ident {
         .load::<Cookies>(&conn)
         .expect("Loading cookies from google chrome failed.");
 
+    if &res.len() == &(0 as usize) {
+        return Err(crate::Error::CookieError);
+    }
+    
     // Get system password
     let ring = Keyring::new("Chrome Safe Storage", "Chrome");
     let pass = ring.get_password().expect("Get Password failed");
@@ -80,10 +84,10 @@ pub fn cookies() -> Ident {
         }
     }
     
-    Ident {
-        csrf: m.get("csrftoken").unwrap().to_string(),
-        session: m.get("LEETCODE_SESSION").unwrap().to_string(),
-    }
+    Ok(Ident {
+        csrf: m.get("csrftoken")?.to_string(),
+        session: m.get("LEETCODE_SESSION")?.to_string(),
+    })
 }
 
 

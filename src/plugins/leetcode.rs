@@ -44,10 +44,10 @@ impl LeetCode {
     }
 
     /// New LeetCode client
-    pub fn new() -> LeetCode {
+    pub fn new() -> Result<LeetCode, crate::Error> {
         debug!("Building reqwest client...");
         let conf = cfg::locate();
-        let cookies = chrome::cookies();
+        let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
             vec![
@@ -65,11 +65,11 @@ impl LeetCode {
             .build()
             .expect("Reqwest client build failed");
 
-        LeetCode {
+        Ok(LeetCode {
             conf,
             client,
             default_headers,
-        }
+        })
     }
 
     /// Get category problems

@@ -11,6 +11,7 @@ pub enum Error {
     ParseError(String),
     CacheError(String),
     FeatureError(String),
+    CookieError,
 }
 
 impl std::fmt::Debug for Error {
@@ -20,6 +21,15 @@ impl std::fmt::Debug for Error {
         match self {
             Error::CacheError(s) => {
                 write!(f, "{} {}, please try again", e, s)
+            },
+            Error::CookieError => {
+                write!(
+                    f,
+                    "{} {}{}",
+                    e,
+                    "cannot get leetcode cookies from chrome, ",
+                    "please make sure you have logined in leetcode.com with chrome.".bold()
+                )
             },
             Error::DownloadError(s) => {
                 write!(f, "{} Download {} failed, please try again", e, s)

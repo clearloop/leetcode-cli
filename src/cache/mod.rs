@@ -241,6 +241,6 @@ impl Cache {
         let c = conn(conf.storage.cache());
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
         
-        Ok(Cache(LeetCode::new()))
+        Ok(Cache(LeetCode::new()?))
     }
 }

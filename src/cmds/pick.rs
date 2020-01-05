@@ -63,7 +63,7 @@ impl Command for PickCommand {
         use crate::cache::Cache;
         use rand::Rng;
         
-        let cache = Cache::new().unwrap();
+        let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
         if problems.len() == 0 {
             cache.clone().download_problems()?;
