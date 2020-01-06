@@ -1,11 +1,7 @@
 use crate::cache;
 use diesel::prelude::*;
 use keyring::Keyring;
-use openssl::{
-    hash,
-    pkcs5,
-    symm
-};
+use openssl::{hash, pkcs5, symm};
 use std::collections::HashMap;
 
 /// LeetCode Cookies Schema
@@ -20,7 +16,7 @@ mod schema {
 }
 
 /// Please make sure the order
-/// 
+///
 /// The order between table and struct must be same.
 #[derive(Queryable, Debug, Clone)]
 struct Cookies {
@@ -38,11 +34,7 @@ pub struct Ident {
 
 impl std::string::ToString for Ident {
     fn to_string(&self) -> String {
-        format!(
-            "LEETCODE_SESSION={};csrftoken={};",
-            self.session,
-            self.csrf
-        ).to_string()
+        format!("LEETCODE_SESSION={};csrftoken={};", self.session, self.csrf).to_string()
     }
 }
 
@@ -56,14 +48,14 @@ pub fn cookies() -> Result<Ident, crate::Error> {
             session: ccfg.session,
         });
     }
-    
+
     // If doesn't config SESSION and csrftoken
     use self::schema::cookies::dsl::*;
     let home = dirs::home_dir()?;
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
         "linux" => home.join(".config/google-chrome/Default/Cookies"),
-        _ => panic!("Opps...only works on OSX or Linux now...")
+        _ => panic!("Opps...only works on OSX or Linux now..."),
     };
 
     debug!("Chrome Cookies path is {:?}", &p);
@@ -77,7 +69,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     if &res.len() == &(0 as usize) {
         return Err(crate::Error::CookieError);
     }
-    
+
     // Get system password
     let ring = Keyring::new("Chrome Safe Storage", "Chrome");
     let pass = ring.get_password().expect("Get Password failed");
@@ -85,11 +77,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     // Decode cookies
     let mut m: HashMap<String, String> = HashMap::new();
     for c in res.to_owned() {
-        if (
-            c.name == "csrftoken".to_string()
-        ) || (
-            c.name == "LEETCODE_SESSION".to_string()
-        ) {
+        if (c.name == "csrftoken".to_string()) || (c.name == "LEETCODE_SESSION".to_string()) {
             m.insert(c.name, decode_cookies(&pass, c.encrypted_value)?);
         }
     }
@@ -99,7 +87,6 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         session: m.get("LEETCODE_SESSION")?.to_string(),
     })
 }
-
 
 /// Decode cookies from chrome
 fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
@@ -111,43 +98,45 @@ fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
                 b"saltysalt",
                 1003,
                 hash::MessageDigest::sha1(),
-                &mut key
-            ).expect("pbkdf2 hmac went error.");
-        },
+                &mut key,
+            )
+            .expect("pbkdf2 hmac went error.");
+        }
         "linux" => {
             pkcs5::pbkdf2_hmac(
                 b"peanuts",
                 b"saltysalt",
                 1,
                 hash::MessageDigest::sha1(),
-                &mut key
-            ).expect("pbkdf2 hmac went error.");
-        },
-        _ => return Err(crate::Error::FeatureError(
-            "only supports OSX or Linux for now".to_string()
-        ))
+                &mut key,
+            )
+            .expect("pbkdf2 hmac went error.");
+        }
+        _ => {
+            return Err(crate::Error::FeatureError(
+                "only supports OSX or Linux for now".to_string(),
+            ))
+        }
     }
 
     chrome_decrypt(v, key)
 }
 
-
 /// Decrypt chrome cookie value with aes-128-cbc
-fn chrome_decrypt(v: Vec<u8>, key: [u8;16]) -> Result<String, crate::Error> {
+fn chrome_decrypt(v: Vec<u8>, key: [u8; 16]) -> Result<String, crate::Error> {
     // <space>: \u16
     let iv = vec![32_u8; 16];
     let mut decrypter = symm::Crypter::new(
         symm::Cipher::aes_128_cbc(),
         symm::Mode::Decrypt,
         &key,
-        Some(&iv)
+        Some(&iv),
     )?;
 
-    
     let data_len = v.len() - 3;
     let block_size = symm::Cipher::aes_128_cbc().block_size();
     let mut plaintext = vec![0; data_len + block_size];
-    
+
     decrypter.pad(false);
 
     let count = decrypter.update(&v[3..], &mut plaintext)?;

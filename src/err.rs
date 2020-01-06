@@ -1,6 +1,6 @@
 //! Errors in leetcode-cli
-use std::fmt;
 use std::error::Error as StdError;
+use std::fmt;
 
 /// Error enum
 #[derive(Clone)]
@@ -12,7 +12,7 @@ pub enum Error {
     CacheError(String),
     FeatureError(String),
     CookieError,
-    DecryptError
+    DecryptError,
 }
 
 impl std::fmt::Debug for Error {
@@ -20,39 +20,23 @@ impl std::fmt::Debug for Error {
         use colored::Colorize;
         let e = "error:".bold().red();
         match self {
-            Error::CacheError(s) => {
-                write!(f, "{} {}, please try again", e, s)
-            },
-            Error::CookieError => {
-                write!(
-                    f,
-                    "{} {}{}{}{}{}",
-                    e,
-                    "Cannot get leetcode cookies from chrome, ",
-                    "please make sure you have logined in leetcode.com with chrome. ".bold(),
-                    "Either you can handwrite your LEETCODE_SESSION and csrf to leetcode.toml, ",
-                    "more info please checkout this: ",
-                    "https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies"
-                )
-            },
-            Error::DownloadError(s) => {
-                write!(f, "{} Download {} failed, please try again", e, s)
-            },
-            Error::NetworkError(s) => {
-                write!(f, "{} {}, please try again", e, s)
-            },
-            Error::ParseError(s) => {
-                write!(f, "{} {}, please try again", e, s)
-            },
-            Error::FeatureError(s) => {
-                write!(f, "{} {}", e, s)
-            }
-            Error::MatchError => {
-                write!(f, "{} Nothing matches", e)
-            },
-            Error::DecryptError => {
-                write!(f, "{} openssl decrypt failed", e)
-            }
+            Error::CacheError(s) => write!(f, "{} {}, please try again", e, s),
+            Error::CookieError => write!(
+                f,
+                "{} {}{}{}{}{}",
+                e,
+                "Cannot get leetcode cookies from chrome, ",
+                "please make sure you have logined in leetcode.com with chrome. ".bold(),
+                "Either you can handwrite your LEETCODE_SESSION and csrf to leetcode.toml, ",
+                "more info please checkout this: ",
+                "https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies"
+            ),
+            Error::DownloadError(s) => write!(f, "{} Download {} failed, please try again", e, s),
+            Error::NetworkError(s) => write!(f, "{} {}, please try again", e, s),
+            Error::ParseError(s) => write!(f, "{} {}, please try again", e, s),
+            Error::FeatureError(s) => write!(f, "{} {}", e, s),
+            Error::MatchError => write!(f, "{} Nothing matches", e),
+            Error::DecryptError => write!(f, "{} openssl decrypt failed", e),
         }
     }
 }

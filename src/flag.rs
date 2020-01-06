@@ -6,9 +6,9 @@
 //!     -h, --help       Prints help information
 //!     -V, --version    Prints version information
 //! ```
+use crate::err::Error;
 use clap::Arg;
 use env_logger::Env;
-use crate::err::Error;
 
 /// Abstract flag trait
 pub trait Flag {
@@ -27,10 +27,8 @@ impl Flag for Debug {
             .help("debug mode")
     }
 
-    fn handler() -> Result<(), Error>{
-        env_logger::from_env(
-            Env::default().default_filter_or("leetcode")
-        ).init();
+    fn handler() -> Result<(), Error> {
+        env_logger::from_env(Env::default().default_filter_or("leetcode")).init();
 
         Ok(())
     }

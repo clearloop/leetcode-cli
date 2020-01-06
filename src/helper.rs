@@ -1,8 +1,8 @@
 //! A set of helper traits
-pub use self::file::code_path;
 pub use self::digit::Digit;
-pub use self::html::HTML;
+pub use self::file::code_path;
 pub use self::filter::filter;
+pub use self::html::HTML;
 
 /// Convert i32 to specific digits string.
 mod digit {
@@ -46,7 +46,7 @@ mod digit {
 mod filter {
     use crate::cache::models::Problem;
     /// Abstract query filter
-    /// 
+    ///
     /// ```sh
     ///     -q, --query <query>          Fliter questions by conditions:
     ///                                  Uppercase means negative
@@ -85,7 +85,7 @@ mod html {
     pub enum Token {
         Plain(String),
         Bold(String),
-        Eof(String)
+        Eof(String),
     }
 
     /// Html render plugin
@@ -98,7 +98,7 @@ mod html {
         fn ser(&self) -> Vec<Token> {
             // empty tags
             let mut tks = self.to_string();
-            
+
             // converting symbols
             tks = tks.replace(r#"&lt;"#, "<");
             tks = tks.replace(r#"&gt;"#, ">");
@@ -120,36 +120,34 @@ mod html {
                                     output.push(Token::Bold(tks[ptr..i].to_string()));
                                     bold = false;
                                 }
-                                false => output.push(
-                                    Token::Plain(tks[ptr..i].to_string())
-                                ),
+                                false => output.push(Token::Plain(tks[ptr..i].to_string())),
                             }
                             ptr = i;
-                        },
+                        }
                         '>' => {
-                            match &tks[i-1..i] {
+                            match &tks[i - 1..i] {
                                 "-" => continue,
                                 _ => match &tks[(ptr + 1)..i] {
                                     "b" | "strong" => bold = true,
-                                    _ => {},
+                                    _ => {}
                                 },
                             }
                             ptr = i + 1;
-                        },
-                        _ => {},
+                        }
+                        _ => {}
                     }
-                };
+                }
                 output.push(Token::Eof(tks[ptr..tks.len()].to_string()));
                 res = output;
             }
-            
+
             res
         }
 
         fn render(&self) -> String {
             let ts = self.ser();
             let mut tks: Vec<String> = vec![];
-            
+
             for i in ts {
                 match i {
                     Token::Plain(s) => tks.push(s.normal().to_string()),
@@ -163,7 +161,7 @@ mod html {
                             br.push_str("\n\n");
                             tks.push(br);
                         }
-                        
+
                         tks.push(s.bold().to_string());
                     }
                     Token::Eof(s) => tks.push(s.normal().to_string()),
@@ -195,15 +193,15 @@ mod file {
             "rust" => Ok("rs"),
             "scala" => Ok("scala"),
             "swift" => Ok("swift"),
-            _ => Ok("c")
-        }    
+            _ => Ok("c"),
+        }
     }
 
     use crate::cache::models::Problem;
     /// Generate code path by fid
     pub fn code_path(target: &Problem) -> Result<String, crate::Error> {
         let conf = crate::cfg::locate()?;
-        
+
         let lang = conf.code.lang;
         let mut path = format!(
             "{}/{}.{}",

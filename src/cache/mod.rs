@@ -1,24 +1,20 @@
 //! Save bad network\'s ass.
-mod sql;
-pub mod parser;
 pub mod models;
+pub mod parser;
 pub mod schemas;
+mod sql;
+use self::models::*;
+use self::schemas::{problems::dsl::*, tags::dsl::*};
+use self::sql::*;
+use crate::{cfg, err::Error, plugins::LeetCode};
+use colored::Colorize;
 use diesel::prelude::*;
 use serde_json::Value;
-use colored::Colorize;
 use std::collections::HashMap;
-use self::sql::*;
-use self::models::*;
-use self::schemas::{
-    tags::dsl::*,
-    problems::dsl::*,
-};
-use crate::{cfg, err::Error, plugins::LeetCode};
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
-    SqliteConnection::establish(&p)
-        .unwrap_or_else(|_| panic!("Error connecting to {:?}", p))
+    SqliteConnection::establish(&p).unwrap_or_else(|_| panic!("Error connecting to {:?}", p))
 }
 
 /// Condition submit or test
@@ -37,7 +33,7 @@ impl Cache {
     fn conn(&self) -> Result<SqliteConnection, Error> {
         Ok(conn(self.0.conf.storage.cache()?))
     }
-    
+
     /// Clean cache
     pub fn clean(&self) -> Result<(), Error> {
         Ok(std::fs::remove_file(&self.0.conf.storage.cache()?)?)
@@ -51,10 +47,10 @@ impl Cache {
             let target = problems.filter(id.eq(i.id));
             diesel::update(target).set(i.to_owned()).execute(&c)?;
         }
-        
+
         Ok(())
     }
-    
+
     /// Download leetcode problems to db
     pub fn download_problems(self) -> Result<Vec<Problem>, Error> {
         info!("Fetching leetcode problems...");
@@ -68,25 +64,26 @@ impl Cache {
         let count = self.get_problems()?.len();
         if count == 0 {
             ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap_or(std::cmp::Ordering::Equal));
-            diesel::insert_into(problems).values(&ps).execute(&self.conn()?)?;
+            diesel::insert_into(problems)
+                .values(&ps)
+                .execute(&self.conn()?)?;
         }
 
         Ok(ps)
     }
-
 
     /// Get problem
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
         let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
         if p.category != "algorithms".to_string() {
             return Err(Error::FeatureError(
-                "Not support database and shell questions for now".to_string()
+                "Not support database and shell questions for now".to_string(),
             ));
         }
 
-        if p.locked  {
+        if p.locked {
             return Err(Error::FeatureError(
-                "Not support premium question for now".to_string()
+                "Not support premium question for now".to_string(),
             ));
         }
 
@@ -99,12 +96,10 @@ impl Cache {
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
         Ok(problems.load::<Problem>(&self.conn()?)?)
     }
-    
+
     /// Get question
     pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
-        let target: Problem = problems
-            .filter(fid.eq(rfid))
-            .first(&self.conn()?)?;
+        let target: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
 
         let ids = match target.level {
             1 => target.fid.to_string().green(),
@@ -112,23 +107,23 @@ impl Cache {
             3 => target.fid.to_string().red(),
             _ => target.fid.to_string().dimmed(),
         };
-        
+
         println!(
             "\n[{}] {} {}\n\n",
             &ids,
             &target.name.bold().underline(),
             "is on the run...".dimmed()
         );
-        
+
         if target.category != "algorithms".to_string() {
             return Err(Error::FeatureError(
-                "Not support database and shell questions for now".to_string()
+                "Not support database and shell questions for now".to_string(),
             ));
         }
 
-        if target.locked  {
+        if target.locked {
             return Err(Error::FeatureError(
-                "Not support premium question for now".to_string()
+                "Not support premium question for now".to_string(),
             ));
         }
 
@@ -141,7 +136,9 @@ impl Cache {
 
             // update the question
             let sdesc = serde_json::to_string(&rdesc)?;
-            diesel::update(&target).set(desc.eq(sdesc)).execute(&self.conn()?)?;
+            diesel::update(&target)
+                .set(desc.eq(sdesc))
+                .execute(&self.conn()?)?;
         }
 
         Ok(rdesc)
@@ -150,7 +147,9 @@ impl Cache {
     pub fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
         trace!("Geting {} questions...", &rslug);
         let ids: Vec<String>;
-        let rtag = tags.filter(tag.eq(rslug.to_string())).first::<Tag>(&self.conn()?);
+        let rtag = tags
+            .filter(tag.eq(rslug.to_string()))
+            .first::<Tag>(&self.conn()?);
         if let Ok(t) = rtag {
             trace!("Got {} questions from local cache...", &rslug);
             ids = serde_json::from_str(&t.refs)?;
@@ -161,28 +160,32 @@ impl Cache {
                 r#refs: serde_json::to_string(&ids)?,
             };
 
-            diesel::insert_into(tags).values(&t).execute(&self.conn()?)?;
+            diesel::insert_into(tags)
+                .values(&t)
+                .execute(&self.conn()?)?;
         }
-        
+
         Ok(ids)
     }
 
     /// run_code data
-    fn pre_run_code(&self, run: Run, rfid: i32) ->
-        Result<(HashMap<&'static str, String>, [String; 2]), Error>
-    {
+    fn pre_run_code(
+        &self,
+        run: Run,
+        rfid: i32,
+    ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
+        use crate::helper::code_path;
         use std::fs::File;
         use std::io::Read;
-        use crate::helper::code_path;
 
         let p = &self.get_problem(rfid)?;
         let d: Question = serde_json::from_str(&p.desc)?;
         let conf = &self.0.conf;
         let mut json: HashMap<&'static str, String> = HashMap::new();
         let mut code: String = "".to_string();
-        
+
         File::open(code_path(&p)?)?.read_to_string(&mut code)?;
-        
+
         json.insert("lang", conf.code.lang.to_string());
         json.insert("question_id", p.id.to_string());
         json.insert("test_mode", false.to_string());
@@ -199,21 +202,21 @@ impl Cache {
                 conf.sys.urls.get("submit")?.replace("$slug", &p.slug)
             }
         };
-        
+
         Ok((
             json,
             [
                 url,
                 conf.sys.urls.get("problems")?.replace("$slug", &p.slug),
-            ]
+            ],
         ))
     }
 
     /// TODO: The real delay
     fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
+        use serde_json::{from_str, Error as SJError};
         use std::time::Duration;
-        use serde_json::{Error as SJError, from_str};
-        
+
         trace!("Run veriy recursion...");
         std::thread::sleep(Duration::from_micros(3000));
 
@@ -230,21 +233,21 @@ impl Cache {
             "SUCCESS" => res,
             _ => self.recur_verify(rid)?,
         };
-        
+
         Ok(res)
     }
-    
+
     /// Exec problem fliter —— Test or Submit
     pub fn exec_problem(&self, rfid: i32, run: Run) -> Result<VerifyResult, Error> {
         trace!("Exec problem fliter —— Test or Submit");
         let pre = self.pre_run_code(run.clone(), rfid)?;
         let json = pre.0;
 
-        let run_res: RunCode = self.0.clone().run_code(
-            json.clone(),
-            pre.1[0].clone(),
-            pre.1[1].clone()
-        )?.json()?;
+        let run_res: RunCode = self
+            .0
+            .clone()
+            .run_code(json.clone(), pre.1[0].clone(), pre.1[1].clone())?
+            .json()?;
 
         let mut res = match run {
             Run::Test => self.recur_verify(run_res.interpret_id)?,
@@ -262,7 +265,7 @@ impl Cache {
         let c = conn(conf.storage.cache()?);
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
         diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&c)?;
-        
+
         Ok(Cache(LeetCode::new()?))
     }
 }

@@ -1,25 +1,16 @@
 //! Clap Commanders
-use clap::{App, AppSettings};
 use crate::{
     cmds::{
-        Command,
-        DataCommand,
-        EditCommand,
-        ExecCommand,
-        ListCommand,
-        PickCommand,
-        StatCommand,
+        Command, DataCommand, EditCommand, ExecCommand, ListCommand, PickCommand, StatCommand,
         TestCommand,
     },
-    flag::{
-        Flag,
-        Debug,
-    },
     err::Error,
+    flag::{Debug, Flag},
 };
+use clap::{App, AppSettings};
 
 /// Get maches
-pub fn main() -> Result<(), Error>{
+pub fn main() -> Result<(), Error> {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
         .version("0.2.2")
@@ -41,8 +32,8 @@ pub fn main() -> Result<(), Error>{
         Debug::handler()?;
     } else {
         env_logger::from_env(env_logger::Env::new().default_filter_or("info"))
-        .format_timestamp(None)
-        .init();
+            .format_timestamp(None)
+            .init();
     }
 
     match m.subcommand() {
@@ -53,6 +44,6 @@ pub fn main() -> Result<(), Error>{
         ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m)?),
         ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m)?),
         ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m)?),
-        _ => Err(Error::MatchError)
+        _ => Err(Error::MatchError),
     }
 }

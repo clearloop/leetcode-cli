@@ -5,21 +5,11 @@ use crate::{
     plugins::chrome,
 };
 
-use std::{
-    collections::HashMap,
-    str::FromStr,
-    time::Duration,
-};
+use std::{collections::HashMap, str::FromStr, time::Duration};
 
 use reqwest::{
-    Client,
-    ClientBuilder,
-    Response,
-    header::{
-        HeaderMap,
-        HeaderName,
-        HeaderValue,
-    }
+    header::{HeaderMap, HeaderName, HeaderValue},
+    Client, ClientBuilder, Response,
 };
 
 /// LeetCode API set
@@ -39,7 +29,7 @@ impl LeetCode {
             if name.is_err() || value.is_err() {
                 return Err(Error::ParseError("http header parse failed".to_string()));
             }
-                
+
             headers.insert(name.unwrap(), value.unwrap());
         }
 
@@ -57,10 +47,10 @@ impl LeetCode {
                 ("Cookie", cookies.to_string().as_str()),
                 ("x-csrftoken", &cookies.csrf),
                 ("x-requested-with", "XMLHttpRequest"),
-                ("Origin", &conf.sys.urls["base"])
+                ("Origin", &conf.sys.urls["base"]),
             ],
         )?;
-        
+
         let client = ClientBuilder::new()
             .gzip(true)
             .connect_timeout(Duration::from_secs(30))
@@ -71,7 +61,7 @@ impl LeetCode {
         if &conf.cookies.csrf != &cookies.csrf {
             &conf.sync()?;
         }
-        
+
         Ok(LeetCode {
             conf,
             client,
@@ -82,7 +72,12 @@ impl LeetCode {
     /// Get category problems
     pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         trace!("Requesting {} problems...", &category);
-        let url = &self.conf.sys.urls.get("problems")?.replace("$category", category);
+        let url = &self
+            .conf
+            .sys
+            .urls
+            .get("problems")?
+            .replace("$category", category);
 
         Req {
             default_headers: self.default_headers,
@@ -92,7 +87,8 @@ impl LeetCode {
             mode: Mode::Get,
             name: "get_category_problems",
             url: url.to_string(),
-        }.send(&self.client)
+        }
+        .send(&self.client)
     }
 
     pub fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
@@ -111,9 +107,10 @@ impl LeetCode {
                 "    }",
                 "  }",
                 "}",
-            ].join("\n")
+            ]
+            .join("\n"),
         );
-        
+
         Req {
             default_headers: self.default_headers,
             refer: Some((&self.conf.sys.urls.get("tag")?).replace("$slug", slug)),
@@ -122,7 +119,8 @@ impl LeetCode {
             mode: Mode::Post,
             name: "get_question_ids_by_tag",
             url: url.to_string(),
-        }.send(&self.client)
+        }
+        .send(&self.client)
     }
 
     /// Get specific problem detail
@@ -143,17 +141,18 @@ impl LeetCode {
                 "    metaData",
                 "    translatedContent",
                 "  }",
-                "}"
-            ].join("\n")
+                "}",
+            ]
+            .join("\n"),
         );
 
         json.insert(
             "variables",
-            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", &slug)
+            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", &slug),
         );
 
         json.insert("operationName", "getQuestionDetail".to_string());
-        
+
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
@@ -162,7 +161,8 @@ impl LeetCode {
             mode: Mode::Post,
             name: "get_problem_detail",
             url: (&self.conf.sys.urls["graphql"]).to_string(),
-        }.send(&self.client)
+        }
+        .send(&self.client)
     }
 
     /// Send code to judge
@@ -176,7 +176,8 @@ impl LeetCode {
             mode: Mode::Post,
             name: "run_code",
             url: url,
-        }.send(&self.client)
+        }
+        .send(&self.client)
     }
 
     /// Get the result of submission / testing
@@ -191,21 +192,17 @@ impl LeetCode {
             mode: Mode::Get,
             name: "verify_result",
             url: url,
-        }.send(&self.client)
+        }
+        .send(&self.client)
     }
 }
-
 
 /// Sub-module for leetcode, simplify requests
 mod req {
     use super::LeetCode;
     use crate::err::Error;
+    use reqwest::{header::HeaderMap, Client, Response};
     use std::collections::HashMap;
-    use reqwest::{
-        Client,
-        header::HeaderMap,
-        Response,
-    };
 
     /// Standardize json format
     pub type Json = HashMap<&'static str, String>;
@@ -213,7 +210,7 @@ mod req {
     /// Standardize request mode
     pub enum Mode {
         Get,
-        Post
+        Post,
     }
 
     /// LeetCode request prototype
@@ -233,7 +230,7 @@ mod req {
             if self.info {
                 info!("{}", &self.name);
             }
-            
+
             let headers = LeetCode::headers(
                 self.default_headers,
                 vec![("Referer", &self.refer.unwrap_or(self.url.to_owned()))],
@@ -243,7 +240,7 @@ mod req {
                 Mode::Get => client.get(&self.url),
                 Mode::Post => client.post(&self.url).json(&self.json),
             };
-            
+
             Ok(req.headers(headers).send()?)
         }
     }

@@ -5,16 +5,16 @@ use clap::{App, ArgMatches};
 /// Abstract `edit` command
 ///
 /// ```sh
-/// leetcode-edit 
+/// leetcode-edit
 /// Edit question by id
-/// 
+///
 /// USAGE:
 ///     leetcode edit <id>
-/// 
+///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
-/// 
+///
 /// ARGS:
 ///     <id>    question id
 /// ```
@@ -23,20 +23,21 @@ pub struct EditCommand;
 impl Command for EditCommand {
     /// `edit` usage
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
-        use clap::{SubCommand, Arg};
+        use clap::{Arg, SubCommand};
         SubCommand::with_name("edit")
             .about("Edit question by id")
             .visible_alias("e")
-            .arg(Arg::with_name("id")
-                 .takes_value(true)
-                 .required(true)
-                 .help("question id")
+            .arg(
+                Arg::with_name("id")
+                    .takes_value(true)
+                    .required(true)
+                    .help("question id"),
             )
     }
 
     /// `edit` handler
     fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
-        use crate::{Cache, cache::models::Question};
+        use crate::{cache::models::Question, Cache};
         use std::fs::File;
         use std::io::Write;
         use std::path::Path;
@@ -58,16 +59,16 @@ impl Command for EditCommand {
             }
 
             if !flag {
-                return Err(crate::Error::FeatureError(
-                    format!(
-                        "This question doesn't support {}, please try another",
-                        &cache.0.conf.code.lang
-                    )
-                ));
+                return Err(crate::Error::FeatureError(format!(
+                    "This question doesn't support {}, please try another",
+                    &cache.0.conf.code.lang
+                )));
             }
         }
 
-        std::process::Command::new(cache.0.conf.code.editor).arg(path).status()?;
+        std::process::Command::new(cache.0.conf.code.editor)
+            .arg(path)
+            .status()?;
         Ok(())
     }
 }

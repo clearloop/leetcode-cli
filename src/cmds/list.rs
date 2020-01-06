@@ -1,17 +1,17 @@
 //! list subcomAmand - List leetcode problems
 //!
 //! ```sh
-//! leetcode-list 
+//! leetcode-list
 //! List problems
-//! 
+//!
 //! USAGE:
 //!     leetcode list [FLAGS] [OPTIONS] [keyword]
-//! 
+//!
 //! FLAGS:
 //!     -h, --help       Prints help information
 //!     -s, --stat       Show statistics of listed problems
 //!     -V, --version    Prints version information
-//! 
+//!
 //! OPTIONS:
 //!     -c, --category <category>    Fliter problems by category name
 //!                                  [alogrithms, database, shell]
@@ -23,10 +23,10 @@
 //!                                  d = done     D = not done
 //!                                  l = locked   L = not locked
 //!                                  s = starred  S = not starred
-//! 
+//!
 //! ARGS:
 //!     <keyword>    Keyword in select query
-//! 
+//!
 //! EXAMPLES:
 //!     leetcode list               List all questions
 //!     leetcode list array         List questions that has "array" in name
@@ -34,8 +34,8 @@
 //!     leetcode list -q eD         List questions that with easy level and not done
 //! ```
 use super::Command;
-use crate::{cache::Cache, helper::Digit, err::Error};
-use clap::{SubCommand, App, Arg, ArgMatches};
+use crate::{cache::Cache, err::Error, helper::Digit};
+use clap::{App, Arg, ArgMatches, SubCommand};
 /// Abstract `list` command
 ///
 /// ## handler
@@ -73,33 +73,38 @@ impl Command for ListCommand {
         SubCommand::with_name("list")
             .about("List problems")
             .visible_alias("l")
-            .arg(Arg::with_name("category")
-                 .short("c")
-                 .long("category")
-                 .takes_value(true)
-                 .help(CATEGORY_HELP)
+            .arg(
+                Arg::with_name("category")
+                    .short("c")
+                    .long("category")
+                    .takes_value(true)
+                    .help(CATEGORY_HELP),
             )
-            .arg(Arg::with_name("query")
-                 .short("q")
-                 .long("query")
-                 .takes_value(true)
-                 .help(QUERY_HELP)
+            .arg(
+                Arg::with_name("query")
+                    .short("q")
+                    .long("query")
+                    .takes_value(true)
+                    .help(QUERY_HELP),
             )
             .after_help(LIST_AFTER_HELP)
-            .arg(Arg::with_name("stat")
-                 .short("s")
-                 .long("stat")
-                 .help("Show statistics of listed problems")
+            .arg(
+                Arg::with_name("stat")
+                    .short("s")
+                    .long("stat")
+                    .help("Show statistics of listed problems"),
             )
-            .arg(Arg::with_name("tag")
-                 .short("t")
-                 .long("tag")
-                 .takes_value(true)
-                 .help("Filter questions by tag")
+            .arg(
+                Arg::with_name("tag")
+                    .short("t")
+                    .long("tag")
+                    .takes_value(true)
+                    .help("Filter questions by tag"),
             )
-            .arg(Arg::with_name("keyword")
-                 .takes_value(true)
-                 .help("Keyword in select query")
+            .arg(
+                Arg::with_name("keyword")
+                    .takes_value(true)
+                    .help("Keyword in select query"),
             )
     }
 
@@ -107,11 +112,11 @@ impl Command for ListCommand {
     ///
     /// List commands contains "-c", "-q", "-s" flags.
     /// + matches with `-c` will override the default <all> keyword.
-    /// + `-qs` 
+    /// + `-qs`
     fn handler(m: &ArgMatches) -> Result<(), Error> {
         use std::collections::HashMap;
         trace!("Input list command...");
-        
+
         let cache = Cache::new()?;
         let mut ps = cache.clone().get_problems()?;
 
@@ -130,7 +135,7 @@ impl Command for ListCommand {
 
             ps.retain(|x| map.get(&x.id.to_string()).is_some());
         }
-        
+
         // filter category
         if m.is_present("category") {
             ps.retain(|x| x.category == m.value_of("category").unwrap_or("algorithms"));
@@ -141,14 +146,16 @@ impl Command for ListCommand {
             let query = m.value_of("query")?;
             crate::helper::filter(&mut ps, query.to_string());
         }
-        
+
         // retain if keyword exists
-        if let Some(keyword) =  m.value_of("keyword") {
+        if let Some(keyword) = m.value_of("keyword") {
             ps.retain(|x| x.name.contains(&keyword));
         }
-        
-        for p in &ps { println!("{}", p); }
-        
+
+        for p in &ps {
+            println!("{}", p);
+        }
+
         // one more thing, filter stat
         if m.is_present("stat") {
             let mut listed = 0;
@@ -162,8 +169,12 @@ impl Command for ListCommand {
 
             for p in ps {
                 listed += 1;
-                if p.starred {starred += 1;}
-                if p.locked {locked += 1;}
+                if p.starred {
+                    starred += 1;
+                }
+                if p.locked {
+                    locked += 1;
+                }
 
                 match p.status.as_str() {
                     "ac" => ac += 1,
@@ -180,13 +191,20 @@ impl Command for ListCommand {
             }
 
             let remain = listed - ac - notac;
-            println!("
+            println!(
+                "
         Listed: {}     Locked: {}     Starred: {}
         Accept: {}     Not-Ac: {}     Remain:  {}
         Easy  : {}     Medium: {}     Hard:    {}",
-                     listed.digit(4), locked.digit(4), starred.digit(4),
-                     ac.digit(4), notac.digit(4), remain.digit(4),
-                     easy.digit(4), medium.digit(4), hard.digit(4),
+                listed.digit(4),
+                locked.digit(4),
+                starred.digit(4),
+                ac.digit(4),
+                notac.digit(4),
+                remain.digit(4),
+                easy.digit(4),
+                medium.digit(4),
+                hard.digit(4),
             );
         }
         Ok(())

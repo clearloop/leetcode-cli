@@ -1,21 +1,21 @@
 //! Pick command
 use super::Command;
 use crate::err::Error;
-use clap::{SubCommand, App, Arg, ArgMatches};
+use clap::{App, Arg, ArgMatches, SubCommand};
 
 /// Abstract pick command
 ///
 /// ```sh
-/// leetcode-pick 
+/// leetcode-pick
 /// Pick a problem
-/// 
+///
 /// USAGE:
 ///     leetcode pick [OPTIONS] [id]
-/// 
+///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
-/// 
+///
 /// OPTIONS:
 ///     -q, --query <query>    Fliter questions by conditions:
 ///                            Uppercase means negative
@@ -25,7 +25,7 @@ use clap::{SubCommand, App, Arg, ArgMatches};
 ///                            d = done     D = not done
 ///                            l = locked   L = not locked
 ///                            s = starred  S = not starred
-/// 
+///
 /// ARGS:
 ///     <id>    Problem id
 /// ```
@@ -46,28 +46,29 @@ impl Command for PickCommand {
         SubCommand::with_name("pick")
             .about("Pick a problem")
             .visible_alias("p")
-            .arg(Arg::with_name("id")
-                 .help("Problem id")
-                 .takes_value(true)
-            ).arg(Arg::with_name("query")
-                  .short("q")
-                  .long("query")
-                  .takes_value(true)
-                  .help(QUERY_HELP)
-            ).arg(Arg::with_name("tag")
-                 .short("t")
-                 .long("tag")
-                 .takes_value(true)
-                 .help("Filter questions by tag")
+            .arg(Arg::with_name("id").help("Problem id").takes_value(true))
+            .arg(
+                Arg::with_name("query")
+                    .short("q")
+                    .long("query")
+                    .takes_value(true)
+                    .help(QUERY_HELP),
+            )
+            .arg(
+                Arg::with_name("tag")
+                    .short("t")
+                    .long("tag")
+                    .takes_value(true)
+                    .help("Filter questions by tag"),
             )
     }
 
     /// `pick` handler
-    fn handler(m: &ArgMatches) -> Result<(), Error>{
-        use rand::Rng;
+    fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::Cache;
+        use rand::Rng;
         use std::collections::HashMap;
-        
+
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
         if problems.len() == 0 {
@@ -78,21 +79,23 @@ impl Command for PickCommand {
         // tag filter
         if m.is_present("tag") {
             let mut map: HashMap<String, bool> = HashMap::new();
-            let ids = cache.clone().get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
+            let ids = cache
+                .clone()
+                .get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
             ids.iter().for_each(|x| {
                 map.insert(x.to_string(), true).unwrap_or_default();
             });
 
             problems.retain(|x| map.get(&x.id.to_string()).is_some());
         }
-        
+
         // query filter
         if m.is_present("query") {
             let query = m.value_of("query")?;
             crate::helper::filter(&mut problems, query.to_string());
         }
 
-        if let Some(id) =  m.value_of("id") {
+        if let Some(id) = m.value_of("id") {
             problems.retain(|x| x.fid.to_string() == id);
         }
 

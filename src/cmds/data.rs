@@ -1,18 +1,18 @@
 //! Cache managger
 use super::Command;
 use crate::{cache::Cache, helper::Digit};
+use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::Colorize;
-use clap::{SubCommand, App, Arg, ArgMatches};
 
 /// Abstract `data` command
 ///
 /// ```sh
-/// leetcode-data 
+/// leetcode-data
 /// Manage Cache
-/// 
+///
 /// USAGE:
 ///     leetcode data [FLAGS]
-/// 
+///
 /// FLAGS:
 ///     -d, --delete     Delete cache
 ///     -u, --update     Update cache
@@ -27,25 +27,27 @@ impl Command for DataCommand {
         SubCommand::with_name("data")
             .about("Manage Cache")
             .visible_alias("d")
-            .arg(Arg::with_name("delete")
-                 .display_order(1)
-                 .short("d")
-                 .long("delete")
-                 .help("Delete cache")
+            .arg(
+                Arg::with_name("delete")
+                    .display_order(1)
+                    .short("d")
+                    .long("delete")
+                    .help("Delete cache"),
             )
-            .arg(Arg::with_name("update")
-                 .display_order(2)
-                 .short("u")
-                 .long("update")
-                 .help("Update cache")
+            .arg(
+                Arg::with_name("update")
+                    .display_order(2)
+                    .short("u")
+                    .long("update")
+                    .help("Update cache"),
             )
     }
 
     /// `data` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error>{
+    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error> {
         use std::fs::File;
         use std::path::Path;
-        
+
         let cache = Cache::new()?;
         let path = cache.0.conf.storage.cache()?;
         let f = File::open(&path)?;
@@ -56,7 +58,8 @@ impl Command for DataCommand {
             Path::new(&path)
                 .file_name()?
                 .to_string_lossy()
-                .to_string().digit(65 - (len.len() as i32))
+                .to_string()
+                .digit(65 - (len.len() as i32))
                 .bright_green(),
             len
         );

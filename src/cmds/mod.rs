@@ -1,5 +1,5 @@
 //! All subcommands in leetcode-cli
-//! 
+//!
 //! ```sh
 //! SUBCOMMANDS:
 //!     data    Manage Cache [aliases: d]
@@ -10,8 +10,8 @@
 //!     test    Edit question by id [aliases: t]
 //!     help    Prints this message or the help of the given subcommand(s)
 //! ```
-use clap::{App, ArgMatches};
 use crate::err::Error;
+use clap::{App, ArgMatches};
 /// Abstract commands' trait.
 pub trait Command {
     /// Usage of the spefic command

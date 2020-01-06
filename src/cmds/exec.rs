@@ -5,16 +5,16 @@ use clap::{App, ArgMatches};
 /// Abstract Exec Command
 ///
 /// ```sh
-/// leetcode-exec 
+/// leetcode-exec
 /// Submit solution
-/// 
+///
 /// USAGE:
 ///     leetcode exec <id>
-/// 
+///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
-/// 
+///
 /// ARGS:
 ///     <id>    question id
 /// ```
@@ -23,14 +23,15 @@ pub struct ExecCommand;
 impl Command for ExecCommand {
     /// `exec` usage
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
-        use clap::{SubCommand, Arg};
+        use clap::{Arg, SubCommand};
         SubCommand::with_name("exec")
             .about("Submit solution")
             .visible_alias("x")
-            .arg(Arg::with_name("id")
-                 .takes_value(true)
-                 .required(true)
-                 .help("question id")
+            .arg(
+                Arg::with_name("id")
+                    .takes_value(true)
+                    .required(true)
+                    .help("question id"),
             )
     }
 

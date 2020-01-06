@@ -1,18 +1,17 @@
-
 //! status command
 use super::Command;
+use clap::{App, ArgMatches, SubCommand};
 use colored::Colorize;
-use clap::{SubCommand, App, ArgMatches};
 
 /// Abstract statues command
 ///
 /// ```sh
-/// leetcode-stat 
+/// leetcode-stat
 /// Show simple chart about submissions
-/// 
+///
 /// USAGE:
 ///     leetcode stat
-/// 
+///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
@@ -29,11 +28,11 @@ impl Command for StatCommand {
 
     /// `stat` handler
     fn handler(_m: &ArgMatches) -> Result<(), crate::err::Error> {
-        use crate::{Cache, helper::Digit};
-        
+        use crate::{helper::Digit, Cache};
+
         let cache = Cache::new()?;
         let res = cache.get_problems()?;
-        
+
         let mut easy: f64 = 0.00;
         let mut easy_ac: f64 = 0.00;
         let mut medium: f64 = 0.00;
@@ -48,23 +47,22 @@ impl Command for StatCommand {
                     if i.status == "ac".to_string() {
                         easy_ac += 1.00;
                     }
-                },
+                }
                 2 => {
                     medium += 1.00;
                     if i.status == "ac".to_string() {
                         medium_ac += 1.00;
                     }
-                },
+                }
                 3 => {
                     hard += 1.00;
                     if i.status == "ac".to_string() {
                         hard_ac += 1.00;
                     }
-                },
+                }
                 _ => {}
             }
         }
-
 
         // level: len = 8
         // count: len = 8
@@ -79,29 +77,28 @@ impl Command for StatCommand {
             "{}",
             "  -----------------------------------------------------------------".bright_black()
         );
-        
+
         // lines
-        for (i, l) in vec![
-            (easy, easy_ac),
-            (medium, medium_ac),
-            (hard, hard_ac)
-        ].iter().enumerate() {
+        for (i, l) in vec![(easy, easy_ac), (medium, medium_ac), (hard, hard_ac)]
+            .iter()
+            .enumerate()
+        {
             match i {
                 0 => {
                     print!("  {}", "Easy".bright_green());
                     print!("{}", " ".digit(4));
-                },
+                }
                 1 => {
                     print!("  {}", "Medium".bright_yellow());
                     print!("{}", " ".digit(2));
-                },
+                }
                 2 => {
                     print!("  {}", "Hard".bright_red());
                     print!("{}", " ".digit(4));
-                },
-                _ => continue
+                }
+                _ => continue,
             }
-            
+
             let count = format!("{}/{}", l.1, l.0);
             let pct = format!("( {:.2} %)", ((100.0 * l.1) / l.0));
             let mut line = "".to_string();
@@ -111,13 +108,9 @@ impl Command for StatCommand {
             line.push_str(&pct);
             print!("{}", line);
             print!("     ");
-            
-            let done = "░".repeat(
-                ((32.00 * l.1) / l.0) as usize
-            ).bright_green();
-            let udone = "░".repeat(
-                32 - ((32.00 * l.1) / l.0) as usize
-            ).red();
+
+            let done = "░".repeat(((32.00 * l.1) / l.0) as usize).bright_green();
+            let udone = "░".repeat(32 - ((32.00 * l.1) / l.0) as usize).red();
             print!("{}", done);
             println!("{}", udone);
         }

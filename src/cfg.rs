@@ -2,12 +2,12 @@
 //!
 //! leetcode-cli will generate a `leetcode.toml` by default,
 //! if you wanna change to it, you can:
-//! 
+//!
 //! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
 //! + Use `leetcode config` to update it
-use toml;
-use std::{fs, collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, fs, path::PathBuf};
+use toml;
 
 const DEFAULT_CONFIG: &'static str = r#"
 # usually you don't wanna change those
@@ -76,7 +76,7 @@ pub struct Config {
     pub sys: Sys,
     pub code: Code,
     pub cookies: Cookies,
-    pub storage: Storage
+    pub storage: Storage,
 }
 
 impl Config {
@@ -94,7 +94,7 @@ impl Config {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Cookies {
     pub csrf: String,
-    pub session: String
+    pub session: String,
 }
 
 /// System settings, for leetcode api mainly
@@ -132,7 +132,7 @@ pub struct Code {
     pub editor: String,
     pub lang: String,
     pub pick: String,
-    pub submission: String
+    pub submission: String,
 }
 
 /// Locate code files
@@ -142,7 +142,7 @@ pub struct Code {
 pub struct Storage {
     cache: String,
     code: String,
-    root: String
+    root: String,
 }
 
 impl Storage {
@@ -169,11 +169,10 @@ impl Storage {
         if !PathBuf::from(&p).exists() {
             std::fs::create_dir(&p)?
         }
-        
+
         Ok(p.to_string_lossy().to_string())
     }
 }
-
 
 /// Locate lc's config file
 pub fn locate() -> Result<Config, crate::Error> {
@@ -185,7 +184,7 @@ pub fn locate() -> Result<Config, crate::Error> {
     let s = fs::read_to_string(&conf)?;
     let r = toml::from_str(&s);
     if r.is_err() {
-        return Err(crate::Error::ParseError("toml parsed failed".to_string()))
+        return Err(crate::Error::ParseError("toml parsed failed".to_string()));
     }
 
     Ok(r.unwrap())
@@ -196,9 +195,7 @@ pub fn root() -> Result<std::path::PathBuf, crate::Error> {
     let dir = dirs::home_dir()?.join(".leetcode");
     if !dir.is_dir() {
         info!("Generate root dir at {:?}.", &dir);
-        fs::DirBuilder::new()
-            .recursive(true)
-            .create(&dir)?;
+        fs::DirBuilder::new().recursive(true).create(&dir)?;
     }
 
     Ok(dir)

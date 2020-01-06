@@ -1,15 +1,15 @@
 //! Leetcode data models
-use colored::Colorize;
-use serde::{Serialize, Deserialize};
 use super::schemas::{problems, tags};
 use crate::helper::HTML;
+use colored::Colorize;
+use serde::{Deserialize, Serialize};
 
 /// Tag model
 #[derive(Clone, Insertable, Queryable, Serialize, Debug)]
 #[table_name = "tags"]
 pub struct Tag {
     pub tag: String,
-    pub refs: String
+    pub refs: String,
 }
 
 /// Problem model
@@ -43,7 +43,9 @@ impl std::fmt::Display for Problem {
         let mut name = "".to_string();
         let mut level = "".normal();
 
-        if self.locked { lock = LOCK };
+        if self.locked {
+            lock = LOCK
+        };
         if self.status == "ac".to_string() {
             done = DONE.green().bold();
         } else if self.status == "notac" {
@@ -55,19 +57,19 @@ impl std::fmt::Display for Problem {
                 id.push_str(&SPACE.repeat(2));
                 id.push_str(&self.fid.to_string());
                 id.push_str(&SPACE.repeat(1));
-            },
+            }
             2 => {
                 id.push_str(&SPACE.repeat(1));
                 id.push_str(&self.fid.to_string());
                 id.push_str(&SPACE.repeat(1));
-            },
+            }
             3 => {
                 id.push_str(&SPACE.repeat(1));
                 id.push_str(&self.fid.to_string());
-            },
+            }
             4 => {
                 id.push_str(&self.fid.to_string());
-            },
+            }
             _ => {
                 id.push_str(&space_2);
                 id.push_str(&space_2);
@@ -88,13 +90,17 @@ impl std::fmt::Display for Problem {
             1 => "Easy  ".bright_green(),
             2 => "Medium".bright_yellow(),
             3 => "Hard  ".bright_red(),
-            _ => level
+            _ => level,
         };
-        
+
         write!(
             f,
             "  {} {} [{}] {} {} ({} %)",
-            lock, done, id, name, level,
+            lock,
+            done,
+            id,
+            name,
+            level,
             &self.percent.to_string()[0..5]
         )
     }
@@ -118,11 +124,10 @@ impl std::fmt::Display for Question {
     }
 }
 
-
 use question::*;
 /// deps of Question
 mod question {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
     /// Code samples
     #[derive(Debug, Default, Serialize, Deserialize)]
@@ -149,9 +154,9 @@ mod question {
         #[serde(alias = "totalSubmissionRaw")]
         tsmr: i32,
         #[serde(alias = "acRate")]
-        rate: String
+        rate: String,
     }
-    
+
     /// Algorithm metadata
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct MetaData {
@@ -164,16 +169,15 @@ mod question {
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct Param {
         pub name: String,
-        pub r#type: String
+        pub r#type: String,
     }
 
     /// MetaData nested fields
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct Return {
-        pub r#type: String
+        pub r#type: String,
     }
 }
-
 
 /// run_code Result
 #[derive(Debug, Deserialize)]
@@ -211,7 +215,7 @@ pub struct VerifyResult {
     code_output: Vec<String>,
     #[serde(default)]
     std_output: String,
-    
+
     // flatten
     #[serde(flatten, default)]
     info: VerifyInfo,
@@ -266,7 +270,12 @@ impl std::fmt::Display for VerifyResult {
                         "  Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
                         ", faster than ",
-                        &self.analyse.runtime_percentile.unwrap_or(0).to_string().bold(),
+                        &self
+                            .analyse
+                            .runtime_percentile
+                            .unwrap_or(0)
+                            .to_string()
+                            .bold(),
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
@@ -276,7 +285,12 @@ impl std::fmt::Display for VerifyResult {
                         "  Memory Usage: ".dimmed(),
                         &self.status.status_memory.bold(),
                         ", less than ",
-                        &self.analyse.memory_percentile.unwrap_or(0).to_string().bold(),
+                        &self
+                            .analyse
+                            .memory_percentile
+                            .unwrap_or(0)
+                            .to_string()
+                            .bold(),
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
@@ -297,7 +311,7 @@ impl std::fmt::Display for VerifyResult {
                         "\n  Expected:      ",
                         eca,
                     ),
-                }
+                },
             },
             // Output Timeout Exceeded
             13 => write!(
@@ -313,16 +327,16 @@ impl std::fmt::Display for VerifyResult {
                 &self.status.status_msg.red().bold(),
                 &self.error.full_compile_error
             ),
-            _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold())
+            _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold()),
         }
     }
 }
 
 use verify::*;
 mod verify {
-    use serde::Deserialize;
     use super::super::parser::ssr;
-    
+    use serde::Deserialize;
+
     #[derive(Debug, Default, Deserialize)]
     pub struct Submit {
         #[serde(default)]
@@ -332,7 +346,7 @@ mod verify {
         #[serde(default)]
         pub compare_result: String,
     }
-    
+
     #[derive(Debug, Default, Deserialize)]
     pub struct VerifyInfo {
         #[serde(default)]
@@ -342,7 +356,7 @@ mod verify {
         #[serde(default)]
         task_finish_time: i64,
     }
-    
+
     #[derive(Debug, Default, Deserialize)]
     pub struct Analyse {
         #[serde(default)]
@@ -354,7 +368,7 @@ mod verify {
         #[serde(default)]
         pub memory_percentile: Option<i32>,
     }
-    
+
     #[derive(Debug, Default, Deserialize)]
     pub struct VerifyStatus {
         #[serde(default)]
@@ -366,7 +380,7 @@ mod verify {
         #[serde(default)]
         pub status_runtime: String,
     }
-    
+
     #[derive(Debug, Default, Deserialize)]
     pub struct CompileError {
         #[serde(default)]
@@ -374,7 +388,7 @@ mod verify {
         #[serde(default)]
         pub full_compile_error: String,
     }
-    
+
     #[derive(Debug, Default, Deserialize)]
     pub struct Expected {
         #[serde(default)]
@@ -394,6 +408,6 @@ mod verify {
         #[serde(default)]
         expected_task_finish_time: i64,
         #[serde(default, deserialize_with = "ssr")]
-        pub expected_code_answer: Vec<String>
+        pub expected_code_answer: Vec<String>,
     }
 }
