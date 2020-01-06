@@ -67,6 +67,11 @@ impl LeetCode {
             .cookie_store(true)
             .build()?;
 
+        // Sync conf
+        if &conf.cookies.csrf != &cookies.csrf {
+            &conf.sync()?;
+        }
+        
         Ok(LeetCode {
             conf,
             client,

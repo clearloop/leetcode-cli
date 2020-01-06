@@ -57,7 +57,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         });
     }
     
-    // if doesn't config SESSION and csrftoken
+    // If doesn't config SESSION and csrftoken
     use self::schema::cookies::dsl::*;
     let home = dirs::home_dir()?;
     let p = match std::env::consts::OS {
@@ -93,7 +93,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
             m.insert(c.name, decode_cookies(&pass, c.encrypted_value)?);
         }
     }
-    
+
     Ok(Ident {
         csrf: m.get("csrftoken")?.to_string(),
         session: m.get("LEETCODE_SESSION")?.to_string(),
