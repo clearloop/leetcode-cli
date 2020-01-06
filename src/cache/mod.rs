@@ -148,11 +148,11 @@ impl Cache {
     }
 
     pub fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
-        trace!("Get tagged questions...");
+        trace!("Geting {} questions...", &rslug);
         let ids: Vec<String>;
         let rtag = tags.filter(tag.eq(rslug.to_string())).first::<Tag>(&self.conn()?);
         if let Ok(t) = rtag {
-            trace!("Get tag contents from local cache...");
+            trace!("Got {} questions from local cache...", &rslug);
             ids = serde_json::from_str(&t.refs)?;
         } else {
             ids = parser::tags(self.clone().0.get_question_ids_by_tag(&rslug)?.json()?)?;
@@ -246,7 +246,6 @@ impl Cache {
             pre.1[1].clone()
         )?.json()?;
 
-        info!("verify result from leetcode.com...");
         let mut res = match run {
             Run::Test => self.recur_verify(run_res.interpret_id)?,
             Run::Submit => self.recur_verify(run_res.submission_id.to_string())?,

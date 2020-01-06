@@ -48,7 +48,7 @@ impl LeetCode {
 
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
-        debug!("Building reqwest client...");
+        trace!("Building reqwest client...");
         let conf = cfg::locate()?;
         let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(
@@ -81,6 +81,7 @@ impl LeetCode {
 
     /// Get category problems
     pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
+        trace!("Requesting {} problems...", &category);
         let url = &self.conf.sys.urls.get("problems")?.replace("$category", category);
 
         Req {
@@ -95,6 +96,7 @@ impl LeetCode {
     }
 
     pub fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
+        trace!("Requesting {} ref problems...", &slug);
         let url = &self.conf.sys.urls.get("graphql")?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "getTopicTag".to_string());
@@ -125,6 +127,7 @@ impl LeetCode {
 
     /// Get specific problem detail
     pub fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
+        trace!("Requesting {} detail...", &slug);
         let refer = self.conf.sys.urls.get("problems")?.replace("$slug", slug);
         let mut json: Json = HashMap::new();
         json.insert(
@@ -164,7 +167,7 @@ impl LeetCode {
 
     /// Send code to judge
     pub fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
-        info!("Sending code to leetcode.com...");
+        info!("Sending code to judge...");
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
@@ -178,6 +181,7 @@ impl LeetCode {
 
     /// Get the result of submission / testing
     pub fn verify_result(self, id: String) -> Result<Response, Error> {
+        trace!("Verifying result...");
         let url = self.conf.sys.urls.get("verify")?.replace("$id", &id);
         Req {
             default_headers: self.default_headers,
@@ -225,9 +229,9 @@ mod req {
 
     impl Req {
         pub fn send<'req>(self, client: &'req Client) -> Result<Response, Error> {
-            debug!("Running leetcode::{}...", &self.name);
+            trace!("Running leetcode::{}...", &self.name);
             if self.info {
-                info!("Downloading {} deps...", &self.name);
+                info!("{}", &self.name);
             }
             
             let headers = LeetCode::headers(
