@@ -9,7 +9,10 @@ use colored::Colorize;
 use std::collections::HashMap;
 use self::sql::*;
 use self::models::*;
-use self::schemas::problems::dsl::*;
+use self::schemas::{
+    tags::dsl::*,
+    problems::dsl::*,
+};
 use crate::{cfg, err::Error, plugins::LeetCode};
 
 /// sqlite connection
@@ -144,6 +147,25 @@ impl Cache {
         Ok(rdesc)
     }
 
+    pub fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
+        trace!("Get tagged questions...");
+        let ids: Vec<String>;
+        let rtag = tags.filter(tag.eq(rslug.to_string())).first::<Tag>(&self.conn()?);
+        if let Ok(t) = rtag {
+            trace!("Get tag contents from local cache...");
+            ids = serde_json::from_str(&t.refs)?;
+        } else {
+            ids = parser::tags(self.clone().0.get_question_ids_by_tag(&rslug)?.json()?)?;
+            let t = Tag {
+                r#tag: rslug.to_string(),
+                r#refs: serde_json::to_string(&ids)?,
+            };
+
+            diesel::insert_into(tags).values(&t).execute(&self.conn()?)?;
+        }
+        
+        Ok(ids)
+    }
 
     /// run_code data
     fn pre_run_code(&self, run: Run, rfid: i32) ->
@@ -240,6 +262,7 @@ impl Cache {
         let conf = cfg::locate()?;
         let c = conn(conf.storage.cache()?);
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
+        diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&c)?;
         
         Ok(Cache(LeetCode::new()?))
     }

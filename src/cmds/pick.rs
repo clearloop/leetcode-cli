@@ -1,6 +1,5 @@
 //! Pick command
 use super::Command;
-// use crate::{cache::Cache, helper::Digit};
 use crate::err::Error;
 use clap::{SubCommand, App, Arg, ArgMatches};
 
@@ -55,13 +54,19 @@ impl Command for PickCommand {
                   .long("query")
                   .takes_value(true)
                   .help(QUERY_HELP)
+            ).arg(Arg::with_name("tag")
+                 .short("t")
+                 .long("tag")
+                 .takes_value(true)
+                 .help("Filter questions by tag")
             )
     }
 
     /// `pick` handler
     fn handler(m: &ArgMatches) -> Result<(), Error>{
-        use crate::cache::Cache;
         use rand::Rng;
+        use crate::cache::Cache;
+        use std::collections::HashMap;
         
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
@@ -70,6 +75,18 @@ impl Command for PickCommand {
             Self::handler(m)?
         }
 
+        // tag filter
+        if m.is_present("tag") {
+            let mut map: HashMap<String, bool> = HashMap::new();
+            let ids = cache.clone().get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
+            ids.iter().for_each(|x| {
+                map.insert(x.to_string(), true).unwrap_or_default();
+            });
+
+            problems.retain(|x| map.get(&x.id.to_string()).is_some());
+        }
+        
+        // query filter
         if m.is_present("query") {
             let query = m.value_of("query")?;
             crate::helper::filter(&mut problems, query.to_string());

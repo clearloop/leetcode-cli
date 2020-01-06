@@ -1,8 +1,16 @@
 //! Leetcode data models
 use colored::Colorize;
 use serde::{Serialize, Deserialize};
-use super::schemas::problems;
+use super::schemas::{problems, tags};
 use crate::helper::HTML;
+
+/// Tag model
+#[derive(Clone, Insertable, Queryable, Serialize, Debug)]
+#[table_name = "tags"]
+pub struct Tag {
+    pub tag: String,
+    pub refs: String
+}
 
 /// Problem model
 #[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
@@ -262,7 +270,7 @@ impl std::fmt::Display for VerifyResult {
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
-                        "online submissions for ",
+                        " online submissions for ",
                         &self.name,
                         ".\n\n",
                         "  Memory Usage: ".dimmed(),
@@ -272,7 +280,7 @@ impl std::fmt::Display for VerifyResult {
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
-                        "online submissions for ",
+                        " online submissions for ",
                         &self.name,
                     ),
                     // Wrong Answer

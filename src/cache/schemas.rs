@@ -14,3 +14,11 @@ table! {
         desc -> Text,
     }
 }
+
+// Tags
+table! {
+    tags(tag) {
+        tag -> Text,
+        refs -> Text,
+    }
+}

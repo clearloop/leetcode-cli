@@ -43,6 +43,7 @@ graphql = "https://leetcode.com/graphql"
 login = "https://leetcode.com/accounts/login/"
 problems = "https://leetcode.com/api/problems/$category/"
 problem = "https://leetcode.com/problems/$slug/description/"
+tag = "https://leetcode.com/tag/$slug/"
 test = "https://leetcode.com/problems/$slug/interpret_solution/"
 session = "https://leetcode.com/session/"
 submit = "https://leetcode.com/problems/$slug/submit/"
@@ -66,6 +67,7 @@ session = ""
 cache = "Problems"
 code = "code"
 root = "~/.leetcode"
+scripts = "scripts"
 "#;
 
 /// Sync with `~/.leetcode/config.toml`

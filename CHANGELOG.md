@@ -1,3 +1,8 @@
+## v0.2.2
+1. optimize logs
+2. add tag filter
+3. sync configs
+
 ## v0.2.1
 1. fix cookies error handling
 2. dismiss all `unwrap`, `expect` and `panic`

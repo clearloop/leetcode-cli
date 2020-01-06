@@ -46,6 +46,31 @@ pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
     Ok(())
 }
 
+/// tag parser
+pub fn tags(v: Value) -> Result<Vec<String>, Error> {
+    trace!("Parse tags...");
+    let tag = v.as_object()?
+        .get("data")?
+        .as_object()?
+        .get("topicTag")?;
+
+    if tag.is_null() {
+        return Ok(vec![]);
+    }
+
+    let arr = tag
+        .as_object()?
+        .get("questions")?
+        .as_array()?;
+
+    let mut res: Vec<String> = vec![];
+    for q in arr.iter() {
+        res.push(q.as_object()?.get("questionId")?.as_str()?.to_string())
+    }
+    
+    Ok(res)
+}
+
 pub use ss::ssr;
 /// string or squence
 mod ss {

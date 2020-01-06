@@ -14,4 +14,11 @@ pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &'static str = r#"
   )
 "#;
 
+pub static CREATE_TAGS_IF_NOT_EXISTS: &'static str = r#"
+  CREATE TABLE IF NOT EXISTS tags (
+    tag TEXT NOT NULL,
+    refs TEXT NOT NULL
+  )
+"#;
+
 // pub static DROP_PROBLEMS: &'static str = r#"DROP TABLE problems"#;

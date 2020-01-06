@@ -59,10 +59,11 @@ l = locked   L = not locked
 s = starred  S = not starred"#;
 
 static LIST_AFTER_HELP: &'static str = r#"EXAMPLES:
-    leetcode list               List all questions
-    leetcode list array         List questions that has "array" in name
-    leetcode list -c database   List questions that in database category
-    leetcode list -q eD         List questions that with easy level and not done    
+    leetcode list                   List all questions
+    leetcode list array             List questions that has "array" in name
+    leetcode list -c database       List questions that in database category
+    leetcode list -q eD             List questions that with easy level and not done    
+    leetcode list -t linked-list    List questions that under tag "linked-list"
 "#;
 
 /// implement Command trait for `list`
@@ -90,6 +91,12 @@ impl Command for ListCommand {
                  .long("stat")
                  .help("Show statistics of listed problems")
             )
+            .arg(Arg::with_name("tag")
+                 .short("t")
+                 .long("tag")
+                 .takes_value(true)
+                 .help("Filter questions by tag")
+            )
             .arg(Arg::with_name("keyword")
                  .takes_value(true)
                  .help("Keyword in select query")
@@ -102,15 +109,28 @@ impl Command for ListCommand {
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs` 
     fn handler(m: &ArgMatches) -> Result<(), Error> {
+        use std::collections::HashMap;
+        trace!("Input list command...");
+        
         let cache = Cache::new()?;
-        let mut ps = cache.get_problems()?;
+        let mut ps = cache.clone().get_problems()?;
 
         if ps.len() == 0 {
-            cache.download_problems()?;
-            Self::handler(m)?
+            return Self::handler(m);
         }
 
         // filtering...
+        // filter tag
+        if m.is_present("tag") {
+            let mut map: HashMap<String, bool> = HashMap::new();
+            let ids = cache.get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
+            ids.iter().for_each(|x| {
+                map.insert(x.to_string(), true).unwrap_or_default();
+            });
+
+            ps.retain(|x| map.get(&x.id.to_string()).is_some());
+        }
+        
         // filter category
         if m.is_present("category") {
             ps.retain(|x| x.category == m.value_of("category").unwrap_or("algorithms"));
@@ -121,7 +141,6 @@ impl Command for ListCommand {
             let query = m.value_of("query")?;
             crate::helper::filter(&mut ps, query.to_string());
         }
-        
         
         // retain if keyword exists
         if let Some(keyword) =  m.value_of("keyword") {

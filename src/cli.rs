@@ -22,7 +22,7 @@ use crate::{
 pub fn main() -> Result<(), Error>{
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.2.1")
+        .version("0.2.2")
         .about("Here's to the crazy ones 👻")
         .subcommands(vec![
             DataCommand::usage().display_order(1),

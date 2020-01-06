@@ -76,8 +76,7 @@ impl LeetCode {
 
     /// Get category problems
     pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
-        let pre_url = &self.conf.sys.urls["problems"];
-        let url = &pre_url.replace("$category", category);
+        let url = &self.conf.sys.urls.get("problems")?.replace("$category", category);
 
         Req {
             default_headers: self.default_headers,
@@ -86,6 +85,35 @@ impl LeetCode {
             json: None,
             mode: Mode::Get,
             name: "get_category_problems",
+            url: url.to_string(),
+        }.send(&self.client)
+    }
+
+    pub fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
+        let url = &self.conf.sys.urls.get("graphql")?;
+        let mut json: Json = HashMap::new();
+        json.insert("operationName", "getTopicTag".to_string());
+        json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", &slug));
+        json.insert(
+            "query",
+            vec![
+                "query getTopicTag($slug: String!) {",
+                "  topicTag(slug: $slug) {",
+                "    questions {",
+                "      questionId",
+                "    }",
+                "  }",
+                "}",
+            ].join("\n")
+        );
+        
+        Req {
+            default_headers: self.default_headers,
+            refer: Some((&self.conf.sys.urls.get("tag")?).replace("$slug", slug)),
+            info: false,
+            json: Some(json),
+            mode: Mode::Post,
+            name: "get_question_ids_by_tag",
             url: url.to_string(),
         }.send(&self.client)
     }
