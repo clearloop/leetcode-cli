@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
 use toml;
 
-const DEFAULT_CONFIG: &'static str = r#"
+const DEFAULT_CONFIG: &str = r#"
 # usually you don't wanna change those
 [sys]
 categories = [

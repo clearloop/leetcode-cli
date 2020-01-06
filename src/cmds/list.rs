@@ -45,11 +45,11 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 /// + ...
 pub struct ListCommand;
 
-static CATEGORY_HELP: &'static str = r#"Fliter problems by category name
+static CATEGORY_HELP: &str = r#"Fliter problems by category name
 [alogrithms, database, shell]
 "#;
 
-static QUERY_HELP: &'static str = r#"Fliter questions by conditions:
+static QUERY_HELP: &str = r#"Fliter questions by conditions:
 Uppercase means negative
 e = easy     E = m+h
 m = medium   M = e+h
@@ -58,7 +58,7 @@ d = done     D = not done
 l = locked   L = not locked
 s = starred  S = not starred"#;
 
-static LIST_AFTER_HELP: &'static str = r#"EXAMPLES:
+static LIST_AFTER_HELP: &str = r#"EXAMPLES:
     leetcode list                   List all questions
     leetcode list array             List questions that has "array" in name
     leetcode list -c database       List questions that in database category
@@ -120,7 +120,7 @@ impl Command for ListCommand {
         let cache = Cache::new()?;
         let mut ps = cache.clone().get_problems()?;
 
-        if ps.len() == 0 {
+        if ps.is_empty() {
             return Self::handler(m);
         }
 

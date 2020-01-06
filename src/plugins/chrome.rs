@@ -34,7 +34,7 @@ pub struct Ident {
 
 impl std::string::ToString for Ident {
     fn to_string(&self) -> String {
-        format!("LEETCODE_SESSION={};csrftoken={};", self.session, self.csrf).to_string()
+        format!("LEETCODE_SESSION={};csrftoken={};", self.session, self.csrf)
     }
 }
 
@@ -42,7 +42,7 @@ impl std::string::ToString for Ident {
 pub fn cookies() -> Result<Ident, crate::Error> {
     trace!("Derive cookies from google chrome...");
     let ccfg = crate::cfg::locate()?.cookies;
-    if ccfg.csrf.len() > 0 && ccfg.session.len() > 0 {
+    if !ccfg.csrf.is_empty() && !ccfg.session.is_empty() {
         return Ok(Ident {
             csrf: ccfg.csrf,
             session: ccfg.session,
@@ -66,7 +66,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         .expect("Loading cookies from google chrome failed.");
 
     println!("res {:?}", &res);
-    if &res.len() == &(0 as usize) {
+    if res.len() == (0 as usize) {
         return Err(crate::Error::CookieError);
     }
 
@@ -77,7 +77,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     // Decode cookies
     let mut m: HashMap<String, String> = HashMap::new();
     for c in res.to_owned() {
-        if (c.name == "csrftoken".to_string()) || (c.name == "LEETCODE_SESSION".to_string()) {
+        if (c.name == "csrftoken") || (c.name == "LEETCODE_SESSION") {
             m.insert(c.name, decode_cookies(&pass, c.encrypted_value)?);
         }
     }

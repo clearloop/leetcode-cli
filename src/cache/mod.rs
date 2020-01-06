@@ -75,7 +75,7 @@ impl Cache {
     /// Get problem
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
         let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
-        if p.category != "algorithms".to_string() {
+        if p.category != "algorithms" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
             ));
@@ -98,6 +98,7 @@ impl Cache {
     }
 
     /// Get question
+    #[allow(clippy::useless_let_if_seq)]
     pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
         let target: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
 
@@ -115,7 +116,7 @@ impl Cache {
             "is on the run...".dimmed()
         );
 
-        if target.category != "algorithms".to_string() {
+        if target.category != "algorithms" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
             ));
@@ -128,7 +129,7 @@ impl Cache {
         }
 
         let mut rdesc = Question::default();
-        if target.desc.len() > 0 {
+        if !target.desc.is_empty() {
             rdesc = serde_json::from_str(&target.desc)?;
         } else {
             let json: Value = self.0.clone().get_question_detail(&target.slug)?.json()?;
@@ -193,7 +194,7 @@ impl Cache {
 
         // pass manually data
         json.insert("name", p.name.to_string());
-        json.insert("data_input", d.case.to_string());
+        json.insert("data_input", d.case);
 
         let url = match run {
             Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),

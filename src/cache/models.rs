@@ -29,11 +29,11 @@ pub struct Problem {
     pub desc: String,
 }
 
-static DONE: &'static str = " ✔";
-static ETC: &'static str = "...";
-static LOCK: &'static str = "🔒";
-static NDONE: &'static str = "✘";
-static SPACE: &'static str = " ";
+static DONE: &str = " ✔";
+static ETC: &str = "...";
+static LOCK: &str = "🔒";
+static NDONE: &str = "✘";
+static SPACE: &str = " ";
 impl std::fmt::Display for Problem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let space_2 = SPACE.repeat(2);
@@ -46,7 +46,7 @@ impl std::fmt::Display for Problem {
         if self.locked {
             lock = LOCK
         };
-        if self.status == "ac".to_string() {
+        if self.status == "ac" {
             done = DONE.green().bold();
         } else if self.status == "notac" {
             done = NDONE.green().bold();
@@ -76,7 +76,7 @@ impl std::fmt::Display for Problem {
             }
         }
 
-        if &self.name.len() < &60_usize {
+        if self.name.len() < 60_usize {
             name.push_str(&self.name);
             name.push_str(&SPACE.repeat(60 - &self.name.len()));
         } else {
@@ -246,24 +246,25 @@ impl std::fmt::Display for VerifyResult {
         debug!("{:#?}", &self);
 
         match &self.status.status_code {
-            10 => match self.correct_answer {
-                // Pass Test
-                true => write!(
-                    f,
-                    "\n  {}{}{}\n{}{}{}{}{}{}\n",
-                    &self.status.status_msg.green().bold(),
-                    "       Runtime: ".dimmed(),
-                    &self.status.status_runtime.dimmed(),
-                    "\n  Your input:    ",
-                    &self.data_input.replace("\n", ", "),
-                    "\n  Output:        ",
-                    ca,
-                    "\n  Expected:      ",
-                    eca,
-                ),
-                false => match &self.submit.compare_result.len() > &0 {
+            10 => {
+                if self.correct_answer {
+                    // Pass Test
+                    write!(
+                        f,
+                        "\n  {}{}{}\n{}{}{}{}{}{}\n",
+                        &self.status.status_msg.green().bold(),
+                        "       Runtime: ".dimmed(),
+                        &self.status.status_runtime.dimmed(),
+                        "\n  Your input:    ",
+                        &self.data_input.replace("\n", ", "),
+                        "\n  Output:        ",
+                        ca,
+                        "\n  Expected:      ",
+                        eca,
+                    )
+                } else if !self.submit.compare_result.is_empty() {
                     // Submit Successfully
-                    true => write!(
+                    write!(
                         f,
                         "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n",
                         "  Success\n\n".green().bold(),
@@ -296,9 +297,10 @@ impl std::fmt::Display for VerifyResult {
                         &self.pretty_lang,
                         " online submissions for ",
                         &self.name,
-                    ),
+                    )
+                } else {
                     // Wrong Answer
-                    false => write!(
+                    write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
                         "  Wrong Answer".red().bold(),
@@ -310,9 +312,9 @@ impl std::fmt::Display for VerifyResult {
                         ca,
                         "\n  Expected:      ",
                         eca,
-                    ),
-                },
-            },
+                    )
+                }
+            }
             // Output Timeout Exceeded
             13 => write!(
                 f,

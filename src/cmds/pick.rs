@@ -31,7 +31,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 /// ```
 pub struct PickCommand;
 
-static QUERY_HELP: &'static str = r#"Fliter questions by conditions:
+static QUERY_HELP: &str = r#"Fliter questions by conditions:
 Uppercase means negative
 e = easy     E = m+h
 m = medium   M = e+h
@@ -71,7 +71,7 @@ impl Command for PickCommand {
 
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
-        if problems.len() == 0 {
+        if problems.is_empty() {
             cache.clone().download_problems()?;
             Self::handler(m)?
         }

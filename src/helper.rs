@@ -70,8 +70,8 @@ mod filter {
                 'M' => ps.retain(|x| x.level != 2),
                 'h' => ps.retain(|x| x.level == 3),
                 'H' => ps.retain(|x| x.level != 3),
-                'd' => ps.retain(|x| x.status == "ac".to_string()),
-                'D' => ps.retain(|x| x.status != "ac".to_string()),
+                'd' => ps.retain(|x| x.status == "ac"),
+                'D' => ps.retain(|x| x.status != "ac"),
                 _ => {}
             }
         }
@@ -115,12 +115,11 @@ mod html {
                 for (i, e) in tks.chars().enumerate() {
                     match e {
                         '<' => {
-                            match bold {
-                                true => {
-                                    output.push(Token::Bold(tks[ptr..i].to_string()));
-                                    bold = false;
-                                }
-                                false => output.push(Token::Plain(tks[ptr..i].to_string())),
+                            if bold {
+                                output.push(Token::Bold(tks[ptr..i].to_string()));
+                                bold = false;
+                            } else {
+                                output.push(Token::Plain(tks[ptr..i].to_string()));
                             }
                             ptr = i;
                         }

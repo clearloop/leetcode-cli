@@ -58,8 +58,8 @@ impl LeetCode {
             .build()?;
 
         // Sync conf
-        if &conf.cookies.csrf != &cookies.csrf {
-            &conf.sync()?;
+        if conf.cookies.csrf != cookies.csrf {
+            conf.sync()?;
         }
 
         Ok(LeetCode {
@@ -118,7 +118,7 @@ impl LeetCode {
             json: Some(json),
             mode: Mode::Post,
             name: "get_question_ids_by_tag",
-            url: url.to_string(),
+            url: (*url).to_string(),
         }
         .send(&self.client)
     }
@@ -175,7 +175,7 @@ impl LeetCode {
             json: Some(j),
             mode: Mode::Post,
             name: "run_code",
-            url: url,
+            url,
         }
         .send(&self.client)
     }
@@ -191,7 +191,7 @@ impl LeetCode {
             json: None,
             mode: Mode::Get,
             name: "verify_result",
-            url: url,
+            url,
         }
         .send(&self.client)
     }
@@ -225,15 +225,15 @@ mod req {
     }
 
     impl Req {
-        pub fn send<'req>(self, client: &'req Client) -> Result<Response, Error> {
+        pub fn send(self, client: &Client) -> Result<Response, Error> {
             trace!("Running leetcode::{}...", &self.name);
             if self.info {
                 info!("{}", &self.name);
             }
-
+            let url = self.url.to_owned();
             let headers = LeetCode::headers(
                 self.default_headers,
-                vec![("Referer", &self.refer.unwrap_or(self.url.to_owned()))],
+                vec![("Referer", &self.refer.unwrap_or(url))],
             )?;
 
             let req = match self.mode {

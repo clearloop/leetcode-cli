@@ -1,4 +1,4 @@
-pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &'static str = r#"
+pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &str = r#"
   CREATE TABLE IF NOT EXISTS problems (
     category TEXT NOT NULL,
     fid INTEGER NOT NULL,
@@ -14,7 +14,7 @@ pub static CREATE_PROBLEMS_IF_NOT_EXISTS: &'static str = r#"
   )
 "#;
 
-pub static CREATE_TAGS_IF_NOT_EXISTS: &'static str = r#"
+pub static CREATE_TAGS_IF_NOT_EXISTS: &str = r#"
   CREATE TABLE IF NOT EXISTS tags (
     tag TEXT NOT NULL,
     refs TEXT NOT NULL

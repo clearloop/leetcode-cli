@@ -26,7 +26,7 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
         });
     }
 
-    return Ok(());
+    Ok(())
 }
 
 /// desc parser

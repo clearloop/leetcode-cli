@@ -44,19 +44,19 @@ impl Command for StatCommand {
             match i.level {
                 1 => {
                     easy += 1.00;
-                    if i.status == "ac".to_string() {
+                    if i.status == "ac" {
                         easy_ac += 1.00;
                     }
                 }
                 2 => {
                     medium += 1.00;
-                    if i.status == "ac".to_string() {
+                    if i.status == "ac" {
                         medium_ac += 1.00;
                     }
                 }
                 3 => {
                     hard += 1.00;
-                    if i.status == "ac".to_string() {
+                    if i.status == "ac" {
                         hard_ac += 1.00;
                     }
                 }
@@ -114,7 +114,7 @@ impl Command for StatCommand {
             print!("{}", done);
             println!("{}", udone);
         }
-        println!("");
+        println!();
         Ok(())
     }
 }

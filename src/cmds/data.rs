@@ -67,7 +67,7 @@ impl Command for DataCommand {
         let mut title = "\n  Cache".digit(63);
         title.push_str("Size");
         title.push_str("\n  ");
-        title.push_str(&"-".repeat(65).to_string());
+        title.push_str(&"-".repeat(65));
 
         let mut flags = 0;
         if m.is_present("delete") {
