@@ -38,7 +38,6 @@ impl LeetCode {
 
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
-        trace!("Building reqwest client...");
         let conf = cfg::locate()?;
         let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(

@@ -7,7 +7,6 @@
 //! + Use `leetcode config` to update it
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
-use toml;
 
 const DEFAULT_CONFIG: &str = r#"
 # usually you don't wanna change those
@@ -143,6 +142,7 @@ pub struct Storage {
     cache: String,
     code: String,
     root: String,
+    scripts: Option<String>,
 }
 
 impl Storage {
@@ -162,10 +162,26 @@ impl Storage {
             .to_string())
     }
 
-    /// get cache path
+    /// get code path
     pub fn code(&self) -> Result<String, crate::Error> {
         let root = &self.root()?;
         let p = PathBuf::from(root).join(&self.code);
+        if !PathBuf::from(&p).exists() {
+            std::fs::create_dir(&p)?
+        }
+
+        Ok(p.to_string_lossy().to_string())
+    }
+
+    /// get scripts path
+    pub fn scripts(mut self) -> Result<String, crate::Error> {
+        let root = &self.root()?;
+        if self.scripts.is_none() {
+            let tmp = toml::from_str::<Config>(&DEFAULT_CONFIG)?;
+            self.scripts = Some(tmp.storage.scripts?);
+        }
+
+        let p = PathBuf::from(root).join(&self.scripts?);
         if !PathBuf::from(&p).exists() {
             std::fs::create_dir(&p)?
         }
@@ -182,12 +198,7 @@ pub fn locate() -> Result<Config, crate::Error> {
     }
 
     let s = fs::read_to_string(&conf)?;
-    let r = toml::from_str(&s);
-    if r.is_err() {
-        return Err(crate::Error::ParseError("toml parsed failed".to_string()));
-    }
-
-    Ok(r.unwrap())
+    Ok(toml::from_str::<Config>(&s)?)
 }
 
 /// Get root path of leetcode-cli

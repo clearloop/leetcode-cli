@@ -1,7 +1,7 @@
 //! A set of helper traits
 pub use self::digit::Digit;
-pub use self::file::code_path;
-pub use self::filter::filter;
+pub use self::file::{code_path, load_script};
+pub use self::filter::{filter, squash};
 pub use self::html::HTML;
 
 /// Convert i32 to specific digits string.
@@ -75,6 +75,18 @@ mod filter {
                 _ => {}
             }
         }
+    }
+
+    /// Squash questions and ids
+    pub fn squash(ps: &mut Vec<Problem>, ids: Vec<String>) -> Result<(), crate::Error> {
+        use std::collections::HashMap;
+
+        let mut map: HashMap<String, bool> = HashMap::new();
+        ids.iter().for_each(|x| {
+            map.insert(x.to_string(), true).unwrap_or_default();
+        });
+        ps.retain(|x| map.get(&x.id.to_string()).is_some());
+        Ok(())
     }
 }
 
@@ -213,5 +225,17 @@ mod file {
         path = path.replace("${slug}", &target.slug.to_string());
 
         Ok(path)
+    }
+
+    /// Load python scripts
+    pub fn load_script(module: &str) -> Result<String, crate::Error> {
+        use std::fs::File;
+        use std::io::Read;
+        let conf = crate::cfg::locate()?;
+        let mut script = "".to_string();
+        File::open(format!("{}/{}.py", conf.storage.scripts()?, module))?
+            .read_to_string(&mut script)?;
+
+        Ok(script)
     }
 }

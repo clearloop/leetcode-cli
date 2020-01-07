@@ -13,7 +13,7 @@ use clap::{App, AppSettings};
 pub fn main() -> Result<(), Error> {
     let m = App::new("leetcode")
         .author("clearloop <udtrokia@163.com>")
-        .version("0.2.2")
+        .version("0.2.3")
         .about("Here's to the crazy ones 👻")
         .subcommands(vec![
             DataCommand::usage().display_order(1),

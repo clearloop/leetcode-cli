@@ -67,7 +67,6 @@ impl Command for PickCommand {
     fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::Cache;
         use rand::Rng;
-        use std::collections::HashMap;
 
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
@@ -76,17 +75,19 @@ impl Command for PickCommand {
             Self::handler(m)?
         }
 
+        // filtering...
+        // pym scripts
+        if m.is_present("plan") {
+            let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+            crate::helper::squash(&mut problems, ids)?;
+        }
+
         // tag filter
         if m.is_present("tag") {
-            let mut map: HashMap<String, bool> = HashMap::new();
             let ids = cache
                 .clone()
                 .get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
-            ids.iter().for_each(|x| {
-                map.insert(x.to_string(), true).unwrap_or_default();
-            });
-
-            problems.retain(|x| map.get(&x.id.to_string()).is_some());
+            crate::helper::squash(&mut problems, ids)?;
         }
 
         // query filter

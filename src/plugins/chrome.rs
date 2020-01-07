@@ -40,7 +40,6 @@ impl std::string::ToString for Ident {
 
 /// Get cookies from chrome storage
 pub fn cookies() -> Result<Ident, crate::Error> {
-    trace!("Derive cookies from google chrome...");
     let ccfg = crate::cfg::locate()?.cookies;
     if !ccfg.csrf.is_empty() && !ccfg.session.is_empty() {
         return Ok(Ident {
@@ -51,6 +50,8 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 
     // If doesn't config SESSION and csrftoken
     use self::schema::cookies::dsl::*;
+    trace!("Derive cookies from google chrome...");
+
     let home = dirs::home_dir()?;
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),

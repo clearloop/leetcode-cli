@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["clearloop <udtrokia@163.com>"]
 edition = "2018"
 description = "Leet your code in command-line."
@@ -31,4 +31,5 @@ reqwest = "0.9.24"
 serde = "1.0.104"
 serde_derive = "1.0.104"
 serde_json = "1.0.44"
+pyo3 = "0.8.5"
 toml = "0.5.5"

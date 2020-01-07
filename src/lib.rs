@@ -205,6 +205,7 @@ pub mod err;
 pub mod flag;
 pub mod helper;
 pub mod plugins;
+pub mod pym;
 // really pub
 pub mod cli;
 

@@ -81,6 +81,13 @@ impl Command for ListCommand {
                     .help(CATEGORY_HELP),
             )
             .arg(
+                Arg::with_name("plan")
+                    .short("p")
+                    .long("plan")
+                    .takes_value(true)
+                    .help("Invoking python scripts to filter questions"),
+            )
+            .arg(
                 Arg::with_name("query")
                     .short("q")
                     .long("query")
@@ -114,7 +121,6 @@ impl Command for ListCommand {
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs`
     fn handler(m: &ArgMatches) -> Result<(), Error> {
-        use std::collections::HashMap;
         trace!("Input list command...");
 
         let cache = Cache::new()?;
@@ -125,15 +131,16 @@ impl Command for ListCommand {
         }
 
         // filtering...
+        // pym scripts
+        if m.is_present("plan") {
+            let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+            crate::helper::squash(&mut ps, ids)?;
+        }
+
         // filter tag
         if m.is_present("tag") {
-            let mut map: HashMap<String, bool> = HashMap::new();
             let ids = cache.get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
-            ids.iter().for_each(|x| {
-                map.insert(x.to_string(), true).unwrap_or_default();
-            });
-
-            ps.retain(|x| map.get(&x.id.to_string()).is_some());
+            crate::helper::squash(&mut ps, ids)?;
         }
 
         // filter category

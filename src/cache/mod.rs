@@ -169,6 +169,10 @@ impl Cache {
         Ok(ids)
     }
 
+    pub fn get_tags(&self) -> Result<Vec<Tag>, Error> {
+        Ok(tags.load::<Tag>(&self.conn()?)?)
+    }
+
     /// run_code data
     fn pre_run_code(
         &self,
