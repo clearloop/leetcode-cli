@@ -189,7 +189,7 @@ impl Cache {
         let mut json: HashMap<&'static str, String> = HashMap::new();
         let mut code: String = "".to_string();
 
-        File::open(code_path(&p)?)?.read_to_string(&mut code)?;
+        File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
         json.insert("lang", conf.code.lang.to_string());
         json.insert("question_id", p.id.to_string());

@@ -1,3 +1,6 @@
+## v0.2.5
+update local cache when submission status changes
+
 ## v0.2.4
 auto fetch question while exec `edit` directly.
 

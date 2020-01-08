@@ -28,6 +28,13 @@ impl Command for EditCommand {
             .about("Edit question by id")
             .visible_alias("e")
             .arg(
+                Arg::with_name("lang")
+                    .short("l")
+                    .long("lang")
+                    .takes_value(true)
+                    .help("Edit with specific language"),
+            )
+            .arg(
                 Arg::with_name("id")
                     .takes_value(true)
                     .required(true)
@@ -45,8 +52,14 @@ impl Command for EditCommand {
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
         let target = cache.get_problem(id)?;
-        let path = crate::helper::code_path(&target)?;
 
+        // condition language
+        let mut lang = cache.to_owned().0.conf.code.lang;
+        if m.is_present("lang") {
+            lang = m.value_of("lang")?.to_string();
+        }
+
+        let path = crate::helper::code_path(&target, Some(lang.to_owned()))?;
         if !Path::new(&path).exists() {
             let mut qr = serde_json::from_str(&target.desc);
             if qr.is_err() {
@@ -57,16 +70,17 @@ impl Command for EditCommand {
             let mut f = File::create(&path)?;
             let mut flag = false;
             for d in question.defs.0 {
-                if d.value == cache.0.conf.code.lang {
+                if d.value == lang {
                     flag = true;
                     f.write_all(d.code.to_string().as_bytes())?;
                 }
             }
 
             if !flag {
+                std::fs::remove_file(&path)?;
                 return Err(crate::Error::FeatureError(format!(
                     "This question doesn't support {}, please try another",
-                    &cache.0.conf.code.lang
+                    &lang
                 )));
             }
         }
