@@ -4,45 +4,12 @@
 //! [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 //!
-//! ## Cookies
+//! ## Features
 //!
-//! The cookie plugin of leetcode-cil can work on OSX and [Linux][#1], If you are on other platforms or your cookies just don't want to be catched, you can **handwrite your LeetCode Cookies to `~/.leetcode/leetcode.toml`**
-//!
-//! ```toml
-//! # Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
-//! [cookies]
-//! csrf = "..."
-//! session = "..."
-//! ```
-//!
-//! ### How to find LeetCode Cookies?
-//!
-//! For Example, if you're using chrome to login to leetcode.com.
-//!
-//!
-//! #### Step 1
-//!
-//! Open chrome and paste the link below to the `chrome linkbar`.
-//!
-//! ```sh
-//! chrome://settings/cookies/detail?site=leetcode.com
-//! ```
-//!
-//! #### Step 2
-//!
-//! Copy the contents of `LEETCODE_SESSION` and `csrftoken`.
-//!
-//! #### Step 3
-//!
-//! Paste them to `session` and `csrf`.
-//!
-//! ```toml
-//! # Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
-//! [cookies]
-//! csrf = "${LEETCODE_SESSION}"
-//! session = "${csrf}"
-//! ```
-//!
+//! + [x] the edit flow —— solution files will generate automatically!
+//! + [x] support python script to filter questions
+//! + [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
+//! + [ ]  support local signal to keep coding as longer as you want.
 //!
 //!
 //! ## Building
@@ -51,12 +18,17 @@
 //! cargo install leetcode-cli
 //! ```
 //!
+//! ## Login
+//!
+//! **Please make sure you have logined in leetcode.com with chrome**, the cookie plugin of leetcode-cil can work on both OSX and [Linux][#1], username and password are not required, and if you are on other platforms or your cookies just don't want to be catched, please checkout [this](#cookies).
+//!
+//!
 //! ## Usage
 //!
 //! Please make sure you have logined in `leetcode.com` with `chrome`, more info plz checkout [this](#cookies)
 //!
 //! ```sh
-//! leetcode 0.2.2
+//! leetcode 0.2.3
 //! clearloop <udtrokia@163.com>
 //! Here's to the crazy ones 👻
 //!
@@ -121,7 +93,6 @@
 //! ```
 //!
 //! ```rust
-//! # struct Solution;
 //! impl Solution {
 //!     pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
 //!         use std::collections::HashMap;
@@ -162,7 +133,7 @@
 //! leetcode submit 1
 //! ```
 //!
-//! ```sh
+//! ```
 //!
 //!   Success
 //!
@@ -173,12 +144,92 @@
 //!
 //! ```
 //!
-//! ## Features
+//! ## Cookies
 //!
-//! + [x] the edit flow —— solution files will generate automatically!
-//! + [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
-//!    + [ ] btw, generate a site is easy for `lc-rs`!
-//! + [ ]  support local signal to keep coding as longer as you want.
+//! The cookie plugin of leetcode-cil can work on OSX and [Linux][#1], **If you are on other platforms or your cookies just don't want to be catched**, you can handwrite your LeetCode Cookies to `~/.leetcode/leetcode.toml`
+//!
+//! ```toml
+//! # Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
+//! [cookies]
+//! csrf = "..."
+//! session = "..."
+//! ```
+//!
+//! For Example, if you're using chrome to login to leetcode.com.
+//!
+//!
+//! #### Step 1
+//!
+//! Open chrome and paste the link below to the `chrome linkbar`.
+//!
+//! ```sh
+//! chrome://settings/cookies/detail?site=leetcode.com
+//! ```
+//!
+//! #### Step 2
+//!
+//! Copy the contents of `LEETCODE_SESSION` and `csrftoken`.
+//!
+//! #### Step 3
+//!
+//! Paste them to `session` and `csrf`.
+//!
+//! ```toml
+//! # Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
+//! [cookies]
+//! csrf = "${csrftoken}"
+//! session = "${LEETCODE_SESSION}"
+//! ```
+//!
+//!
+//! ## Programmable
+//!
+//! If we want to filter leetcode questions using our own python scripts, what should we do?
+//!
+//! For example, our config is:
+//!
+//! ```toml
+//! # Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
+//! [storage]
+//! scripts = "scripts"
+//! ```
+//!
+//! We write our python scripts:
+//!
+//! ```python
+//! # ~/.leetcode/scripts/plan1.py
+//! import json;
+//!
+//! def plan(sps, stags):
+//!     ##
+//!     # `print` in python is supported,
+//!     # if you want to know the data structures of these two args,
+//!     # just print them
+//!     ##
+//!     problems = json.loads(sps)
+//!     tags = json.loads(stags)
+//!
+//!     ret = []
+//!     tm = {}
+//!     for tag in tags:
+//!         tm[tag["tag"]] = tag["refs"];
+//!
+//!     for i in problems:
+//!         if i["level"] == 1 and str(i["id"]) in tm["linked-list"]:
+//!             ret.append(str(i["id"]))
+//!
+//!     # return is `List[string]`
+//!     return ret
+//! ```
+//!
+//! Then we can run filter as what we write now:
+//!
+//! ```sh
+//! leetcode list -p plan1
+//! ```
+//!
+//! Well done, enjoy it!
+//!
 //!
 //! ## PR
 //!
