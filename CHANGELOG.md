@@ -1,3 +1,9 @@
+## v0.2.4
+auto fetch question while exec `edit` directly.
+
+## v0.2.3
+Programmable leetcode-cli
+
 ## v0.2.2
 1. optimize logs
 2. add tag filter

@@ -48,8 +48,13 @@ impl Command for EditCommand {
         let path = crate::helper::code_path(&target)?;
 
         if !Path::new(&path).exists() {
+            let mut qr = serde_json::from_str(&target.desc);
+            if qr.is_err() {
+                qr = Ok(cache.get_question(id)?);
+            }
+
+            let question: Question = qr?;
             let mut f = File::create(&path)?;
-            let question: Question = serde_json::from_str(&target.desc)?;
             let mut flag = false;
             for d in question.defs.0 {
                 if d.value == cache.0.conf.code.lang {

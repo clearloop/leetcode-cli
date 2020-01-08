@@ -18,14 +18,9 @@
 cargo install leetcode-cli
 ```
 
-## Login
-
-**Please make sure you have logined in leetcode.com with chrome**, the cookie plugin of leetcode-cil can work on both OSX and [Linux][#1], username and password are not required, and if you are on other platforms or your cookies just don't want to be catched, please checkout [this](#cookies).
-
-
 ## Usage
 
-Please make sure you have logined in `leetcode.com` with `chrome`, more info plz checkout [this](#cookies)
+**Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
 leetcode 0.2.3
