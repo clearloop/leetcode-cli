@@ -69,6 +69,7 @@ impl std::convert::From<diesel::result::Error> for Error {
 // serde
 impl std::convert::From<serde_json::error::Error> for Error {
     fn from(err: serde_json::Error) -> Self {
+        error!("{:?}", &err);
         Error::ParseError(err.description().to_string())
     }
 }

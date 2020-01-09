@@ -179,6 +179,7 @@ impl Cache {
         run: Run,
         rfid: i32,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
+        trace!("pre run code...");
         use crate::helper::code_path;
         use std::fs::File;
         use std::io::Read;

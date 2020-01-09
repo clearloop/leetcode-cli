@@ -263,6 +263,23 @@ impl std::fmt::Display for VerifyResult {
                         eca,
                     )
                 } else if !self.submit.compare_result.is_empty() {
+                    let (mut rp, mut mp) = (0, 0);
+                    if let Some(n) = &self.analyse.runtime_percentile {
+                        if n.is_f64() {
+                            rp = n.as_f64().unwrap_or(0.0) as i64;
+                        } else {
+                            rp = n.as_i64().unwrap_or(0);
+                        }
+                    }
+
+                    if let Some(n) = &self.analyse.memory_percentile {
+                        if n.is_f64() {
+                            mp = n.as_f64().unwrap_or(0.0) as i64;
+                        } else {
+                            mp = n.as_i64().unwrap_or(0);
+                        }
+                    }
+
                     // Submit Successfully
                     write!(
                         f,
@@ -271,12 +288,7 @@ impl std::fmt::Display for VerifyResult {
                         "  Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
                         ", faster than ",
-                        &self
-                            .analyse
-                            .runtime_percentile
-                            .unwrap_or(0)
-                            .to_string()
-                            .bold(),
+                        rp.to_string().bold(),
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
@@ -286,12 +298,7 @@ impl std::fmt::Display for VerifyResult {
                         "  Memory Usage: ".dimmed(),
                         &self.status.status_memory.bold(),
                         ", less than ",
-                        &self
-                            .analyse
-                            .memory_percentile
-                            .unwrap_or(0)
-                            .to_string()
-                            .bold(),
+                        mp.to_string().bold(),
                         "% ".bold(),
                         "of ",
                         &self.pretty_lang,
@@ -338,6 +345,7 @@ use verify::*;
 mod verify {
     use super::super::parser::ssr;
     use serde::Deserialize;
+    use serde_json::Number;
 
     #[derive(Debug, Default, Deserialize)]
     pub struct Submit {
@@ -362,13 +370,13 @@ mod verify {
     #[derive(Debug, Default, Deserialize)]
     pub struct Analyse {
         #[serde(default)]
-        pub total_correct: Option<i32>,
+        pub total_correct: Option<Number>,
         #[serde(default)]
-        pub total_testcases: Option<i32>,
+        pub total_testcases: Option<Number>,
         #[serde(default)]
-        pub runtime_percentile: Option<i32>,
+        pub runtime_percentile: Option<Number>,
         #[serde(default)]
-        pub memory_percentile: Option<i32>,
+        pub memory_percentile: Option<Number>,
     }
 
     #[derive(Debug, Default, Deserialize)]

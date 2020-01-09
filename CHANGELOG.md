@@ -1,4 +1,7 @@
-## v0.2.5
+## v0.2.7
+fixed float bug in result
+
+## v0.2.6
 sync config while change current lang
 
 ## v0.2.5

@@ -23,7 +23,7 @@ cargo install leetcode-cli
 **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
-leetcode 0.2.6
+leetcode 0.2.7
 clearloop <udtrokia@163.com>
 Here's to the crazy ones 👻
 
@@ -88,6 +88,7 @@ leetcode edit 1
 ```
 
 ```rust
+# struct Solution;
 impl Solution {
     pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
         use std::collections::HashMap;
@@ -128,7 +129,7 @@ leetcode test 1
 leetcode submit 1
 ```
 
-```
+```sh
 
   Success
 
