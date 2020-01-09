@@ -52,13 +52,15 @@ impl Command for EditCommand {
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
         let target = cache.get_problem(id)?;
+        let mut conf = cache.to_owned().0.conf;
 
         // condition language
-        let mut lang = cache.to_owned().0.conf.code.lang;
         if m.is_present("lang") {
-            lang = m.value_of("lang")?.to_string();
+            conf.code.lang = m.value_of("lang")?.to_string();
+            conf.sync()?;
         }
 
+        let lang = conf.code.lang;
         let path = crate::helper::code_path(&target, Some(lang.to_owned()))?;
         if !Path::new(&path).exists() {
             let mut qr = serde_json::from_str(&target.desc);
@@ -85,7 +87,7 @@ impl Command for EditCommand {
             }
         }
 
-        std::process::Command::new(cache.0.conf.code.editor)
+        std::process::Command::new(conf.code.editor)
             .arg(path)
             .status()?;
         Ok(())

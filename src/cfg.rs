@@ -82,7 +82,7 @@ impl Config {
     /// Sync new config to config.toml
     pub fn sync(&self) -> Result<(), crate::Error> {
         let home = dirs::home_dir()?;
-        let conf = home.join(".leetcode/conf.toml");
+        let conf = home.join(".leetcode/leetcode.toml");
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
 
         Ok(())

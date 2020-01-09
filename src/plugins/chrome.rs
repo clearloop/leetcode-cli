@@ -66,7 +66,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         .load::<Cookies>(&conn)
         .expect("Loading cookies from google chrome failed.");
 
-    println!("res {:?}", &res);
+    debug!("res {:?}", &res);
     if res.len() == (0 as usize) {
         return Err(crate::Error::CookieError);
     }

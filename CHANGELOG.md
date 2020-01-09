@@ -1,4 +1,7 @@
 ## v0.2.5
+sync config while change current lang
+
+## v0.2.5
 update local cache when submission status changes
 
 ## v0.2.4
