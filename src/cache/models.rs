@@ -326,7 +326,7 @@ impl std::fmt::Display for VerifyResult {
             // Failed some tests
             11 => write!(
                 f,
-                "\n{}:\n\n{}{}\n{}{}\n",
+                "\n{}:\n\n{}{}\n{}{}\n{}{}\n",
                 &self.status.status_msg.red().bold(),
                 "Total Correct:   ".green(),
                 &self
@@ -336,7 +336,7 @@ impl std::fmt::Display for VerifyResult {
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .green(),
-                "Total Testcases: ".bold().yellow(),
+                "Total Testcases: ".yellow(),
                 &self
                     .analyse
                     .total_testcases
@@ -345,6 +345,8 @@ impl std::fmt::Display for VerifyResult {
                     .to_string()
                     .bold()
                     .yellow(),
+                "Last TestCase:   ".dimmed(),
+                &self.submit.last_testcase.dimmed()
             ),
             // Output Timeout Exceeded
             13 => write!(
@@ -376,7 +378,7 @@ mod verify {
         #[serde(default)]
         question_id: String,
         #[serde(default)]
-        last_testcase: String,
+        pub last_testcase: String,
         #[serde(default)]
         pub compare_result: String,
     }
