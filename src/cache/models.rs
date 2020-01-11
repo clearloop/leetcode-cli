@@ -3,6 +3,7 @@ use super::schemas::{problems, tags};
 use crate::helper::HTML;
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
+use serde_json::Number;
 
 /// Tag model
 #[derive(Clone, Insertable, Queryable, Serialize, Debug)]
@@ -322,6 +323,29 @@ impl std::fmt::Display for VerifyResult {
                     )
                 }
             }
+            // Failed some tests
+            11 => write!(
+                f,
+                "\n{}:\n\n{}{}\n{}{}\n",
+                &self.status.status_msg.red().bold(),
+                "Total Correct:   ".green(),
+                &self
+                    .analyse
+                    .total_correct
+                    .as_ref()
+                    .unwrap_or(&Number::from(0))
+                    .to_string()
+                    .green(),
+                "Total Testcases: ".bold().yellow(),
+                &self
+                    .analyse
+                    .total_testcases
+                    .as_ref()
+                    .unwrap_or(&Number::from(0))
+                    .to_string()
+                    .bold()
+                    .yellow(),
+            ),
             // Output Timeout Exceeded
             13 => write!(
                 f,
