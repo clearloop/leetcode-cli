@@ -1,3 +1,9 @@
+## v0.2.9
+update ac status after submit successfully
+
+## v0.2.8
+show last testcases
+
 ## v0.2.7
 fixed float bug in result
 

@@ -264,6 +264,20 @@ impl std::fmt::Display for VerifyResult {
                         eca,
                     )
                 } else if !self.submit.compare_result.is_empty() {
+                    // Submit Successfully
+                    // TODO: result shoule be all 1;
+                    // Lines below are sucks...
+                    let cache = super::Cache::new().expect("cache gen failed");
+                    cache
+                        .update_after_ac(
+                            self.submit
+                                .question_id
+                                .parse()
+                                .expect("submit succcessfully, parse question_id to i32 failed"),
+                        )
+                        .expect("update ac to cache failed");
+
+                    // prints
                     let (mut rp, mut mp) = (0, 0);
                     if let Some(n) = &self.analyse.runtime_percentile {
                         if n.is_f64() {
@@ -280,8 +294,6 @@ impl std::fmt::Display for VerifyResult {
                             mp = n.as_i64().unwrap_or(0);
                         }
                     }
-
-                    // Submit Successfully
                     write!(
                         f,
                         "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n",
@@ -376,7 +388,7 @@ mod verify {
     #[derive(Debug, Default, Deserialize)]
     pub struct Submit {
         #[serde(default)]
-        question_id: String,
+        pub question_id: String,
         #[serde(default)]
         pub last_testcase: String,
         #[serde(default)]
