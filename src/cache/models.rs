@@ -367,6 +367,8 @@ impl std::fmt::Display for VerifyResult {
                 &self.status.status_msg.yellow().bold(),
                 &self.code_output,
             ),
+            // Runtime error
+            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold()),
             // Compile Error
             20 => write!(
                 f,
