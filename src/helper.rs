@@ -112,14 +112,11 @@ mod html {
             let mut tks = self.to_string();
 
             // converting symbols
-            tks = tks.replace(r#"&lt;"#, "<");
-            tks = tks.replace(r#"&gt;"#, ">");
-            tks = tks.replace(r#"&amp;"#, "&");
-            tks = tks.replace(r#"&quot;"#, "\"");
-            tks = tks.replace(r#"&nbsp;"#, " ");
-            tks = tks.replace(r#"&#39;"#, "'");
-            tks = tks.replace(r#"&ge;"#, ">=");
-            tks = tks.replace(r#"&le;"#, "<=");
+            tks = tks
+                .replace(r#"&amp;"#, "&")
+                .replace(r#"&quot;"#, "\"")
+                .replace(r#"&nbsp;"#, " ")
+                .replace(r#"&#39;"#, "'");
 
             let res: Vec<Token>;
             // styled
@@ -182,7 +179,15 @@ mod html {
                 }
             }
 
-            tks.join("")
+            // post replace
+            let mut tks = tks.join("");
+            tks = tks
+                .replace(r#"&lt;"#, "<")
+                .replace(r#"&gt;"#, ">")
+                .replace(r#"&ge;"#, ">=")
+                .replace(r#"&le;"#, "<=");
+
+            tks
         }
     }
 }
