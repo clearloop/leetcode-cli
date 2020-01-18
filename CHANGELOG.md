@@ -1,3 +1,8 @@
+## v0.2.11
+added code 14 and transfered `&#ge;`、`&#le` and `&#39;`.
+## v0.2.10
+add code 15
+
 ## v0.2.9
 update ac status after submit successfully
 

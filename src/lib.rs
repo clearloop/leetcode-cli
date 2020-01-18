@@ -23,9 +23,9 @@
 //! **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 //!
 //! ```sh
-//! leetcode 0.2.10
+//! leetcode 0.2.11
 //! clearloop <udtrokia@163.com>
-//! Here's to the crazy ones 👻
+//! May the Code be with You 👻
 //!
 //! USAGE:
 //!     leetcode [FLAGS] [SUBCOMMAND]

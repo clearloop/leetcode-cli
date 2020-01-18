@@ -161,7 +161,7 @@ mod question {
     /// Algorithm metadata
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct MetaData {
-        pub name: String,
+        pub name: Option<String>,
         pub params: Vec<Param>,
         pub r#return: Return,
     }
@@ -362,6 +362,13 @@ impl std::fmt::Display for VerifyResult {
             ),
             // Output Timeout Exceeded
             13 => write!(
+                f,
+                "\n{}:\n\n{:?}\n",
+                &self.status.status_msg.yellow().bold(),
+                &self.code_output,
+            ),
+            // Output Timeout Exceeded
+            14 => write!(
                 f,
                 "\n{}:\n\n{:?}\n",
                 &self.status.status_msg.yellow().bold(),

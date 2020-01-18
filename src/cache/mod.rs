@@ -140,6 +140,7 @@ impl Cache {
             rdesc = serde_json::from_str(&target.desc)?;
         } else {
             let json: Value = self.0.clone().get_question_detail(&target.slug)?.json()?;
+            debug!("{:#?}", &json);
             parser::desc(&mut rdesc, json)?;
 
             // update the question

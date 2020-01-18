@@ -117,6 +117,9 @@ mod html {
             tks = tks.replace(r#"&amp;"#, "&");
             tks = tks.replace(r#"&quot;"#, "\"");
             tks = tks.replace(r#"&nbsp;"#, " ");
+            tks = tks.replace(r#"&#39;"#, "'");
+            tks = tks.replace(r#"&ge;"#, ">=");
+            tks = tks.replace(r#"&le;"#, "<=");
 
             let res: Vec<Token>;
             // styled
