@@ -1,5 +1,12 @@
+## v0.2.13
+fix percent length panic
+
+## v0.2.12
+fix gt || ge || lt || le
+
 ## v0.2.11
 added code 14 and transfered `&#ge;`、`&#le` and `&#39;`.
+
 ## v0.2.10
 add code 15
 

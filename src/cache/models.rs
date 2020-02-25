@@ -94,6 +94,10 @@ impl std::fmt::Display for Problem {
             _ => level,
         };
 
+        let mut pct = self.percent.to_string();
+        if pct.len() < 5 {
+            pct.push_str(&"0".repeat(5 - pct.len()));
+        }
         write!(
             f,
             "  {} {} [{}] {} {} ({} %)",
@@ -102,7 +106,7 @@ impl std::fmt::Display for Problem {
             id,
             name,
             level,
-            &self.percent.to_string()[0..5]
+            &pct[..5]
         )
     }
 }
