@@ -198,8 +198,8 @@ mod file {
         match l {
             "bash" => Ok("sh"),
             "c" => Ok("c"),
-            "cpp" => Ok("c"),
-            "csharp" => Ok("c"),
+            "cpp" => Ok("cpp"),
+            "csharp" => Ok("cs"),
             "golang" => Ok("go"),
             "java" => Ok("java"),
             "javascript" => Ok("js"),
