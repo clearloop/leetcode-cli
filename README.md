@@ -4,13 +4,16 @@
 [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
+## Contributors
++ [@Raees678](https://github.com/Raees678)
++ [@clearloop](https://github.com/clearloop)
+
 ## Features
 
 + [x] the edit flow —— solution files will generate automatically!
 + [x] support python script to filter questions
 + [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
-+ [ ]  support local signal to keep coding as longer as you want.
-
++ [ ] support local signal to keep coding as longer as you want.
 
 ## Building
 
@@ -23,7 +26,7 @@ cargo install leetcode-cli
 **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
-leetcode 0.2.12
+leetcode 0.2.14
 clearloop <udtrokia@163.com>
 May the Code be with You 👻
 
@@ -229,7 +232,7 @@ Well done, enjoy it!
 
 ## PR
 
-PR is welcome, [here][pr] it is.
+PR is welcome!! [Come][pr] As You Are!
 
 ## LICENSE
 MIT
