@@ -7,13 +7,13 @@ use crate::{
     err::Error,
     flag::{Debug, Flag},
 };
-use clap::{App, AppSettings};
+use clap::{App, AppSettings, crate_name, crate_authors, crate_version};
 
 /// Get maches
 pub fn main() -> Result<(), Error> {
-    let m = App::new("leetcode")
-        .author("clearloop <udtrokia@163.com>")
-        .version("0.2.14")
+    let m = App::new(crate_name!())
+        .author(crate_authors!("\n"))
+        .version(crate_version!())
         .about("May the Code be with You 👻")
         .subcommands(vec![
             DataCommand::usage().display_order(1),
