@@ -25,7 +25,7 @@ impl Command for TestCommand {
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
         use clap::{Arg, SubCommand};
         SubCommand::with_name("test")
-            .about("Edit question by id")
+            .about("Test question by id")
             .visible_alias("t")
             .arg(
                 Arg::with_name("id")
