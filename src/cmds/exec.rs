@@ -41,7 +41,7 @@ impl Command for ExecCommand {
 
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Submit)?;
+        let res = cache.exec_problem(id, Run::Submit, None)?;
 
         println!("{}", res);
         Ok(())

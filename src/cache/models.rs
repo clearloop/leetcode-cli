@@ -261,7 +261,7 @@ impl std::fmt::Display for VerifyResult {
                         "       Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
                         "\n  Your input:    ",
-                        &self.data_input.replace("\n", ", "),
+                        &self.data_input.replace("\n", "↩"),
                         "\n  Output:        ",
                         ca,
                         "\n  Expected:      ",
@@ -331,7 +331,7 @@ impl std::fmt::Display for VerifyResult {
                         "   Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
                         "\n  Your input:    ",
-                        &self.data_input.replace("\n", ", "),
+                        &self.data_input.replace("\n", "↩"),
                         "\n  Output:        ",
                         ca,
                         "\n  Expected:      ",
@@ -387,7 +387,7 @@ impl std::fmt::Display for VerifyResult {
                 &self.status.status_msg.red().bold(),
                 &self.error.full_compile_error
             ),
-            _ => write!(f, "{}", "\nUnKnow Error...\n".red().bold()),
+            _ => write!(f, "{}", "\nUnknown Error...\n".red().bold()),
         }
     }
 }
