@@ -4,13 +4,11 @@ use crate::{
     err::Error,
     plugins::chrome,
 };
-
-use std::{collections::HashMap, str::FromStr, time::Duration};
-
 use reqwest::{
+    blocking::{Client, ClientBuilder, Response},
     header::{HeaderMap, HeaderName, HeaderValue},
-    Client, ClientBuilder, Response,
 };
+use std::{collections::HashMap, str::FromStr, time::Duration};
 
 /// LeetCode API set
 #[derive(Clone)]
@@ -53,7 +51,6 @@ impl LeetCode {
         let client = ClientBuilder::new()
             .gzip(true)
             .connect_timeout(Duration::from_secs(30))
-            .cookie_store(true)
             .build()?;
 
         // Sync conf
@@ -200,7 +197,10 @@ impl LeetCode {
 mod req {
     use super::LeetCode;
     use crate::err::Error;
-    use reqwest::{header::HeaderMap, Client, Response};
+    use reqwest::{
+        blocking::{Client, Response},
+        header::HeaderMap,
+    };
     use std::collections::HashMap;
 
     /// Standardize json format
