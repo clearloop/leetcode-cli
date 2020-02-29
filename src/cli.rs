@@ -7,12 +7,11 @@ use crate::{
     err::Error,
     flag::{Debug, Flag},
 };
-use clap::{App, AppSettings, crate_name, crate_authors, crate_version};
+use clap::{crate_name, crate_version, App, AppSettings};
 
 /// Get maches
 pub fn main() -> Result<(), Error> {
     let m = App::new(crate_name!())
-        .author(crate_authors!("\n"))
         .version(crate_version!())
         .about("May the Code be with You 👻")
         .subcommands(vec![

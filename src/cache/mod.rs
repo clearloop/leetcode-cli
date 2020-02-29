@@ -186,7 +186,7 @@ impl Cache {
         &self,
         run: Run,
         rfid: i32,
-        testcase: Option<String>
+        testcase: Option<String>,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
         use crate::helper::code_path;
@@ -194,6 +194,12 @@ impl Cache {
         use std::io::Read;
 
         let p = &self.get_problem(rfid)?;
+        if p.desc.is_empty() {
+            trace!("Problem description does not exist, pull desc and exec again...");
+            self.get_question(rfid)?;
+            return self.pre_run_code(run, rfid, testcase);
+        }
+
         let d: Question = serde_json::from_str(&p.desc)?;
         let conf = &self.0.conf;
         let mut json: HashMap<&'static str, String> = HashMap::new();
@@ -210,8 +216,7 @@ impl Cache {
         json.insert("name", p.name.to_string());
         match testcase {
             Some(case) => json.insert("data_input", case),
-            _ => json.insert("data_input", d.case)
-
+            _ => json.insert("data_input", d.case),
         };
 
         let url = match run {
@@ -257,7 +262,12 @@ impl Cache {
     }
 
     /// Exec problem filter —— Test or Submit
-    pub fn exec_problem(&self, rfid: i32, run: Run, testcase: Option<String>) -> Result<VerifyResult, Error> {
+    pub fn exec_problem(
+        &self,
+        rfid: i32,
+        run: Run,
+        testcase: Option<String>,
+    ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
         let pre = self.pre_run_code(run.clone(), rfid, testcase)?;
         let json = pre.0;

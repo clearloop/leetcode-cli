@@ -1,6 +1,5 @@
 //! Errors in leetcode-cli
 use colored::Colorize;
-use std::error::Error as StdError;
 use std::fmt;
 
 /// Error enum
@@ -48,29 +47,28 @@ impl std::fmt::Debug for Error {
 // network
 impl std::convert::From<reqwest::Error> for Error {
     fn from(err: reqwest::Error) -> Self {
-        Error::NetworkError(err.description().to_string())
+        Error::NetworkError(err.to_string())
     }
 }
 
 // nums
 impl std::convert::From<std::num::ParseIntError> for Error {
     fn from(err: std::num::ParseIntError) -> Self {
-        Error::ParseError(err.description().to_string())
+        Error::ParseError(err.to_string())
     }
 }
 
 // sql
 impl std::convert::From<diesel::result::Error> for Error {
     fn from(err: diesel::result::Error) -> Self {
-        Error::CacheError(err.description().to_string())
+        Error::CacheError(err.to_string())
     }
 }
 
 // serde
 impl std::convert::From<serde_json::error::Error> for Error {
     fn from(err: serde_json::Error) -> Self {
-        error!("{:?}", &err);
-        Error::ParseError(err.description().to_string())
+        Error::ParseError(err.to_string())
     }
 }
 
@@ -79,7 +77,7 @@ impl std::convert::From<toml::de::Error> for Error {
     fn from(err: toml::de::Error) -> Self {
         Error::ParseError(format!(
             "{}, {}{}{}{}{}{}{}{}",
-            err.description().to_string(),
+            err.to_string(),
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
             "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
@@ -94,14 +92,14 @@ impl std::convert::From<toml::de::Error> for Error {
 
 impl std::convert::From<toml::ser::Error> for Error {
     fn from(err: toml::ser::Error) -> Self {
-        Error::ParseError(err.description().to_string())
+        Error::ParseError(err.to_string())
     }
 }
 
 // io
 impl std::convert::From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
-        Error::CacheError(err.description().to_string())
+        Error::CacheError(err.to_string())
     }
 }
 
