@@ -186,6 +186,7 @@ impl Cache {
         &self,
         run: Run,
         rfid: i32,
+        testcase: Option<String>
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
         use crate::helper::code_path;
@@ -207,7 +208,11 @@ impl Cache {
 
         // pass manually data
         json.insert("name", p.name.to_string());
-        json.insert("data_input", d.case);
+        match testcase {
+            Some(case) => json.insert("data_input", case),
+            _ => json.insert("data_input", d.case)
+
+        };
 
         let url = match run {
             Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),
@@ -251,10 +256,10 @@ impl Cache {
         Ok(res)
     }
 
-    /// Exec problem fliter —— Test or Submit
-    pub fn exec_problem(&self, rfid: i32, run: Run) -> Result<VerifyResult, Error> {
-        trace!("Exec problem fliter —— Test or Submit");
-        let pre = self.pre_run_code(run.clone(), rfid)?;
+    /// Exec problem filter —— Test or Submit
+    pub fn exec_problem(&self, rfid: i32, run: Run, testcase: Option<String>) -> Result<VerifyResult, Error> {
+        trace!("Exec problem filter —— Test or Submit");
+        let pre = self.pre_run_code(run.clone(), rfid, testcase)?;
         let json = pre.0;
 
         let run_res: RunCode = self
