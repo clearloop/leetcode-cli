@@ -1,7 +1,9 @@
 # leetcode-cli
-[![doc](https://img.shields.io/badge/current-docs-green.svg)](https://docs.rs/leetcode-cli/)
-[![Crates.io](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
-[![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
+![Rust](https://github.com/clearloop/leetcode-cli/workflows/Rust/badge.svg)
+[![crate](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
+[![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/leetcode-cli/)
+[![dependency status](https://deps.rs/repo/github/clearloop/leetcode-cli/status.svg)](https://deps.rs/repo/github/clearloop/leetcode-cli)
+[![downloads](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Contributors

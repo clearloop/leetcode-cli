@@ -1,3 +1,9 @@
+## v0.2.15
+Allow for custom testcases with the `leetcode test` command, and some minor edits
+
+## v0.2.14
+Corrects file suffixes for c++ and c# files
+
 ## v0.2.13
 fix percent length panic
 

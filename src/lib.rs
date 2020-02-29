@@ -246,14 +246,13 @@ extern crate diesel;
 // show docs
 pub mod cache;
 pub mod cfg;
+pub mod cli;
 pub mod cmds;
 pub mod err;
 pub mod flag;
 pub mod helper;
 pub mod plugins;
 pub mod pym;
-// really pub
-pub mod cli;
 
 // re-exports
 pub use cache::Cache;
