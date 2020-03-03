@@ -7,6 +7,7 @@
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Contributors
++ [@hulufi](https://github.com/hulufei)
 + [@ldm0](https://github.com/ldm0)
 + [@Raees678](https://github.com/Raees678)
 + [@clearloop](https://github.com/clearloop)
@@ -29,7 +30,7 @@ cargo install leetcode-cli
 **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
-leetcode 0.2.15
+leetcode 0.2.17
 May the Code be with You 👻
 
 USAGE:

@@ -1,3 +1,9 @@
+## v0.2.17
+Fix panic on stat command with zero numbers 
+
+## v0.2.16
+Update versions of diesel and reqwest
+
 ## v0.2.15
 Allow for custom testcases with the `leetcode test` command, and some minor edits
 
