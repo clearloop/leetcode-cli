@@ -99,8 +99,9 @@ impl Command for StatCommand {
                 _ => continue,
             }
 
+            let checked_div = |lhs: f64, rhs: f64| if rhs == 0. { 0. } else { lhs / rhs };
             let count = format!("{}/{}", l.1, l.0);
-            let pct = format!("( {:.2} %)", ((100.0 * l.1) / l.0));
+            let pct = format!("( {:.2} %)", checked_div(100.0 * l.1, l.0));
             let mut line = "".to_string();
             line.push_str(&" ".digit(8 - (count.len() as i32)));
             line.push_str(&count);
@@ -109,8 +110,12 @@ impl Command for StatCommand {
             print!("{}", line);
             print!("     ");
 
-            let done = "░".repeat(((32.00 * l.1) / l.0) as usize).bright_green();
-            let udone = "░".repeat(32 - ((32.00 * l.1) / l.0) as usize).red();
+            let done = "░"
+                .repeat(checked_div(32.00 * l.1, l.0) as usize)
+                .bright_green();
+            let udone = "░"
+                .repeat(32 - checked_div(32.00 * l.1, l.0) as usize)
+                .red();
             print!("{}", done);
             println!("{}", udone);
         }
