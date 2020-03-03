@@ -71,8 +71,9 @@ impl Command for PickCommand {
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
         if problems.is_empty() {
-            cache.clone().download_problems()?;
-            Self::handler(m)?
+            cache.download_problems()?;
+            Self::handler(m)?;
+            return Ok(());
         }
 
         // filtering...
