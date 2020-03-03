@@ -25,9 +25,10 @@ pub enum Run {
 }
 
 impl std::default::Default for Run {
-    fn default() -> Self { Run::Submit }
+    fn default() -> Self {
+        Run::Submit
+    }
 }
-
 
 /// Requests if data not download
 #[derive(Clone)]

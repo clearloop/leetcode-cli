@@ -1,3 +1,8 @@
+## v0.2.18
++ Display stdout for test and execute commands, fix minor spacing in results displayed
+
++ Fix panic on `pick` command without cache
+
 ## v0.2.17
 Fix panic on stat command with zero numbers 
 

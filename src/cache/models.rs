@@ -262,13 +262,13 @@ impl std::fmt::Display for VerifyResult {
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
                         &self.status.status_msg.green().bold(),
-                        "       Runtime: ".dimmed(),
+                        &"Runtime: ".before_spaces(7).dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\nYour input:    ",
-                        &self.data_input.replace("\n", "↩"),
-                        "\nOutput:        ",
+                        &"\nYour input:".after_spaces(4),
+                        &self.data_input.replace("\n", "↩ "),
+                        &"\nOutput:".after_spaces(8),
                         ca,
-                        "\nExpected:      ",
+                        &"\nExpected:".after_spaces(6),
                         eca,
                     )?
                 } else if !self.submit.compare_result.is_empty() {
@@ -334,11 +334,11 @@ impl std::fmt::Display for VerifyResult {
                         "Wrong Answer".red().bold(),
                         "   Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\nYour input:    ",
-                        &self.data_input.replace("\n", "↩"),
-                        "\nOutput:        ",
+                        &"\nYour input:".after_spaces(4),
+                        &self.data_input.replace("\n", "↩ "),
+                        &"\nOutput:".after_spaces(8),
                         ca,
-                        "\nExpected:      ",
+                        &"\nExpected:".after_spaces(6),
                         eca,
                     )?
                 }
@@ -348,7 +348,7 @@ impl std::fmt::Display for VerifyResult {
                 f,
                 "\n{}\n\n{}{}\n{}{}\n{}{}\n",
                 &self.status.status_msg.red().bold(),
-                "Cases passed:  ".green(),
+                "Cases passed:".after_spaces(2).green(),
                 &self
                     .analyse
                     .total_correct
@@ -356,7 +356,7 @@ impl std::fmt::Display for VerifyResult {
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .green(),
-                "Total cases:   ".yellow(),
+                &"Total cases:".after_spaces(3).yellow(),
                 &self
                     .analyse
                     .total_testcases
@@ -365,8 +365,8 @@ impl std::fmt::Display for VerifyResult {
                     .to_string()
                     .bold()
                     .yellow(),
-                "Last case:     ".dimmed(),
-                &self.submit.last_testcase.replace("\n", "↩").dimmed()
+                &"Last case:".after_spaces(5).dimmed(),
+                &self.submit.last_testcase.replace("\n", "↩ ").dimmed()
             )?,
             // Output Timeout Exceeded
             //
@@ -404,8 +404,8 @@ impl std::fmt::Display for VerifyResult {
                     write!(
                         f,
                         "{}{}",
-                        "Stdout:        ".purple(),
-                        &self.code_output.join("\n               ")
+                        &"Stdout:".after_spaces(8).purple(),
+                        &self.code_output.join(&"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
@@ -416,8 +416,8 @@ impl std::fmt::Display for VerifyResult {
                     write!(
                         f,
                         "{}{}",
-                        "Stdout:        ".purple(),
-                        &self.std_output.replace("\n", "\n               ")
+                        &"Stdout:".after_spaces(8).purple(),
+                        &self.std_output.replace("\n", &"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
@@ -428,7 +428,6 @@ impl std::fmt::Display for VerifyResult {
 }
 
 use verify::*;
-
 mod verify {
     use super::super::parser::ssr;
     use serde::Deserialize;
@@ -506,5 +505,27 @@ mod verify {
         expected_task_finish_time: i64,
         #[serde(default, deserialize_with = "ssr")]
         pub expected_code_answer: Vec<String>,
+    }
+}
+
+/// Formatter for str
+trait Formatter {
+    fn after_spaces<'f>(&self, spaces: usize) -> String;
+    fn before_spaces<'f>(&self, spaces: usize) -> String;
+}
+
+impl Formatter for str {
+    fn after_spaces<'f>(&self, spaces: usize) -> String {
+        let mut r = String::new();
+        r.push_str(self);
+        r.push_str(&" ".repeat(spaces));
+        r
+    }
+
+    fn before_spaces<'f>(&self, spaces: usize) -> String {
+        let mut r = String::new();
+        r.push_str(&" ".repeat(spaces));
+        r.push_str(self);
+        r
     }
 }

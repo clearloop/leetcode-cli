@@ -30,7 +30,7 @@ cargo install leetcode-cli
 **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
-leetcode 0.2.17
+leetcode 0.2.18
 May the Code be with You 👻
 
 USAGE:
