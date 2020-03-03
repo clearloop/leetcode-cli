@@ -18,11 +18,16 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 /// Condition submit or test
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Run {
     Test,
     Submit,
 }
+
+impl std::default::Default for Run {
+    fn default() -> Self { Run::Submit }
+}
+
 
 /// Requests if data not download
 #[derive(Clone)]
@@ -285,6 +290,7 @@ impl Cache {
 
         res.name = json.get("name")?.to_string();
         res.data_input = json.get("data_input")?.to_string();
+        res.result_type = run;
         Ok(res)
     }
 
