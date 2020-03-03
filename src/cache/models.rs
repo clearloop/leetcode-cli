@@ -196,6 +196,8 @@ pub struct RunCode {
 }
 
 use super::parser::ssr;
+use crate::cache::Run;
+
 /// verify result model
 #[derive(Debug, Deserialize)]
 pub struct VerifyResult {
@@ -204,6 +206,8 @@ pub struct VerifyResult {
     pub name: String,
     #[serde(skip)]
     pub data_input: String,
+    #[serde(skip)]
+    pub result_type: Run,
     #[serde(default)]
     lang: String,
     #[serde(default)]
@@ -256,17 +260,17 @@ impl std::fmt::Display for VerifyResult {
                     // Pass Test
                     write!(
                         f,
-                        "\n  {}{}{}\n{}{}{}{}{}{}\n",
+                        "\n{}{}{}\n{}{}{}{}{}{}\n",
                         &self.status.status_msg.green().bold(),
                         "       Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\n  Your input:    ",
+                        "\nYour input:    ",
                         &self.data_input.replace("\n", "↩"),
-                        "\n  Output:        ",
+                        "\nOutput:        ",
                         ca,
-                        "\n  Expected:      ",
+                        "\nExpected:      ",
                         eca,
-                    )
+                    )?
                 } else if !self.submit.compare_result.is_empty() {
                     // Submit Successfully
                     // TODO: result shoule be all 1;
@@ -300,9 +304,9 @@ impl std::fmt::Display for VerifyResult {
                     }
                     write!(
                         f,
-                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n",
-                        "  Success\n\n".green().bold(),
-                        "  Runtime: ".dimmed(),
+                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n\n",
+                        "Success\n\n".green().bold(),
+                        "Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
                         ", faster than ",
                         rp.to_string().bold(),
@@ -312,7 +316,7 @@ impl std::fmt::Display for VerifyResult {
                         " online submissions for ",
                         &self.name,
                         ".\n\n",
-                        "  Memory Usage: ".dimmed(),
+                        "Memory Usage: ".dimmed(),
                         &self.status.status_memory.bold(),
                         ", less than ",
                         mp.to_string().bold(),
@@ -321,30 +325,30 @@ impl std::fmt::Display for VerifyResult {
                         &self.pretty_lang,
                         " online submissions for ",
                         &self.name,
-                    )
+                    )?
                 } else {
-                    // Wrong Answer
+                    // Wrong Answer during testing
                     write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
-                        "  Wrong Answer".red().bold(),
+                        "Wrong Answer".red().bold(),
                         "   Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\n  Your input:    ",
+                        "\nYour input:    ",
                         &self.data_input.replace("\n", "↩"),
-                        "\n  Output:        ",
+                        "\nOutput:        ",
                         ca,
-                        "\n  Expected:      ",
+                        "\nExpected:      ",
                         eca,
-                    )
+                    )?
                 }
-            }
-            // Failed some tests
+            },
+            // Failed some tests during submission
             11 => write!(
                 f,
-                "\n{}:\n\n{}{}\n{}{}\n{}{}\n",
+                "\n{}\n\n{}{}\n{}{}\n{}{}\n",
                 &self.status.status_msg.red().bold(),
-                "Total Correct:   ".green(),
+                "Cases passed:  ".green(),
                 &self
                     .analyse
                     .total_correct
@@ -352,7 +356,7 @@ impl std::fmt::Display for VerifyResult {
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .green(),
-                "Total Testcases: ".yellow(),
+                "Total cases:   ".yellow(),
                 &self
                     .analyse
                     .total_testcases
@@ -361,38 +365,57 @@ impl std::fmt::Display for VerifyResult {
                     .to_string()
                     .bold()
                     .yellow(),
-                "Last TestCase:   ".dimmed(),
-                &self.submit.last_testcase.dimmed()
-            ),
+                "Last case:     ".dimmed(),
+                &self.submit.last_testcase.dimmed().replace("\n", "↩")
+            )?,
             // Output Timeout Exceeded
-            13 => write!(
+            13 | 14 => write!(
                 f,
-                "\n{}:\n\n{:?}\n",
+                "\n{}\n",
                 &self.status.status_msg.yellow().bold(),
-                &self.code_output,
-            ),
-            // Output Timeout Exceeded
-            14 => write!(
-                f,
-                "\n{}:\n\n{:?}\n",
-                &self.status.status_msg.yellow().bold(),
-                &self.code_output,
-            ),
+            )?,
             // Runtime error
-            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold()),
+            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold())?,
             // Compile Error
             20 => write!(
                 f,
                 "\n{}:\n\n{}\n",
                 &self.status.status_msg.red().bold(),
                 &self.error.full_compile_error
-            ),
-            _ => write!(f, "{}", "\nUnknown Error...\n".red().bold()),
+            )?,
+            _ => write!(f, "{}", "\nUnknown Error...\n".red().bold())?,
+        };
+
+        match &self.result_type {
+            Run::Test => {
+                if &self.code_output.len() > &0 {
+                write!(
+                    f,
+                    "{}{}",
+                    "Stdout:        ".purple(),
+                    &self.code_output.join("\n               ")
+                )
+            } else {
+                write!(f, "")
+            }},
+            _ => {
+                if &self.std_output.len() > &0 {
+                    write!(
+                        f,
+                        "{}{}",
+                        "Stdout:        ".purple(),
+                        &self.std_output.replace("\n", "\n               ")
+                    )
+                } else {
+                    write!(f, "")
+                }
+            },
         }
     }
 }
 
 use verify::*;
+
 mod verify {
     use super::super::parser::ssr;
     use serde::Deserialize;
