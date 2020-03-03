@@ -257,7 +257,7 @@ impl std::fmt::Display for VerifyResult {
         match &self.status.status_code {
             10 => {
                 if self.correct_answer {
-                    // Pass Test
+                    // Pass Tests
                     write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
@@ -342,7 +342,7 @@ impl std::fmt::Display for VerifyResult {
                         eca,
                     )?
                 }
-            },
+            }
             // Failed some tests during submission
             11 => write!(
                 f,
@@ -366,14 +366,13 @@ impl std::fmt::Display for VerifyResult {
                     .bold()
                     .yellow(),
                 "Last case:     ".dimmed(),
-                &self.submit.last_testcase.dimmed().replace("\n", "↩")
+                &self.submit.last_testcase.replace("\n", "↩").dimmed()
             )?,
             // Output Timeout Exceeded
-            13 | 14 => write!(
-                f,
-                "\n{}\n",
-                &self.status.status_msg.yellow().bold(),
-            )?,
+            //
+            // TODO: 13 and 14 might have some different,
+            // if anybody reach this, welcome to fix this!
+            13 | 14 => write!(f, "\n{}\n", &self.status.status_msg.yellow().bold(),)?,
             // Runtime error
             15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold())?,
             // Compile Error
@@ -381,23 +380,37 @@ impl std::fmt::Display for VerifyResult {
                 f,
                 "\n{}:\n\n{}\n",
                 &self.status.status_msg.red().bold(),
-                &self.error.full_compile_error
+                &self.error.full_compile_error.dimmed()
             )?,
-            _ => write!(f, "{}", "\nUnknown Error...\n".red().bold())?,
+            _ => write!(
+                f,
+                "{}{}{}{}{}{}{}{}",
+                "\nUnknown Error...\n".red().bold(),
+                "\nBingo! Welcome to fix this! Pull your request at ".yellow(),
+                "https://github.com/clearloop/leetcode-cli/pulls"
+                    .dimmed()
+                    .underline(),
+                ", and this file is located at ".yellow(),
+                "leetcode-cli/src/cache/models.rs".dimmed().underline(),
+                " waiting for you! Yep, line ".yellow(),
+                "385".dimmed().underline(),
+                ".\n".yellow(),
+            )?,
         };
 
         match &self.result_type {
             Run::Test => {
                 if &self.code_output.len() > &0 {
-                write!(
-                    f,
-                    "{}{}",
-                    "Stdout:        ".purple(),
-                    &self.code_output.join("\n               ")
-                )
-            } else {
-                write!(f, "")
-            }},
+                    write!(
+                        f,
+                        "{}{}",
+                        "Stdout:        ".purple(),
+                        &self.code_output.join("\n               ")
+                    )
+                } else {
+                    write!(f, "")
+                }
+            }
             _ => {
                 if &self.std_output.len() > &0 {
                     write!(
@@ -409,7 +422,7 @@ impl std::fmt::Display for VerifyResult {
                 } else {
                     write!(f, "")
                 }
-            },
+            }
         }
     }
 }
