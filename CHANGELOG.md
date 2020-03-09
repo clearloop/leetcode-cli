@@ -1,3 +1,6 @@
+## v0.2.19
++ Better HTML!
+
 ## v0.2.18
 + Display stdout for test and execute commands, fix minor spacing in results displayed
 
