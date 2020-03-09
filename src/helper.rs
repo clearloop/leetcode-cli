@@ -94,6 +94,7 @@ mod filter {
 mod html {
     // use crate::Error;
     use colored::Colorize;
+    use escaper::decode_html;
     pub enum Token {
         Plain(String),
         Bold(String),
@@ -109,15 +110,7 @@ mod html {
     impl HTML for String {
         fn ser(&self) -> Vec<Token> {
             // empty tags
-            let mut tks = self.to_string();
-
-            // converting symbols
-            tks = tks
-                .replace(r#"&amp;"#, "&")
-                .replace(r#"&quot;"#, "\"")
-                .replace(r#"&nbsp;"#, " ")
-                .replace(r#"&#39;"#, "'");
-
+            let tks = self.to_string();
             let res: Vec<Token>;
             // styled
             {
@@ -180,14 +173,9 @@ mod html {
             }
 
             // post replace
-            let mut tks = tks.join("");
-            tks = tks
-                .replace(r#"&lt;"#, "<")
-                .replace(r#"&gt;"#, ">")
-                .replace(r#"&ge;"#, ">=")
-                .replace(r#"&le;"#, "<=");
+            let tks = tks.join("");
 
-            tks
+            decode_html(&tks).unwrap_or(tks)
         }
     }
 }
