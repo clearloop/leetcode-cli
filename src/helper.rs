@@ -98,6 +98,8 @@ mod html {
     pub enum Token {
         Plain(String),
         Bold(String),
+        Sup(String),
+        Sub(String),
         Eof(String),
     }
 
@@ -107,6 +109,61 @@ mod html {
         fn render(&self) -> String;
     }
 
+    pub fn superscript(n: u8) -> String {
+        if n == 0 {
+            "⁰".to_owned()
+        } else if n == 1 {
+            "¹".to_owned()
+        } else if n == 2 {
+            "²".to_owned()
+        } else if n == 3 {
+            "³".to_owned()
+        } else if n == 4 {
+            "⁴".to_owned()
+        } else if n == 5 {
+            "⁵".to_owned()
+        } else if n == 6 {
+            "⁶".to_owned()
+        } else if n == 7 {
+            "⁷".to_owned()
+        } else if n == 8 {
+            "⁸".to_owned()
+        } else if n == 9 {
+            "⁹".to_owned()
+        } else if n >= 10 {
+            superscript(n / 10) + &superscript(n % 10)
+        } else {
+            n.to_string()
+        }
+    }
+
+    pub fn subscript(n: u8) -> String {
+        if n >= 10 {
+            subscript(n / 10) + &subscript(n % 10)
+        } else if n == 0 {
+            "₀".to_owned()
+        } else if n == 1 {
+            "₁".to_owned()
+        } else if n == 2 {
+            "₂".to_owned()
+        } else if n == 3 {
+            "₃".to_owned()
+        } else if n == 4 {
+            "₄".to_owned()
+        } else if n == 5 {
+            "₅".to_owned()
+        } else if n == 6 {
+            "₆".to_owned()
+        } else if n == 7 {
+            "₇".to_owned()
+        } else if n == 8 {
+            "₈".to_owned()
+        } else if n == 9 {
+            "₉".to_owned()
+        } else {
+            n.to_string()
+        }
+    }
     impl HTML for String {
         fn ser(&self) -> Vec<Token> {
             // empty tags
@@ -117,12 +174,20 @@ mod html {
                 let mut ptr = 0;
                 let mut output = vec![];
                 let mut bold = false;
+                let mut sup = false;
+                let mut sub = false;
                 for (i, e) in tks.chars().enumerate() {
                     match e {
                         '<' => {
                             if bold {
                                 output.push(Token::Bold(tks[ptr..i].to_string()));
                                 bold = false;
+                            } else if sup {
+                                output.push(Token::Sup(tks[ptr..i].to_string()));
+                                sup = false;
+                            } else if sub {
+                                output.push(Token::Sub(tks[ptr..i].to_string()));
+                                sub = false;
                             } else {
                                 output.push(Token::Plain(tks[ptr..i].to_string()));
                             }
@@ -133,6 +198,8 @@ mod html {
                                 "-" => continue,
                                 _ => match &tks[(ptr + 1)..i] {
                                     "b" | "strong" => bold = true,
+                                    "sup" => sup = true,
+                                    "sub" => sub = true,
                                     _ => {}
                                 },
                             }
@@ -168,6 +235,14 @@ mod html {
 
                         tks.push(s.bold().to_string());
                     }
+                    Token::Sup(s) => tks.push(match s.parse::<u8>() {
+                        Ok(n) => superscript(n),
+                        _ => s,
+                    }),
+                    Token::Sub(s) => tks.push(match s.parse::<u8>() {
+                        Ok(n) => subscript(n),
+                        _ => s,
+                    }),
                     Token::Eof(s) => tks.push(s.normal().to_string()),
                 }
             }
