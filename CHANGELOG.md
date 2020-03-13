@@ -1,3 +1,7 @@
+## v0.2.20
+
++ Support sup/sub style for numbers
+
 ## v0.2.19
 + Better HTML!
 
