@@ -78,9 +78,12 @@ impl Command for PickCommand {
 
         // filtering...
         // pym scripts
-        if m.is_present("plan") {
-            let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
-            crate::helper::squash(&mut problems, ids)?;
+        #[cfg(feature = "pym")]
+        {
+            if m.is_present("plan") {
+                let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+                crate::helper::squash(&mut problems, ids)?;
+            }
         }
 
         // tag filter
