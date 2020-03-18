@@ -252,6 +252,7 @@ pub mod err;
 pub mod flag;
 pub mod helper;
 pub mod plugins;
+#[cfg(feature = "pym")]
 pub mod pym;
 
 // re-exports

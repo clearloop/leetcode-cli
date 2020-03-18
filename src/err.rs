@@ -124,6 +124,7 @@ impl std::convert::From<openssl::error::ErrorStack> for Error {
 }
 
 // pyo3
+#[cfg(feature = "pym")]
 impl std::convert::From<pyo3::PyErr> for Error {
     fn from(_: pyo3::PyErr) -> Self {
         Error::ScriptError("Python script went Error".to_string())

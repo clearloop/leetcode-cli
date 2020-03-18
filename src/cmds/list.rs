@@ -132,9 +132,12 @@ impl Command for ListCommand {
 
         // filtering...
         // pym scripts
-        if m.is_present("plan") {
-            let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
-            crate::helper::squash(&mut ps, ids)?;
+        #[cfg(feature = "pym")]
+        {
+            if m.is_present("plan") {
+                let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+                crate::helper::squash(&mut ps, ids)?;
+            }
         }
 
         // filter tag

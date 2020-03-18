@@ -26,10 +26,9 @@ keyring = "0.8.0"
 log = "0.4"
 openssl = "0.10.26"
 rand = "0.7.2"
-serde = "1.0.104"
-serde_derive = "1.0.104"
+serde = { version = "1.0.104", features = ["derive"] }
 serde_json = "1.0.44"
-pyo3 = "0.8.5"
+pyo3 = { version = "0.8.5", optional = true }
 toml = "0.5.5"
 escaper = "0.1.0"
 
@@ -40,3 +39,6 @@ features = ["sqlite"]
 [dependencies.reqwest]
 version = "0.10.3"
 features = ["blocking", "gzip", "json"]
+
+[features]
+pym = ["pyo3"]
