@@ -48,6 +48,13 @@ impl Command for PickCommand {
             .visible_alias("p")
             .arg(Arg::with_name("id").help("Problem id").takes_value(true))
             .arg(
+                Arg::with_name("plan")
+                    .short("p")
+                    .long("plan")
+                    .takes_value(true)
+                    .help("Invoking python scripts to filter questions"),
+            )
+            .arg(
                 Arg::with_name("query")
                     .short("q")
                     .long("query")
