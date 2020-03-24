@@ -107,13 +107,16 @@ impl Command for PickCommand {
             crate::helper::filter(&mut problems, query.to_string());
         }
 
-        if let Some(id) = m.value_of("id") {
-            problems.retain(|x| x.fid.to_string() == id);
-        }
+        let fid = m
+            .value_of("id")
+            .and_then(|id| id.parse::<i32>().ok())
+            .unwrap_or_else(|| {
+                // Pick random without specify id
+                let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
+                problem.fid
+            });
 
-        let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
-
-        let r = cache.get_question(problem.fid);
+        let r = cache.get_question(fid);
         if r.is_err() {
             let e = r.err()?;
             eprintln!("{:?}", &e);
