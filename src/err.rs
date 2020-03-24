@@ -1,4 +1,5 @@
 //! Errors in leetcode-cli
+use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
 use std::fmt;
 
@@ -14,6 +15,7 @@ pub enum Error {
     ScriptError(String),
     CookieError,
     DecryptError,
+    SilentError,
 }
 
 impl std::fmt::Debug for Error {
@@ -40,6 +42,7 @@ impl std::fmt::Debug for Error {
             Error::MatchError => write!(f, "{} Nothing matches", e),
             Error::DecryptError => write!(f, "{} openssl decrypt failed", e),
             Error::ScriptError(s) => write!(f, "{} {}", e, s),
+            Error::SilentError => write!(f, ""),
         }
     }
 }
@@ -61,7 +64,14 @@ impl std::convert::From<std::num::ParseIntError> for Error {
 // sql
 impl std::convert::From<diesel::result::Error> for Error {
     fn from(err: diesel::result::Error) -> Self {
-        Error::CacheError(err.to_string())
+        match err {
+            diesel::result::Error::NotFound => {
+                println!("NotFound, you may update cache, and try it again\r\n");
+                DataCommand::usage().print_help().unwrap_or(());
+                Error::SilentError
+            }
+            _ => Error::CacheError(err.to_string()),
+        }
     }
 }
 

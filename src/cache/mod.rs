@@ -41,13 +41,7 @@ impl Cache {
 
     /// ref to download probems
     pub fn update(self) -> Result<(), Error> {
-        let c = conn((&self.0.conf.storage.cache()?).to_owned());
-        let ps = self.download_problems()?;
-        for i in ps.into_iter() {
-            let target = problems.filter(id.eq(i.id));
-            diesel::update(target).set(i.to_owned()).execute(&c)?;
-        }
-
+        self.download_problems()?;
         Ok(())
     }
 
@@ -68,13 +62,9 @@ impl Cache {
             parser::problem(&mut ps, json)?;
         }
 
-        let count = self.get_problems()?.len();
-        if count == 0 {
-            ps.sort_by(|a, b| b.id.partial_cmp(&a.id).unwrap_or(std::cmp::Ordering::Equal));
-            diesel::insert_into(problems)
-                .values(&ps)
-                .execute(&self.conn()?)?;
-        }
+        diesel::replace_into(problems)
+            .values(&ps)
+            .execute(&self.conn()?)?;
 
         Ok(ps)
     }
