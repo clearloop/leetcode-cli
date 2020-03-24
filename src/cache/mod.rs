@@ -94,8 +94,6 @@ impl Cache {
     }
 
     /// Get problems from cache
-    ///
-    /// if cache doesn't exist, request a new copy
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
         Ok(problems.load::<Problem>(&self.conn()?)?)
     }

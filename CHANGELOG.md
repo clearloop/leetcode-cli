@@ -1,3 +1,12 @@
+## v0.2.22
++ Fixed the cache can't update with new added problems
+
++ Display user friendly errors when pick/edit new added problem.
+
++ upgrade pyo3
+
++ fix leetcode list with empty cache
+
 ## v0.2.21
 
 + Make programmable support to be an advanced feature
