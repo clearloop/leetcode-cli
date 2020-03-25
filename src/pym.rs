@@ -1,3 +1,6 @@
+//! This module is for python scripts.
+//!
+//! Seems like some error exists now, welocome pr to fix this : )
 use crate::cache::Cache;
 use crate::helper::load_script;
 use pyo3::prelude::*;

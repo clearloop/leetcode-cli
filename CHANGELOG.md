@@ -1,3 +1,34 @@
+## v0.2.22
++ Fixed the cache can't update with new added problems
+
++ Display user friendly errors when pick/edit new added problem.
+
++ upgrade pyo3
+
++ fix leetcode list with empty cache
+
+## v0.2.21
+
++ Make programmable support to be an advanced feature
+
+## v0.2.20
+
++ Support sup/sub style for numbers
+
+## v0.2.19
++ Better HTML!
+
+## v0.2.18
++ Display stdout for test and execute commands, fix minor spacing in results displayed
+
++ Fix panic on `pick` command without cache
+
+## v0.2.17
+Fix panic on stat command with zero numbers 
+
+## v0.2.16
+Update versions of diesel and reqwest
+
 ## v0.2.15
 Allow for custom testcases with the `leetcode test` command, and some minor edits
 

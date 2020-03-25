@@ -196,6 +196,8 @@ pub struct RunCode {
 }
 
 use super::parser::ssr;
+use crate::cache::Run;
+
 /// verify result model
 #[derive(Debug, Deserialize)]
 pub struct VerifyResult {
@@ -204,6 +206,8 @@ pub struct VerifyResult {
     pub name: String,
     #[serde(skip)]
     pub data_input: String,
+    #[serde(skip)]
+    pub result_type: Run,
     #[serde(default)]
     lang: String,
     #[serde(default)]
@@ -253,20 +257,20 @@ impl std::fmt::Display for VerifyResult {
         match &self.status.status_code {
             10 => {
                 if self.correct_answer {
-                    // Pass Test
+                    // Pass Tests
                     write!(
                         f,
-                        "\n  {}{}{}\n{}{}{}{}{}{}\n",
+                        "\n{}{}{}\n{}{}{}{}{}{}\n",
                         &self.status.status_msg.green().bold(),
-                        "       Runtime: ".dimmed(),
+                        &"Runtime: ".before_spaces(7).dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\n  Your input:    ",
-                        &self.data_input.replace("\n", "↩"),
-                        "\n  Output:        ",
+                        &"\nYour input:".after_spaces(4),
+                        &self.data_input.replace("\n", "↩ "),
+                        &"\nOutput:".after_spaces(8),
                         ca,
-                        "\n  Expected:      ",
+                        &"\nExpected:".after_spaces(6),
                         eca,
-                    )
+                    )?
                 } else if !self.submit.compare_result.is_empty() {
                     // Submit Successfully
                     // TODO: result shoule be all 1;
@@ -300,9 +304,9 @@ impl std::fmt::Display for VerifyResult {
                     }
                     write!(
                         f,
-                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n",
-                        "  Success\n\n".green().bold(),
-                        "  Runtime: ".dimmed(),
+                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n\n",
+                        "Success\n\n".green().bold(),
+                        "Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
                         ", faster than ",
                         rp.to_string().bold(),
@@ -312,7 +316,7 @@ impl std::fmt::Display for VerifyResult {
                         " online submissions for ",
                         &self.name,
                         ".\n\n",
-                        "  Memory Usage: ".dimmed(),
+                        "Memory Usage: ".dimmed(),
                         &self.status.status_memory.bold(),
                         ", less than ",
                         mp.to_string().bold(),
@@ -321,30 +325,30 @@ impl std::fmt::Display for VerifyResult {
                         &self.pretty_lang,
                         " online submissions for ",
                         &self.name,
-                    )
+                    )?
                 } else {
-                    // Wrong Answer
+                    // Wrong Answer during testing
                     write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
-                        "  Wrong Answer".red().bold(),
+                        "Wrong Answer".red().bold(),
                         "   Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
-                        "\n  Your input:    ",
-                        &self.data_input.replace("\n", "↩"),
-                        "\n  Output:        ",
+                        &"\nYour input:".after_spaces(4),
+                        &self.data_input.replace("\n", "↩ "),
+                        &"\nOutput:".after_spaces(8),
                         ca,
-                        "\n  Expected:      ",
+                        &"\nExpected:".after_spaces(6),
                         eca,
-                    )
+                    )?
                 }
             }
-            // Failed some tests
+            // Failed some tests during submission
             11 => write!(
                 f,
-                "\n{}:\n\n{}{}\n{}{}\n{}{}\n",
+                "\n{}\n\n{}{}\n{}{}\n{}{}\n",
                 &self.status.status_msg.red().bold(),
-                "Total Correct:   ".green(),
+                "Cases passed:".after_spaces(2).green(),
                 &self
                     .analyse
                     .total_correct
@@ -352,7 +356,7 @@ impl std::fmt::Display for VerifyResult {
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .green(),
-                "Total Testcases: ".yellow(),
+                &"Total cases:".after_spaces(3).yellow(),
                 &self
                     .analyse
                     .total_testcases
@@ -361,33 +365,64 @@ impl std::fmt::Display for VerifyResult {
                     .to_string()
                     .bold()
                     .yellow(),
-                "Last TestCase:   ".dimmed(),
-                &self.submit.last_testcase.dimmed()
-            ),
+                &"Last case:".after_spaces(5).dimmed(),
+                &self.submit.last_testcase.replace("\n", "↩ ").dimmed()
+            )?,
             // Output Timeout Exceeded
-            13 => write!(
-                f,
-                "\n{}:\n\n{:?}\n",
-                &self.status.status_msg.yellow().bold(),
-                &self.code_output,
-            ),
-            // Output Timeout Exceeded
-            14 => write!(
-                f,
-                "\n{}:\n\n{:?}\n",
-                &self.status.status_msg.yellow().bold(),
-                &self.code_output,
-            ),
+            //
+            // TODO: 13 and 14 might have some different,
+            // if anybody reach this, welcome to fix this!
+            13 | 14 => write!(f, "\n{}\n", &self.status.status_msg.yellow().bold(),)?,
             // Runtime error
-            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold()),
+            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold())?,
             // Compile Error
             20 => write!(
                 f,
                 "\n{}:\n\n{}\n",
                 &self.status.status_msg.red().bold(),
-                &self.error.full_compile_error
-            ),
-            _ => write!(f, "{}", "\nUnknown Error...\n".red().bold()),
+                &self.error.full_compile_error.dimmed()
+            )?,
+            _ => write!(
+                f,
+                "{}{}{}{}{}{}{}{}",
+                "\nUnknown Error...\n".red().bold(),
+                "\nBingo! Welcome to fix this! Pull your request at ".yellow(),
+                "https://github.com/clearloop/leetcode-cli/pulls"
+                    .dimmed()
+                    .underline(),
+                ", and this file is located at ".yellow(),
+                "leetcode-cli/src/cache/models.rs".dimmed().underline(),
+                " waiting for you! Yep, line ".yellow(),
+                "385".dimmed().underline(),
+                ".\n".yellow(),
+            )?,
+        };
+
+        match &self.result_type {
+            Run::Test => {
+                if &self.code_output.len() > &0 {
+                    write!(
+                        f,
+                        "{}{}",
+                        &"Stdout:".after_spaces(8).purple(),
+                        &self.code_output.join(&"\n".after_spaces(15))
+                    )
+                } else {
+                    write!(f, "")
+                }
+            }
+            _ => {
+                if &self.std_output.len() > &0 {
+                    write!(
+                        f,
+                        "{}{}",
+                        &"Stdout:".after_spaces(8).purple(),
+                        &self.std_output.replace("\n", &"\n".after_spaces(15))
+                    )
+                } else {
+                    write!(f, "")
+                }
+            }
         }
     }
 }
@@ -470,5 +505,27 @@ mod verify {
         expected_task_finish_time: i64,
         #[serde(default, deserialize_with = "ssr")]
         pub expected_code_answer: Vec<String>,
+    }
+}
+
+/// Formatter for str
+trait Formatter {
+    fn after_spaces<'f>(&self, spaces: usize) -> String;
+    fn before_spaces<'f>(&self, spaces: usize) -> String;
+}
+
+impl Formatter for str {
+    fn after_spaces<'f>(&self, spaces: usize) -> String {
+        let mut r = String::new();
+        r.push_str(self);
+        r.push_str(&" ".repeat(spaces));
+        r
+    }
+
+    fn before_spaces<'f>(&self, spaces: usize) -> String {
+        let mut r = String::new();
+        r.push_str(&" ".repeat(spaces));
+        r.push_str(self);
+        r
     }
 }

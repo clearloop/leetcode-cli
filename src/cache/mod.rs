@@ -18,10 +18,16 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 /// Condition submit or test
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Run {
     Test,
     Submit,
+}
+
+impl std::default::Default for Run {
+    fn default() -> Self {
+        Run::Submit
+    }
 }
 
 /// Requests if data not download
@@ -88,8 +94,6 @@ impl Cache {
     }
 
     /// Get problems from cache
-    ///
-    /// if cache doesn't exist, request a new copy
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
         Ok(problems.load::<Problem>(&self.conn()?)?)
     }
@@ -275,6 +279,7 @@ impl Cache {
 
         res.name = json.get("name")?.to_string();
         res.data_input = json.get("data_input")?.to_string();
+        res.result_type = run;
         Ok(res)
     }
 

@@ -126,7 +126,9 @@ impl Command for ListCommand {
         let cache = Cache::new()?;
         let mut ps = cache.clone().get_problems()?;
 
+        // if cache doesn't exist, request a new copy
         if ps.is_empty() {
+            cache.clone().download_problems()?;
             return Self::handler(m);
         }
 

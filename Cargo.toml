@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.2.16"
+version = "0.2.22"
 authors = ["clearloop <cdr.today@foxmail.com>"]
 edition = "2018"
 description = "Leet your code in command-line."
@@ -22,13 +22,14 @@ clap = "2.33.0"
 colored = "1.9.1"
 dirs = "2.0.2"
 env_logger = "0.7.1"
+escaper = "0.1.0"
 keyring = "0.8.0"
 log = "0.4"
 openssl = "0.10.26"
+pyo3 = { version = "0.8.5", optional = true }
 rand = "0.7.2"
 serde = { version = "1.0.104", features = ["derive"] }
 serde_json = "1.0.44"
-pyo3 = { version = "0.8.5", optional = true }
 toml = "0.5.5"
 escaper = "0.1.0"
 regex = "1"
