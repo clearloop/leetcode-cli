@@ -93,13 +93,15 @@ mod filter {
 /// Render html to command-line
 mod html {
     // use crate::Error;
-    use colored::Colorize;
+    use colored::{Color, Colorize};
     use escaper::decode_html;
+    use regex::Regex;
     pub enum Token {
         Plain(String),
         Bold(String),
         Sup(String),
         Sub(String),
+        Font((String, Color)),
         Eof(String),
     }
 
@@ -176,6 +178,8 @@ mod html {
                 let mut bold = false;
                 let mut sup = false;
                 let mut sub = false;
+                let mut color: Option<Color> = None;
+                let re_color = Regex::new(r#"color=['"]([^'"]+)"#).unwrap();
                 for (i, e) in tks.chars().enumerate() {
                     match e {
                         '<' => {
@@ -188,6 +192,9 @@ mod html {
                             } else if sub {
                                 output.push(Token::Sub(tks[ptr..i].to_string()));
                                 sub = false;
+                            } else if color.is_some() {
+                                output.push(Token::Font((tks[ptr..i].to_string(), color.unwrap())));
+                                color = None;
                             } else {
                                 output.push(Token::Plain(tks[ptr..i].to_string()));
                             }
@@ -200,6 +207,12 @@ mod html {
                                     "b" | "strong" => bold = true,
                                     "sup" => sup = true,
                                     "sub" => sub = true,
+                                    s if s.starts_with("font") => {
+                                        color = re_color
+                                            .captures(s)
+                                            .and_then(|caps| caps.get(1))
+                                            .and_then(|cap| cap.as_str().parse().ok());
+                                    }
                                     _ => {}
                                 },
                             }
@@ -243,6 +256,7 @@ mod html {
                         Ok(n) => subscript(n),
                         _ => s,
                     }),
+                    Token::Font((s, color)) => tks.push(s.color(color).to_string()),
                     Token::Eof(s) => tks.push(s.normal().to_string()),
                 }
             }
