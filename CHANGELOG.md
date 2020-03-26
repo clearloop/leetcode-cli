@@ -1,3 +1,7 @@
+## v0.2.23
+
++ support color display
+
 ## v0.2.22
 + Fixed the cache can't update with new added problems
 

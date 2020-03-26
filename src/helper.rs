@@ -112,58 +112,40 @@ mod html {
     }
 
     pub fn superscript(n: u8) -> String {
-        if n == 0 {
-            "⁰".to_owned()
-        } else if n == 1 {
-            "¹".to_owned()
-        } else if n == 2 {
-            "²".to_owned()
-        } else if n == 3 {
-            "³".to_owned()
-        } else if n == 4 {
-            "⁴".to_owned()
-        } else if n == 5 {
-            "⁵".to_owned()
-        } else if n == 6 {
-            "⁶".to_owned()
-        } else if n == 7 {
-            "⁷".to_owned()
-        } else if n == 8 {
-            "⁸".to_owned()
-        } else if n == 9 {
-            "⁹".to_owned()
-        } else if n >= 10 {
-            superscript(n / 10) + &superscript(n % 10)
-        } else {
-            n.to_string()
+        match n {
+            0 => "⁰".to_string(),
+            1 => "¹".to_string(),
+            2 => "²".to_string(),
+            3 => "³".to_string(),
+            4 => "⁴".to_string(),
+            5 => "⁵".to_string(),
+            6 => "⁶".to_string(),
+            7 => "⁷".to_string(),
+            8 => "⁸".to_string(),
+            9 => "⁹".to_string(),
+            x if x > 10 => (superscript(n / 10).parse().unwrap_or(0)
+                + &superscript(n % 10).parse().unwrap_or(0))
+                .to_string(),
+            _ => n.to_string(),
         }
     }
 
     pub fn subscript(n: u8) -> String {
-        if n >= 10 {
-            subscript(n / 10) + &subscript(n % 10)
-        } else if n == 0 {
-            "₀".to_owned()
-        } else if n == 1 {
-            "₁".to_owned()
-        } else if n == 2 {
-            "₂".to_owned()
-        } else if n == 3 {
-            "₃".to_owned()
-        } else if n == 4 {
-            "₄".to_owned()
-        } else if n == 5 {
-            "₅".to_owned()
-        } else if n == 6 {
-            "₆".to_owned()
-        } else if n == 7 {
-            "₇".to_owned()
-        } else if n == 8 {
-            "₈".to_owned()
-        } else if n == 9 {
-            "₉".to_owned()
-        } else {
-            n.to_string()
+        match n {
+            x if x >= 10 => (subscript(n / 10).parse().unwrap_or(0)
+                + &subscript(n % 10).parse().unwrap_or(0))
+                .to_string(),
+            0 => "₀".to_string(),
+            1 => "₁".to_string(),
+            2 => "₂".to_string(),
+            3 => "₃".to_string(),
+            4 => "₄".to_string(),
+            5 => "₅".to_string(),
+            6 => "₆".to_string(),
+            7 => "₇".to_string(),
+            8 => "₈".to_string(),
+            9 => "₉".to_string(),
+            _ => n.to_string(),
         }
     }
     impl HTML for String {
@@ -179,6 +161,12 @@ mod html {
                 let mut sup = false;
                 let mut sub = false;
                 let mut color: Option<Color> = None;
+
+                // TODO: check how to make this `unwrap` more flexible..
+                //
+                // or looks better.
+                //
+                // or do some handwrite matching.
                 let re_color = Regex::new(r#"color=['"]([^'"]+)"#).unwrap();
                 for (i, e) in tks.chars().enumerate() {
                     match e {
