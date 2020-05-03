@@ -27,11 +27,11 @@ impl std::fmt::Debug for Error {
                 f,
                 "{} {}{}{}{}{}",
                 e,
-                "Cannot get leetcode cookies from chrome, ",
+                "Your leetcode cookies seems expired, ",
                 "please make sure you have logined in leetcode.com with chrome. "
                     .yellow()
                     .bold(),
-                "Either you can handwrite your LEETCODE_SESSION and csrf to leetcode.toml, ",
+                "Either you can handwrite your `LEETCODE_SESSION` and `csrf` into `leetcode.toml`, ",
                 "more info please checkout this: ",
                 "https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies"
             ),

@@ -241,6 +241,9 @@ impl Cache {
         // debug resp raw text
         let debug_raw = self.clone().0.verify_result(rid.clone())?.text()?;
         debug!("debug resp raw text: \n{:#?}", &debug_raw);
+        if debug_raw.is_empty() {
+            return Err(Error::CookieError);
+        }
 
         // debug json deserializing
         let debug_json: Result<VerifyResult, SJError> = from_str(&debug_raw);
