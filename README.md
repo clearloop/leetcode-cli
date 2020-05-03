@@ -2,8 +2,8 @@
 ![Rust](https://github.com/clearloop/leetcode-cli/workflows/Rust/badge.svg)
 [![crate](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/leetcode-cli/)
-[![dependency status](https://deps.rs/repo/github/clearloop/leetcode-cli/status.svg)](https://deps.rs/repo/github/clearloop/leetcode-cli)
 [![downloads](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
+[![gitter](https://img.shields.io/gitter/room/odditypark/leetcode-cli)](https://gitter.im/Odditypark/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Contributors
@@ -30,7 +30,7 @@ cargo install leetcode-cli
 **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 
 ```sh
-leetcode 0.2.21
+leetcode 0.2.24
 May the Code be with You 👻
 
 USAGE:
