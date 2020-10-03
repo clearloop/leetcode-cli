@@ -36,7 +36,11 @@ pub fn main() -> Result<(), Error> {
             .init();
     }
 
-    let mut runtime = Builder::new().build().unwrap();
+    let mut runtime = Builder::new()
+        .basic_scheduler()
+        .enable_all()
+        .build()
+        .unwrap();
     match m.subcommand() {
         ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m, &mut runtime)?),
         ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m, &mut runtime)?),

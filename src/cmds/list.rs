@@ -125,11 +125,11 @@ impl Command for ListCommand {
         trace!("Input list command...");
 
         let cache = Cache::new()?;
-        let mut ps = cache.clone().get_problems()?;
+        let mut ps = cache.get_problems()?;
 
         // if cache doesn't exist, request a new copy
         if ps.is_empty() {
-            runtime.block_on(cache.clone().download_problems())?;
+            runtime.block_on(cache.download_problems())?;
             return Self::handler(m, runtime);
         }
 

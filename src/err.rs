@@ -25,15 +25,16 @@ impl std::fmt::Debug for Error {
             Error::CacheError(s) => write!(f, "{} {}, please try again", e, s),
             Error::CookieError => write!(
                 f,
-                "{} {}{}{}{}{}",
+                "{} \
+                 Your leetcode cookies seems expired, \
+                 {} \
+                 Either you can handwrite your `LEETCODE_SESSION` and `csrf` into `leetcode.toml`, \
+                 more info please checkout this: \
+                 https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies",
                 e,
-                "Your leetcode cookies seems expired, ",
                 "please make sure you have logined in leetcode.com with chrome. "
                     .yellow()
                     .bold(),
-                "Either you can handwrite your `LEETCODE_SESSION` and `csrf` into `leetcode.toml`, ",
-                "more info please checkout this: ",
-                "https://github.com/clearloop/leetcode-cli/blob/master/README.md#cookies"
             ),
             Error::DownloadError(s) => write!(f, "{} Download {} failed, please try again", e, s),
             Error::NetworkError(s) => write!(f, "{} {}, please try again", e, s),

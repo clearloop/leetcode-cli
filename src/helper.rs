@@ -124,8 +124,8 @@ mod html {
             8 => "⁸".to_string(),
             9 => "⁹".to_string(),
             x if x > 10 => (superscript(n / 10).parse().unwrap_or(0)
-                + &superscript(n % 10).parse().unwrap_or(0))
-                .to_string(),
+                + superscript(n % 10).parse().unwrap_or(0))
+            .to_string(),
             _ => n.to_string(),
         }
     }
@@ -133,8 +133,8 @@ mod html {
     pub fn subscript(n: u8) -> String {
         match n {
             x if x >= 10 => (subscript(n / 10).parse().unwrap_or(0)
-                + &subscript(n % 10).parse().unwrap_or(0))
-                .to_string(),
+                + subscript(n % 10).parse().unwrap_or(0))
+            .to_string(),
             0 => "₀".to_string(),
             1 => "₁".to_string(),
             2 => "₂".to_string(),

@@ -49,7 +49,7 @@ impl Command for TestCommand {
         let testcase = m.value_of("testcase");
         let case_str: Option<String>;
         match testcase {
-            Some(case) => case_str = Option::from(case.replace("\\n", "\n").to_string()),
+            Some(case) => case_str = Option::from(case.replace("\\n", "\n")),
             _ => case_str = None,
         }
         let cache = Cache::new()?;

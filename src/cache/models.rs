@@ -57,15 +57,15 @@ impl std::fmt::Display for Problem {
             1 => {
                 id.push_str(&SPACE.repeat(2));
                 id.push_str(&self.fid.to_string());
-                id.push_str(&SPACE.repeat(1));
+                id.push_str(&SPACE.to_string());
             }
             2 => {
-                id.push_str(&SPACE.repeat(1));
+                id.push_str(&SPACE.to_string());
                 id.push_str(&self.fid.to_string());
-                id.push_str(&SPACE.repeat(1));
+                id.push_str(&SPACE.to_string());
             }
             3 => {
-                id.push_str(&SPACE.repeat(1));
+                id.push_str(&SPACE.to_string());
                 id.push_str(&self.fid.to_string());
             }
             4 => {
@@ -304,26 +304,30 @@ impl std::fmt::Display for VerifyResult {
                     }
                     write!(
                         f,
-                        "\n{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}.\n\n",
+                        "\n{}{}{}\
+                         , faster than \
+                         {}{}\
+                         of \
+                         {} \
+                         online submissions for \
+                         {}.\n\n\
+                         {}{}\
+                         , less than \
+                         {}{} \
+                         of \
+                         {}{}.\n\n",
                         "Success\n\n".green().bold(),
                         "Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
-                        ", faster than ",
                         rp.to_string().bold(),
                         "% ".bold(),
-                        "of ",
                         &self.pretty_lang,
-                        " online submissions for ",
                         &self.name,
-                        ".\n\n",
                         "Memory Usage: ".dimmed(),
                         &self.status.status_memory.bold(),
-                        ", less than ",
                         mp.to_string().bold(),
                         "% ".bold(),
-                        "of ",
                         &self.pretty_lang,
-                        " online submissions for ",
                         &self.name,
                     )?
                 } else {
@@ -400,7 +404,7 @@ impl std::fmt::Display for VerifyResult {
 
         match &self.result_type {
             Run::Test => {
-                if &self.code_output.len() > &0 {
+                if !self.code_output.is_empty() {
                     write!(
                         f,
                         "{}{}",
@@ -412,7 +416,7 @@ impl std::fmt::Display for VerifyResult {
                 }
             }
             _ => {
-                if &self.std_output.len() > &0 {
+                if !self.std_output.is_empty() {
                     write!(
                         f,
                         "{}{}",
@@ -510,19 +514,19 @@ mod verify {
 
 /// Formatter for str
 trait Formatter {
-    fn after_spaces<'f>(&self, spaces: usize) -> String;
-    fn before_spaces<'f>(&self, spaces: usize) -> String;
+    fn after_spaces(&self, spaces: usize) -> String;
+    fn before_spaces(&self, spaces: usize) -> String;
 }
 
 impl Formatter for str {
-    fn after_spaces<'f>(&self, spaces: usize) -> String {
+    fn after_spaces(&self, spaces: usize) -> String {
         let mut r = String::new();
         r.push_str(self);
         r.push_str(&" ".repeat(spaces));
         r
     }
 
-    fn before_spaces<'f>(&self, spaces: usize) -> String {
+    fn before_spaces(&self, spaces: usize) -> String {
         let mut r = String::new();
         r.push_str(&" ".repeat(spaces));
         r.push_str(self);
