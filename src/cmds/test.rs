@@ -1,6 +1,7 @@
 //! Test command
 use super::Command;
 use clap::{App, ArgMatches};
+use tokio::runtime::Runtime;
 
 /// Abstract Test Command
 ///
@@ -42,7 +43,7 @@ impl Command for TestCommand {
     }
 
     /// `test` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
         let id: i32 = m.value_of("id")?.parse()?;
         let testcase = m.value_of("testcase");
@@ -52,7 +53,7 @@ impl Command for TestCommand {
             _ => case_str = None,
         }
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Test, case_str)?;
+        let res = runtime.block_on(cache.exec_problem(id, Run::Test, case_str))?;
 
         println!("{}", res);
         Ok(())

@@ -12,13 +12,15 @@
 //! ```
 use crate::err::Error;
 use clap::{App, ArgMatches};
+use tokio::runtime::Runtime;
+
 /// Abstract commands' trait.
 pub trait Command {
     /// Usage of the spefic command
     fn usage<'a, 'c>() -> App<'a, 'c>;
 
     /// The handler will deal [args, options,...] from the command-line
-    fn handler(m: &ArgMatches) -> Result<(), Error>;
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error>;
 }
 
 mod data;

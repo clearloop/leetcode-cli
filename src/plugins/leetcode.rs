@@ -5,8 +5,8 @@ use crate::{
     plugins::chrome,
 };
 use reqwest::{
-    blocking::{Client, ClientBuilder, Response},
     header::{HeaderMap, HeaderName, HeaderValue},
+    Client, ClientBuilder, Response,
 };
 use std::{collections::HashMap, str::FromStr, time::Duration};
 
@@ -66,7 +66,7 @@ impl LeetCode {
     }
 
     /// Get category problems
-    pub fn get_category_problems(self, category: &str) -> Result<Response, Error> {
+    pub async fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         trace!("Requesting {} problems...", &category);
         let url = &self
             .conf
@@ -85,9 +85,10 @@ impl LeetCode {
             url: url.to_string(),
         }
         .send(&self.client)
+        .await
     }
 
-    pub fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
+    pub async fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} ref problems...", &slug);
         let url = &self.conf.sys.urls.get("graphql")?;
         let mut json: Json = HashMap::new();
@@ -117,10 +118,11 @@ impl LeetCode {
             url: (*url).to_string(),
         }
         .send(&self.client)
+        .await
     }
 
     /// Get specific problem detail
-    pub fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
+    pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
         let refer = self.conf.sys.urls.get("problems")?.replace("$slug", slug);
         let mut json: Json = HashMap::new();
@@ -159,10 +161,11 @@ impl LeetCode {
             url: (&self.conf.sys.urls["graphql"]).to_string(),
         }
         .send(&self.client)
+        .await
     }
 
     /// Send code to judge
-    pub fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
+    pub async fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
         info!("Sending code to judge...");
         Req {
             default_headers: self.default_headers,
@@ -174,10 +177,11 @@ impl LeetCode {
             url,
         }
         .send(&self.client)
+        .await
     }
 
     /// Get the result of submission / testing
-    pub fn verify_result(self, id: String) -> Result<Response, Error> {
+    pub async fn verify_result(self, id: String) -> Result<Response, Error> {
         trace!("Verifying result...");
         let url = self.conf.sys.urls.get("verify")?.replace("$id", &id);
         Req {
@@ -190,6 +194,7 @@ impl LeetCode {
             url,
         }
         .send(&self.client)
+        .await
     }
 }
 
@@ -197,10 +202,7 @@ impl LeetCode {
 mod req {
     use super::LeetCode;
     use crate::err::Error;
-    use reqwest::{
-        blocking::{Client, Response},
-        header::HeaderMap,
-    };
+    use reqwest::{header::HeaderMap, Client, Response};
     use std::collections::HashMap;
 
     /// Standardize json format
@@ -224,7 +226,7 @@ mod req {
     }
 
     impl Req {
-        pub fn send(self, client: &Client) -> Result<Response, Error> {
+        pub async fn send(self, client: &Client) -> Result<Response, Error> {
             trace!("Running leetcode::{}...", &self.name);
             if self.info {
                 info!("{}", &self.name);
@@ -240,7 +242,7 @@ mod req {
                 Mode::Post => client.post(&self.url).json(&self.json),
             };
 
-            Ok(req.headers(headers).send()?)
+            Ok(req.headers(headers).send().await?)
         }
     }
 }

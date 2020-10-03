@@ -8,6 +8,7 @@ use crate::{
     flag::{Debug, Flag},
 };
 use clap::{crate_name, crate_version, App, AppSettings};
+use tokio::runtime::Builder;
 
 /// Get maches
 pub fn main() -> Result<(), Error> {
@@ -35,14 +36,15 @@ pub fn main() -> Result<(), Error> {
             .init();
     }
 
+    let mut runtime = Builder::new().build().unwrap();
     match m.subcommand() {
-        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m)?),
-        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m)?),
-        ("exec", Some(sub_m)) => Ok(ExecCommand::handler(sub_m)?),
-        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m)?),
-        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m)?),
-        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m)?),
-        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m)?),
+        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m, &mut runtime)?),
+        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m, &mut runtime)?),
+        ("exec", Some(sub_m)) => Ok(ExecCommand::handler(sub_m, &mut runtime)?),
+        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m, &mut runtime)?),
+        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m, &mut runtime)?),
+        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m, &mut runtime)?),
+        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m, &mut runtime)?),
         _ => Err(Error::MatchError),
     }
 }

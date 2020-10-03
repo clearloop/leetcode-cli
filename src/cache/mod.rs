@@ -46,8 +46,8 @@ impl Cache {
     }
 
     /// ref to download probems
-    pub fn update(self) -> Result<(), Error> {
-        self.download_problems()?;
+    pub async fn update(self) -> Result<(), Error> {
+        self.download_problems().await?;
         Ok(())
     }
 
@@ -59,12 +59,18 @@ impl Cache {
     }
 
     /// Download leetcode problems to db
-    pub fn download_problems(self) -> Result<Vec<Problem>, Error> {
+    pub async fn download_problems(self) -> Result<Vec<Problem>, Error> {
         info!("Fetching leetcode problems...");
         let mut ps: Vec<Problem> = vec![];
 
         for i in &self.0.conf.sys.categories.to_owned() {
-            let json = self.0.clone().get_category_problems(&i)?.json()?;
+            let json = self
+                .0
+                .clone()
+                .get_category_problems(&i)
+                .await?
+                .json()
+                .await?;
             parser::problem(&mut ps, json)?;
         }
 
@@ -100,7 +106,7 @@ impl Cache {
 
     /// Get question
     #[allow(clippy::useless_let_if_seq)]
-    pub fn get_question(&self, rfid: i32) -> Result<Question, Error> {
+    pub async fn get_question(&self, rfid: i32) -> Result<Question, Error> {
         let target: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
 
         let ids = match target.level {
@@ -133,7 +139,13 @@ impl Cache {
         if !target.desc.is_empty() {
             rdesc = serde_json::from_str(&target.desc)?;
         } else {
-            let json: Value = self.0.clone().get_question_detail(&target.slug)?.json()?;
+            let json: Value = self
+                .0
+                .clone()
+                .get_question_detail(&target.slug)
+                .await?
+                .json()
+                .await?;
             debug!("{:#?}", &json);
             parser::desc(&mut rdesc, json)?;
 
@@ -147,7 +159,7 @@ impl Cache {
         Ok(rdesc)
     }
 
-    pub fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
+    pub async fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
         trace!("Geting {} questions...", &rslug);
         let ids: Vec<String>;
         let rtag = tags
@@ -157,7 +169,14 @@ impl Cache {
             trace!("Got {} questions from local cache...", &rslug);
             ids = serde_json::from_str(&t.refs)?;
         } else {
-            ids = parser::tags(self.clone().0.get_question_ids_by_tag(&rslug)?.json()?)?;
+            ids = parser::tags(
+                self.clone()
+                    .0
+                    .get_question_ids_by_tag(&rslug)
+                    .await?
+                    .json()
+                    .await?,
+            )?;
             let t = Tag {
                 r#tag: rslug.to_string(),
                 r#refs: serde_json::to_string(&ids)?,
@@ -176,7 +195,7 @@ impl Cache {
     }
 
     /// run_code data
-    fn pre_run_code(
+    async fn pre_run_code(
         &self,
         run: Run,
         rfid: i32,
@@ -188,11 +207,11 @@ impl Cache {
         use std::io::Read;
 
         let p = &self.get_problem(rfid)?;
-        if p.desc.is_empty() {
-            trace!("Problem description does not exist, pull desc and exec again...");
-            self.get_question(rfid)?;
-            return self.pre_run_code(run, rfid, testcase);
-        }
+        // if p.desc.is_empty() {
+        //     trace!("Problem description does not exist, pull desc and exec again...");
+        //     self.get_question(rfid).await?;
+        //     return self.pre_run_code(run, rfid, testcase).await;
+        // }
 
         let d: Question = serde_json::from_str(&p.desc)?;
         let conf = &self.0.conf;
@@ -231,7 +250,7 @@ impl Cache {
     }
 
     /// TODO: The real delay
-    fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
+    async fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
         use serde_json::{from_str, Error as SJError};
         use std::time::Duration;
 
@@ -239,7 +258,13 @@ impl Cache {
         std::thread::sleep(Duration::from_micros(3000));
 
         // debug resp raw text
-        let debug_raw = self.clone().0.verify_result(rid.clone())?.text()?;
+        let debug_raw = self
+            .clone()
+            .0
+            .verify_result(rid.clone())
+            .await?
+            .text()
+            .await?;
         debug!("debug resp raw text: \n{:#?}", &debug_raw);
         if debug_raw.is_empty() {
             return Err(Error::CookieError);
@@ -249,35 +274,37 @@ impl Cache {
         let debug_json: Result<VerifyResult, SJError> = from_str(&debug_raw);
         debug!("debug json deserializing: \n{:#?}", &debug_json);
 
-        let mut res = debug_json?;
-        res = match res.state.as_str() {
-            "SUCCESS" => res,
-            _ => self.recur_verify(rid)?,
-        };
+        // let mut res = debug_json?;
+        // res = match res.state.as_str() {
+        //     "SUCCESS" => res,
+        //     _ => self.recur_verify(rid).await?,
+        // };
 
-        Ok(res)
+        Ok(debug_json?)
     }
 
     /// Exec problem filter —— Test or Submit
-    pub fn exec_problem(
+    pub async fn exec_problem(
         &self,
         rfid: i32,
         run: Run,
         testcase: Option<String>,
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let pre = self.pre_run_code(run.clone(), rfid, testcase)?;
+        let pre = self.pre_run_code(run.clone(), rfid, testcase).await?;
         let json = pre.0;
 
         let run_res: RunCode = self
             .0
             .clone()
-            .run_code(json.clone(), pre.1[0].clone(), pre.1[1].clone())?
-            .json()?;
+            .run_code(json.clone(), pre.1[0].clone(), pre.1[1].clone())
+            .await?
+            .json()
+            .await?;
 
         let mut res = match run {
-            Run::Test => self.recur_verify(run_res.interpret_id)?,
-            Run::Submit => self.recur_verify(run_res.submission_id.to_string())?,
+            Run::Test => self.recur_verify(run_res.interpret_id).await?,
+            Run::Submit => self.recur_verify(run_res.submission_id.to_string()).await?,
         };
 
         res.name = json.get("name")?.to_string();

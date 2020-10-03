@@ -2,7 +2,7 @@
 use super::Command;
 use crate::err::Error;
 use clap::{App, Arg, ArgMatches, SubCommand};
-
+use tokio::runtime::Runtime;
 /// Abstract pick command
 ///
 /// ```sh
@@ -71,15 +71,15 @@ impl Command for PickCommand {
     }
 
     /// `pick` handler
-    fn handler(m: &ArgMatches) -> Result<(), Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error> {
         use crate::cache::Cache;
         use rand::Rng;
 
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
         if problems.is_empty() {
-            cache.download_problems()?;
-            Self::handler(m)?;
+            runtime.block_on(cache.download_problems())?;
+            Self::handler(m, runtime)?;
             return Ok(());
         }
 
@@ -95,9 +95,11 @@ impl Command for PickCommand {
 
         // tag filter
         if m.is_present("tag") {
-            let ids = cache
-                .clone()
-                .get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
+            let ids = runtime.block_on(
+                cache
+                    .clone()
+                    .get_tagged_questions(m.value_of("tag").unwrap_or("")),
+            )?;
             crate::helper::squash(&mut problems, ids)?;
         }
 
@@ -116,12 +118,12 @@ impl Command for PickCommand {
                 problem.fid
             });
 
-        let r = cache.get_question(fid);
+        let r = runtime.block_on(cache.get_question(fid));
         if r.is_err() {
             let e = r.err()?;
             eprintln!("{:?}", &e);
             if let Error::FeatureError(_) | Error::NetworkError(_) = e {
-                Self::handler(m)?;
+                Self::handler(m, runtime)?;
             }
         } else {
             println!("{}", r?);

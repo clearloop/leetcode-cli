@@ -1,6 +1,7 @@
 //! Exec command
 use super::Command;
 use clap::{App, ArgMatches};
+use tokio::runtime::Runtime;
 
 /// Abstract Exec Command
 ///
@@ -36,12 +37,12 @@ impl Command for ExecCommand {
     }
 
     /// `exec` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Submit, None)?;
+        let res = runtime.block_on(cache.exec_problem(id, Run::Submit, None))?;
 
         println!("{}", res);
         Ok(())

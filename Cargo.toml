@@ -16,6 +16,7 @@ keywords = ["cli", "games", "leetcode"]
 readme = './README.md'
 
 [dependencies]
+tokio = "0.2.22"
 clap = "2.33.0"
 colored = "1.9.1"
 dirs = "2.0.2"
@@ -37,7 +38,7 @@ features = ["sqlite"]
 
 [dependencies.reqwest]
 version = "0.10.3"
-features = ["blocking", "gzip", "json"]
+features = ["gzip", "json"]
 
 [dev-dependencies.cargo-husky]
 version = "1"

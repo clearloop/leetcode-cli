@@ -36,6 +36,7 @@
 use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
 use clap::{App, Arg, ArgMatches, SubCommand};
+use tokio::runtime::Runtime;
 /// Abstract `list` command
 ///
 /// ## handler
@@ -120,7 +121,7 @@ impl Command for ListCommand {
     /// List commands contains "-c", "-q", "-s" flags.
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs`
-    fn handler(m: &ArgMatches) -> Result<(), Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error> {
         trace!("Input list command...");
 
         let cache = Cache::new()?;
@@ -128,8 +129,8 @@ impl Command for ListCommand {
 
         // if cache doesn't exist, request a new copy
         if ps.is_empty() {
-            cache.clone().download_problems()?;
-            return Self::handler(m);
+            runtime.block_on(cache.clone().download_problems())?;
+            return Self::handler(m, runtime);
         }
 
         // filtering...
@@ -144,7 +145,8 @@ impl Command for ListCommand {
 
         // filter tag
         if m.is_present("tag") {
-            let ids = cache.get_tagged_questions(m.value_of("tag").unwrap_or(""))?;
+            let ids =
+                runtime.block_on(cache.get_tagged_questions(m.value_of("tag").unwrap_or("")))?;
             crate::helper::squash(&mut ps, ids)?;
         }
 

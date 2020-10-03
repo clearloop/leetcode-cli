@@ -1,6 +1,7 @@
 //! Edit command
 use super::Command;
 use clap::{App, ArgMatches};
+use tokio::runtime::Runtime;
 
 /// Abstract `edit` command
 ///
@@ -43,7 +44,7 @@ impl Command for EditCommand {
     }
 
     /// `edit` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
         use crate::{cache::models::Question, Cache};
         use std::fs::File;
         use std::io::Write;
@@ -65,7 +66,7 @@ impl Command for EditCommand {
         if !Path::new(&path).exists() {
             let mut qr = serde_json::from_str(&target.desc);
             if qr.is_err() {
-                qr = Ok(cache.get_question(id)?);
+                qr = Ok(runtime.block_on(cache.get_question(id))?);
             }
 
             let question: Question = qr?;

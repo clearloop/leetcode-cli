@@ -2,6 +2,7 @@
 use super::Command;
 use clap::{App, ArgMatches, SubCommand};
 use colored::Colorize;
+use tokio::runtime::Runtime;
 
 /// Abstract statues command
 ///
@@ -27,7 +28,7 @@ impl Command for StatCommand {
     }
 
     /// `stat` handler
-    fn handler(_m: &ArgMatches) -> Result<(), crate::err::Error> {
+    fn handler(_m: &ArgMatches, _runtime: &mut Runtime) -> Result<(), crate::err::Error> {
         use crate::{helper::Digit, Cache};
 
         let cache = Cache::new()?;

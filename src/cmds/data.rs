@@ -3,6 +3,7 @@ use super::Command;
 use crate::{cache::Cache, helper::Digit};
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::Colorize;
+use tokio::runtime::Runtime;
 
 /// Abstract `data` command
 ///
@@ -44,7 +45,7 @@ impl Command for DataCommand {
     }
 
     /// `data` handler
-    fn handler(m: &ArgMatches) -> Result<(), crate::err::Error> {
+    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::err::Error> {
         use std::fs::File;
         use std::path::Path;
 
@@ -78,7 +79,7 @@ impl Command for DataCommand {
 
         if m.is_present("update") {
             flags += 1;
-            cache.update()?;
+            runtime.block_on(cache.update())?;
             println!("{}", "ok!".bright_green());
         }
 
