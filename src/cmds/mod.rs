@@ -11,16 +11,17 @@
 //!     help    Prints this message or the help of the given subcommand(s)
 //! ```
 use crate::err::Error;
+use async_trait::async_trait;
 use clap::{App, ArgMatches};
-use tokio::runtime::Runtime;
 
 /// Abstract commands' trait.
+#[async_trait]
 pub trait Command {
     /// Usage of the spefic command
     fn usage<'a, 'c>() -> App<'a, 'c>;
 
     /// The handler will deal [args, options,...] from the command-line
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error>;
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error>;
 }
 
 mod data;

@@ -1,9 +1,9 @@
 //! Cache managger
 use super::Command;
 use crate::{cache::Cache, helper::Digit};
+use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::Colorize;
-use tokio::runtime::Runtime;
 
 /// Abstract `data` command
 ///
@@ -22,6 +22,7 @@ use tokio::runtime::Runtime;
 /// ```
 pub struct DataCommand;
 
+#[async_trait]
 impl Command for DataCommand {
     /// `data` command usage
     fn usage<'a, 'cache>() -> App<'a, 'cache> {
@@ -45,7 +46,7 @@ impl Command for DataCommand {
     }
 
     /// `data` handler
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::err::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::err::Error> {
         use std::fs::File;
         use std::path::Path;
 
@@ -79,7 +80,7 @@ impl Command for DataCommand {
 
         if m.is_present("update") {
             flags += 1;
-            runtime.block_on(cache.update())?;
+            cache.update().await?;
             println!("{}", "ok!".bright_green());
         }
 

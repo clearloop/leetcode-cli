@@ -1,8 +1,8 @@
 //! Pick command
 use super::Command;
 use crate::err::Error;
+use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use tokio::runtime::Runtime;
 /// Abstract pick command
 ///
 /// ```sh
@@ -40,6 +40,7 @@ d = done     D = not done
 l = locked   L = not locked
 s = starred  S = not starred"#;
 
+#[async_trait]
 impl Command for PickCommand {
     /// `pick` usage
     fn usage<'a, 'pick>() -> App<'a, 'pick> {
@@ -71,15 +72,15 @@ impl Command for PickCommand {
     }
 
     /// `pick` handler
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
         use crate::cache::Cache;
         use rand::Rng;
 
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
         if problems.is_empty() {
-            runtime.block_on(cache.download_problems())?;
-            Self::handler(m, runtime)?;
+            cache.download_problems().await?;
+            Self::handler(m).await?;
             return Ok(());
         }
 
@@ -95,11 +96,10 @@ impl Command for PickCommand {
 
         // tag filter
         if m.is_present("tag") {
-            let ids = runtime.block_on(
-                cache
-                    .clone()
-                    .get_tagged_questions(m.value_of("tag").unwrap_or("")),
-            )?;
+            let ids = cache
+                .clone()
+                .get_tagged_questions(m.value_of("tag").unwrap_or(""))
+                .await?;
             crate::helper::squash(&mut problems, ids)?;
         }
 
@@ -118,12 +118,12 @@ impl Command for PickCommand {
                 problem.fid
             });
 
-        let r = runtime.block_on(cache.get_question(fid));
+        let r = cache.get_question(fid).await;
         if r.is_err() {
             let e = r.err()?;
             eprintln!("{:?}", &e);
             if let Error::FeatureError(_) | Error::NetworkError(_) = e {
-                Self::handler(m, runtime)?;
+                Self::handler(m).await?;
             }
         } else {
             println!("{}", r?);

@@ -1,7 +1,7 @@
 //! Exec command
 use super::Command;
+use async_trait::async_trait;
 use clap::{App, ArgMatches};
-use tokio::runtime::Runtime;
 
 /// Abstract Exec Command
 ///
@@ -21,6 +21,7 @@ use tokio::runtime::Runtime;
 /// ```
 pub struct ExecCommand;
 
+#[async_trait]
 impl Command for ExecCommand {
     /// `exec` usage
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
@@ -37,12 +38,12 @@ impl Command for ExecCommand {
     }
 
     /// `exec` handler
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
         let id: i32 = m.value_of("id")?.parse()?;
         let cache = Cache::new()?;
-        let res = runtime.block_on(cache.exec_problem(id, Run::Submit, None))?;
+        let res = cache.exec_problem(id, Run::Submit, None).await?;
 
         println!("{}", res);
         Ok(())

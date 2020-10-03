@@ -1,3 +1,8 @@
+## v0.3.0
+
++ Upgrade reqwest to async mode
++ Format code using clippy
+
 ## v0.2.23
 
 + support color display

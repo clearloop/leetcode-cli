@@ -8,10 +8,9 @@ use crate::{
     flag::{Debug, Flag},
 };
 use clap::{crate_name, crate_version, App, AppSettings};
-use tokio::runtime::Builder;
 
 /// Get maches
-pub fn main() -> Result<(), Error> {
+pub async fn main() -> Result<(), Error> {
     let m = App::new(crate_name!())
         .version(crate_version!())
         .about("May the Code be with You 👻")
@@ -36,19 +35,14 @@ pub fn main() -> Result<(), Error> {
             .init();
     }
 
-    let mut runtime = Builder::new()
-        .basic_scheduler()
-        .enable_all()
-        .build()
-        .unwrap();
     match m.subcommand() {
-        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m, &mut runtime)?),
-        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m, &mut runtime)?),
-        ("exec", Some(sub_m)) => Ok(ExecCommand::handler(sub_m, &mut runtime)?),
-        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m, &mut runtime)?),
-        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m, &mut runtime)?),
-        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m, &mut runtime)?),
-        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m, &mut runtime)?),
+        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m).await?),
+        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m).await?),
+        ("exec", Some(sub_m)) => Ok(ExecCommand::handler(sub_m).await?),
+        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m).await?),
+        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m).await?),
+        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m).await?),
+        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m).await?),
         _ => Err(Error::MatchError),
     }
 }

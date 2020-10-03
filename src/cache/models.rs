@@ -199,7 +199,7 @@ use super::parser::ssr;
 use crate::cache::Run;
 
 /// verify result model
-#[derive(Debug, Deserialize)]
+#[derive(Default, Debug, Deserialize)]
 pub struct VerifyResult {
     pub state: String,
     #[serde(skip)]

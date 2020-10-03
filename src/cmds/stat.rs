@@ -1,8 +1,8 @@
 //! status command
 use super::Command;
+use async_trait::async_trait;
 use clap::{App, ArgMatches, SubCommand};
 use colored::Colorize;
-use tokio::runtime::Runtime;
 
 /// Abstract statues command
 ///
@@ -19,6 +19,7 @@ use tokio::runtime::Runtime;
 /// ```
 pub struct StatCommand;
 
+#[async_trait]
 impl Command for StatCommand {
     /// `stat` usage
     fn usage<'a, 'stat>() -> App<'a, 'stat> {
@@ -28,7 +29,7 @@ impl Command for StatCommand {
     }
 
     /// `stat` handler
-    fn handler(_m: &ArgMatches, _runtime: &mut Runtime) -> Result<(), crate::err::Error> {
+    async fn handler(_m: &ArgMatches<'_>) -> Result<(), crate::err::Error> {
         use crate::{helper::Digit, Cache};
 
         let cache = Cache::new()?;

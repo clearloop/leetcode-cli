@@ -35,8 +35,8 @@
 //! ```
 use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
+use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use tokio::runtime::Runtime;
 /// Abstract `list` command
 ///
 /// ## handler
@@ -63,11 +63,12 @@ static LIST_AFTER_HELP: &str = r#"EXAMPLES:
     leetcode list                   List all questions
     leetcode list array             List questions that has "array" in name
     leetcode list -c database       List questions that in database category
-    leetcode list -q eD             List questions that with easy level and not done    
+    leetcode list -q eD             List questions that with easy level and not done
     leetcode list -t linked-list    List questions that under tag "linked-list"
 "#;
 
 /// implement Command trait for `list`
+#[async_trait]
 impl Command for ListCommand {
     /// `list` command usage
     fn usage<'a, 'list>() -> App<'a, 'list> {
@@ -121,7 +122,7 @@ impl Command for ListCommand {
     /// List commands contains "-c", "-q", "-s" flags.
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs`
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
         trace!("Input list command...");
 
         let cache = Cache::new()?;
@@ -129,8 +130,8 @@ impl Command for ListCommand {
 
         // if cache doesn't exist, request a new copy
         if ps.is_empty() {
-            runtime.block_on(cache.download_problems())?;
-            return Self::handler(m, runtime);
+            cache.download_problems().await?;
+            return Self::handler(m).await;
         }
 
         // filtering...
@@ -145,8 +146,9 @@ impl Command for ListCommand {
 
         // filter tag
         if m.is_present("tag") {
-            let ids =
-                runtime.block_on(cache.get_tagged_questions(m.value_of("tag").unwrap_or("")))?;
+            let ids = cache
+                .get_tagged_questions(m.value_of("tag").unwrap_or(""))
+                .await?;
             crate::helper::squash(&mut ps, ids)?;
         }
 

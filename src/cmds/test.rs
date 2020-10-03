@@ -1,7 +1,7 @@
 //! Test command
 use super::Command;
+use async_trait::async_trait;
 use clap::{App, ArgMatches};
-use tokio::runtime::Runtime;
 
 /// Abstract Test Command
 ///
@@ -21,6 +21,7 @@ use tokio::runtime::Runtime;
 /// ```
 pub struct TestCommand;
 
+#[async_trait]
 impl Command for TestCommand {
     /// `test` usage
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
@@ -43,7 +44,7 @@ impl Command for TestCommand {
     }
 
     /// `test` handler
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
         let id: i32 = m.value_of("id")?.parse()?;
         let testcase = m.value_of("testcase");
@@ -53,7 +54,7 @@ impl Command for TestCommand {
             _ => case_str = None,
         }
         let cache = Cache::new()?;
-        let res = runtime.block_on(cache.exec_problem(id, Run::Test, case_str))?;
+        let res = cache.exec_problem(id, Run::Test, case_str).await?;
 
         println!("{}", res);
         Ok(())

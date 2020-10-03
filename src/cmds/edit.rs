@@ -1,7 +1,7 @@
 //! Edit command
 use super::Command;
+use async_trait::async_trait;
 use clap::{App, ArgMatches};
-use tokio::runtime::Runtime;
 
 /// Abstract `edit` command
 ///
@@ -21,6 +21,7 @@ use tokio::runtime::Runtime;
 /// ```
 pub struct EditCommand;
 
+#[async_trait]
 impl Command for EditCommand {
     /// `edit` usage
     fn usage<'a, 'edit>() -> App<'a, 'edit> {
@@ -44,7 +45,7 @@ impl Command for EditCommand {
     }
 
     /// `edit` handler
-    fn handler(m: &ArgMatches, runtime: &mut Runtime) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
         use crate::{cache::models::Question, Cache};
         use std::fs::File;
         use std::io::Write;
@@ -66,7 +67,7 @@ impl Command for EditCommand {
         if !Path::new(&path).exists() {
             let mut qr = serde_json::from_str(&target.desc);
             if qr.is_err() {
-                qr = Ok(runtime.block_on(cache.get_question(id))?);
+                qr = Ok(cache.get_question(id).await?);
             }
 
             let question: Question = qr?;

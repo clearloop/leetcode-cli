@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.2.25"
+version = "0.3.0"
 authors = ["clearloop <cdr.today@foxmail.com>"]
 edition = "2018"
 description = "Leet your code in command-line."
@@ -16,6 +16,7 @@ keywords = ["cli", "games", "leetcode"]
 readme = './README.md'
 
 [dependencies]
+async-trait = "0.1.41"
 tokio = "0.2.22"
 clap = "2.33.0"
 colored = "1.9.1"

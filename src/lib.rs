@@ -28,7 +28,7 @@
 //! **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 //!
 //! ```sh
-//! leetcode 0.2.23
+//! leetcode 0.3.0
 //! May the Code be with You 👻
 //!
 //! USAGE:
@@ -242,7 +242,6 @@
 //! [pr]: https://github.com/clearloop/leetcode-cli/pulls
 //! [#1]: https://github.com/clearloop/leetcode-cli/issues/1
 #![feature(try_trait)]
-#![allow(clippy::write_literal)]
 #[macro_use]
 extern crate log;
 #[macro_use]

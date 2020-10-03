@@ -206,12 +206,12 @@ impl Cache {
         use std::fs::File;
         use std::io::Read;
 
-        let p = &self.get_problem(rfid)?;
-        // if p.desc.is_empty() {
-        //     trace!("Problem description does not exist, pull desc and exec again...");
-        //     self.get_question(rfid).await?;
-        //     return self.pre_run_code(run, rfid, testcase).await;
-        // }
+        let mut p = self.get_problem(rfid)?;
+        if p.desc.is_empty() {
+            trace!("Problem description does not exist, pull desc and exec again...");
+            self.get_question(rfid).await?;
+            p = self.get_problem(rfid)?;
+        }
 
         let d: Question = serde_json::from_str(&p.desc)?;
         let conf = &self.0.conf;
@@ -274,12 +274,6 @@ impl Cache {
         let debug_json: Result<VerifyResult, SJError> = from_str(&debug_raw);
         debug!("debug json deserializing: \n{:#?}", &debug_json);
 
-        // let mut res = debug_json?;
-        // res = match res.state.as_str() {
-        //     "SUCCESS" => res,
-        //     _ => self.recur_verify(rid).await?,
-        // };
-
         Ok(debug_json?)
     }
 
@@ -302,10 +296,13 @@ impl Cache {
             .json()
             .await?;
 
-        let mut res = match run {
-            Run::Test => self.recur_verify(run_res.interpret_id).await?,
-            Run::Submit => self.recur_verify(run_res.submission_id.to_string()).await?,
-        };
+        let mut res: VerifyResult = VerifyResult::default();
+        while res.state != "SUCCESS" {
+            res = match run {
+                Run::Test => self.recur_verify(run_res.interpret_id.clone()).await?,
+                Run::Submit => self.recur_verify(run_res.submission_id.to_string()).await?,
+            };
+        }
 
         res.name = json.get("name")?.to_string();
         res.data_input = json.get("data_input")?.to_string();
