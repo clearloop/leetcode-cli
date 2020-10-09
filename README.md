@@ -15,19 +15,24 @@
 ## Features
 
 + [x] the edit flow —— solution files will generate automatically!
-+ [x] support python script to filter questions
-+ [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
-+ [ ] support local signal to keep coding as longer as you want.
++ [x] support Python script to filter questions
++ [ ] doc support, `lc-rs` can compile the annotation of your solutions to Markdown!
++ [ ] support local signal to keep coding as longer as you want
 
-## Building
-
+## Installing
 ```sh
 cargo install leetcode-cli
 ```
 
-## Usage
+### `error[E0554]`
+If this happens when compiling the program, it means that the package cannot be compiled with stable Rust. To fix this, install Rust Nightly and try the following:
+```sh
+rustup install nightly
+cargo +nightly install leetcode-cli
+```
 
-**Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
+## Usage
+**Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
 leetcode 0.3.0
@@ -54,7 +59,7 @@ SUBCOMMANDS:
 
 ## Example
 
-For example, if your config is:
+For example, given this config (can be found in `~/.leetcode/leetcode.toml`):
 
 ```toml
 [code]
@@ -148,21 +153,20 @@ leetcode submit 1
 
 ## Cookies
 
-The cookie plugin of leetcode-cil can work on OSX and [Linux][#1], **If you are on other platforms or your cookies just don't want to be catched**, you can handwrite your LeetCode Cookies to `~/.leetcode/leetcode.toml`
+The cookie plugin of leetcode-cli can work on OSX and [Linux][#1]. **If you are on a different platform, there are problems with caching the cookies**, you can manually input your LeetCode Cookies to the configuration file.
 
 ```toml
-# Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
 [cookies]
 csrf = "..."
 session = "..."
 ```
 
-For Example, if you're using chrome to login to leetcode.com.
+For Example, using Chrome (after logging in to LeetCode):
 
 
 #### Step 1
 
-Open chrome and paste the link below to the `chrome linkbar`.
+Open Chrome and navigate to the link below:
 
 ```sh
 chrome://settings/cookies/detail?site=leetcode.com
@@ -170,33 +174,23 @@ chrome://settings/cookies/detail?site=leetcode.com
 
 #### Step 2
 
-Copy the contents of `LEETCODE_SESSION` and `csrftoken`.
-
-#### Step 3
-
-Paste them to `session` and `csrf`.
-
+Copy `Content` from `LEETCODE_SESSION` and `csrftoken` to `session` and `csrf` in your configuration file, respectively:
 ```toml
-# Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
 [cookies]
 csrf = "${csrftoken}"
 session = "${LEETCODE_SESSION}"
 ```
 
-
 ## Programmable
 
-If we want to filter leetcode questions using our own python scripts, what should we do?
-
-For example, our config is:
+If you want to filter LeetCode questions using custom Python scripts, add the following to your the configuration file:
 
 ```toml
-# Make sure `leetcode.toml` file is placed at `~/.leetcode/leetcode.toml`
 [storage]
 scripts = "scripts"
 ```
 
-We write our python scripts:
+Then write the script:
 
 ```python
 # ~/.leetcode/scripts/plan1.py
@@ -224,18 +218,17 @@ def plan(sps, stags):
     return ret
 ```
 
-Then we can run filter as what we write now:
+Then run `list` with the filter that you just wrote:
 
 ```sh
 leetcode list -p plan1
 ```
 
-Well done, enjoy it!
+And that's it! Enjoy!
 
 
 ## PR
-
-PR is welcome!! [Come][pr] As You Are!
+[PRs][pr] are more than welcome!
 
 ## LICENSE
 MIT
