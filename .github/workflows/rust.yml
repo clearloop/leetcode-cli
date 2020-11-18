@@ -10,14 +10,14 @@ jobs:
         os: [macOS-latest, ubuntu-latest]
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@master
+        uses: actions/checkout@v1
+      - name: Set nightly toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          rust-version: nightly
+          toolchain: nightly
+          override: true
       - name: Environment
         run: |
-          rustup update
-          rustup toolchain install nightly
-          
           if [[ "$(uname)" == 'Darwin' ]]; then
               brew update
               brew install sqlite3
@@ -26,6 +26,6 @@ jobs:
               sudo apt-get install -y libsqlite3-dev libdbus-1-dev
           fi
       - name: Build
-        run: cargo +nightly build --verbose
+        run: cargo build --all-features -vv
       - name: Run tests
-        run: cargo +nightly test --verbose
+        run: cargo test --all-features -vv
