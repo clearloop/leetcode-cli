@@ -7,10 +7,14 @@
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Contributors
-+ [@hulufi](https://github.com/hulufei)
+
++ [@aymanbagabas](https://github.com/aymanbagabas)
++ [@xiaoxiae](https://github.com/xiaoxiae)
++ [@hulufei](https://github.com/hulufei)
 + [@ldm0](https://github.com/ldm0)
 + [@Raees678](https://github.com/Raees678)
 + [@clearloop](https://github.com/clearloop)
+
 
 ## Features
 
@@ -25,13 +29,16 @@ cargo install leetcode-cli
 ```
 
 ### `error[E0554]`
+
 If this happens when compiling the program, it means that the package cannot be compiled with stable Rust. To fix this, install Rust Nightly and try the following:
+
 ```sh
 rustup install nightly
 cargo +nightly install leetcode-cli
 ```
 
 ## Usage
+
 **Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
@@ -228,9 +235,11 @@ And that's it! Enjoy!
 
 
 ## PR
+
 [PRs][pr] are more than welcome!
 
 ## LICENSE
+
 MIT
 
 
