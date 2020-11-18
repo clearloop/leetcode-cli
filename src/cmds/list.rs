@@ -170,7 +170,6 @@ impl Command for ListCommand {
 
         let out: Vec<String> = ps.iter().map(ToString::to_string).collect();
         println!("{}", out.join("\n"));
-        // io::stdout().write_all(out.join("\n").as_bytes())?;
 
         // one more thing, filter stat
         if m.is_present("stat") {
