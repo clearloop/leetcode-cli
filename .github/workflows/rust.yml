@@ -10,9 +10,12 @@ jobs:
         os: [macOS-latest, ubuntu-latest]
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@v1
+        uses: actions-/checkout@v1
+      - name: Set nightly toolchain
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          override: true
       - name: Environment
         run: |
           if [[ "$(uname)" == 'Darwin' ]]; then
@@ -23,6 +26,6 @@ jobs:
               sudo apt-get install -y libsqlite3-dev libdbus-1-dev
           fi
       - name: Build
-        run: cargo +nightly build --all-features --vv
+        run: cargo build --all-features --vv
       - name: Run tests
-        run: cargo +nightly test --all-features --vv
+        run: cargo test --all-features --vv
