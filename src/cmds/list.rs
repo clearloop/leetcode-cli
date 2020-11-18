@@ -37,6 +37,7 @@ use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
+use std::io::{self, Write};
 /// Abstract `list` command
 ///
 /// ## handler
@@ -168,9 +169,8 @@ impl Command for ListCommand {
             ps.retain(|x| x.name.contains(&keyword));
         }
 
-        for p in &ps {
-            println!("{}", p);
-        }
+        let out: Vec<String> = ps.iter().map(ToString::to_string).collect();
+        io::stdout().write_all(out.join("\n").as_bytes())?;
 
         // one more thing, filter stat
         if m.is_present("stat") {

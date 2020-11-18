@@ -9,8 +9,24 @@ use crate::{
 };
 use clap::{crate_name, crate_version, App, AppSettings};
 
+/// This should be called before calling any cli method or printing any output.
+pub fn reset_signal_pipe_handler() -> Result<(), ()> {
+    #[cfg(target_family = "unix")]
+    {
+        use nix::sys::signal;
+
+        unsafe {
+            signal::signal(signal::Signal::SIGPIPE, signal::SigHandler::SigDfl)
+                .map_err(|e| println!("{:?}", e))?;
+        }
+    }
+
+    Ok(())
+}
+
 /// Get maches
 pub async fn main() -> Result<(), Error> {
+    let _ = reset_signal_pipe_handler();
     let m = App::new(crate_name!())
         .version(crate_version!())
         .about("May the Code be with You 👻")
