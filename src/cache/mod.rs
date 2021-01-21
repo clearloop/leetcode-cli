@@ -222,7 +222,6 @@ impl Cache {
 
         json.insert("lang", conf.code.lang.to_string());
         json.insert("question_id", p.id.to_string());
-        json.insert("test_mode", false.to_string());
         json.insert("typed_code", code);
 
         // pass manually data
@@ -285,16 +284,17 @@ impl Cache {
         testcase: Option<String>,
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let pre = self.pre_run_code(run.clone(), rfid, testcase).await?;
-        let json = pre.0;
+        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, testcase).await?;
+        trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
 
         let run_res: RunCode = self
             .0
             .clone()
-            .run_code(json.clone(), pre.1[0].clone(), pre.1[1].clone())
+            .run_code(json.clone(), url.clone(), refer.clone())
             .await?
             .json()
             .await?;
+        trace!("Run code result {:#?}", run_res);
 
         let mut res: VerifyResult = VerifyResult::default();
         while res.state != "SUCCESS" {
@@ -303,6 +303,7 @@ impl Cache {
                 Run::Submit => self.recur_verify(run_res.submission_id.to_string()).await?,
             };
         }
+        trace!("Recur verify result {:#?}", res);
 
         res.name = json.get("name")?.to_string();
         res.data_input = json.get("data_input")?.to_string();
