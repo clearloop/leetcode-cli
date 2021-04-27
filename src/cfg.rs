@@ -13,6 +13,7 @@ const DEFAULT_CONFIG: &str = r#"
 [sys]
 categories = [
   "algorithms",
+  "concurrency",
   "database",
   "shell"
 ]
