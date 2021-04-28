@@ -8,6 +8,8 @@
 
 ## Contributors
 
+* [@frrad](https://github.com/frrad)
++ [@shmuga](https://github.com/aymanbagabas)
 + [@aymanbagabas](https://github.com/aymanbagabas)
 + [@xiaoxiae](https://github.com/xiaoxiae)
 + [@hulufei](https://github.com/hulufei)
