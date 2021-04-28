@@ -14,7 +14,7 @@
 //!
 //! OPTIONS:
 //!     -c, --category <category>    Fliter problems by category name
-//!                                  [alogrithms, database, shell]
+//!                                  [algorithms, database, shell, concurrency]
 //!     -q, --query <query>          Fliter questions by conditions:
 //!                                  Uppercase means negative
 //!                                  e = easy     E = m+h
@@ -47,7 +47,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 pub struct ListCommand;
 
 static CATEGORY_HELP: &str = r#"Fliter problems by category name
-[alogrithms, database, shell]
+[algorithms, database, shell, concurrency]
 "#;
 
 static QUERY_HELP: &str = r#"Fliter questions by conditions:

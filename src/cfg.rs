@@ -13,6 +13,7 @@ const DEFAULT_CONFIG: &str = r#"
 [sys]
 categories = [
   "algorithms",
+  "concurrency",
   "database",
   "shell"
 ]
@@ -99,7 +100,7 @@ pub struct Cookies {
 /// System settings, for leetcode api mainly
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Sys {
-    pub categories: [String; 3],
+    pub categories: Vec<String>,
     pub langs: [String; 16],
     pub urls: HashMap<String, String>,
 }
