@@ -42,7 +42,7 @@ cargo +nightly install leetcode-cli
 **Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
-leetcode 0.3.0
+leetcode 0.3.3
 May the Code be with You 👻
 
 USAGE:

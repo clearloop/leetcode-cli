@@ -1,36 +1,51 @@
+## v0.3.3
+
+* allow more flexible categories by @frrad
+* change params type to `Option<Param>` @frrad
+
+## v0.3.2
+
+* adds additional tracing by @shmuga
+* removes test_mode parameter by @shmuga
+
+## v0.3.1
+
+* pipe handling by @aymanbagabas
+* Improve README by @xiaoxiae
+
 ## v0.3.0
 
-+ Upgrade reqwest to async mode
-+ Format code using clippy
+* Upgrade reqwest to async mode
+* Format code using clippy
 
 ## v0.2.23
 
-+ support color display
+* support color display
 
 ## v0.2.22
-+ Fixed the cache can't update with new added problems
+* Fixed the cache can't update with new added problems
 
-+ Display user friendly errors when pick/edit new added problem.
+* Display user friendly errors when pick/edit new added problem.
 
-+ upgrade pyo3
+* upgrade pyo3
 
-+ fix leetcode list with empty cache
+* fix leetcode list with empty cache
 
 ## v0.2.21
 
-+ Make programmable support to be an advanced feature
+* Make programmable support to be an advanced feature
 
 ## v0.2.20
 
-+ Support sup/sub style for numbers
+* Support sup/sub style for numbers
 
 ## v0.2.19
-+ Better HTML!
+* Better HTML!
 
 ## v0.2.18
-+ Display stdout for test and execute commands, fix minor spacing in results displayed
+* Display stdout for test and execute commands, fix minor spacing in results displayed
 
-+ Fix panic on `pick` command without cache
+* Fix panic on `pick` command without cache
 
 ## v0.2.17
 Fix panic on stat command with zero numbers 
@@ -42,7 +57,7 @@ Update versions of diesel and reqwest
 Allow for custom testcases with the `leetcode test` command, and some minor edits
 
 ## v0.2.14
-Corrects file suffixes for c++ and c# files
+Corrects file suffixes for c** and c# files
 
 ## v0.2.13
 fix percent length panic
