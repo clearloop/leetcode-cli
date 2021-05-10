@@ -101,7 +101,7 @@ pub struct Cookies {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Sys {
     pub categories: Vec<String>,
-    pub langs: [String; 16],
+    pub langs: Vec<String>,
     pub urls: HashMap<String, String>,
 }
 

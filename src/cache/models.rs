@@ -166,7 +166,7 @@ mod question {
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct MetaData {
         pub name: Option<String>,
-        pub params: Option<Param>,
+        pub params: Option<Vec<Param>>,
         pub r#return: Return,
     }
 
