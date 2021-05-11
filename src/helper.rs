@@ -1,6 +1,6 @@
 //! A set of helper traits
 pub use self::digit::Digit;
-pub use self::file::{code_path, load_script};
+pub use self::file::{code_path, load_script, test_cases_path};
 pub use self::filter::{filter, squash};
 pub use self::html::HTML;
 
@@ -282,6 +282,23 @@ mod file {
     }
 
     use crate::cache::models::Problem;
+
+    /// Generate test casese path by fid
+    pub fn test_cases_path(target: &Problem) -> Result<String, crate::Error> {
+        let conf = crate::cfg::locate()?;
+
+        let mut path = format!(
+            "{}/{}.tests.dat",
+            conf.storage.code()?,
+            conf.code.pick,
+        );
+
+        path = path.replace("${fid}", &target.fid.to_string());
+        path = path.replace("${slug}", &target.slug.to_string());
+
+        Ok(path)
+    }
+
     /// Generate code path by fid
     pub fn code_path(target: &Problem, l: Option<String>) -> Result<String, crate::Error> {
         let conf = crate::cfg::locate()?;

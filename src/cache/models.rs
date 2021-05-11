@@ -118,6 +118,7 @@ pub struct Question {
     pub stats: Stats,
     pub defs: CodeDefintion,
     pub case: String,
+    pub all_cases: String,
     pub metadata: MetaData,
     pub test: bool,
     pub t_content: String,
@@ -166,7 +167,7 @@ mod question {
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub struct MetaData {
         pub name: Option<String>,
-        pub params: Option<Param>,
+        pub params: Option<Vec<Param>>,
         pub r#return: Return,
     }
 
@@ -378,7 +379,7 @@ impl std::fmt::Display for VerifyResult {
             // if anybody reach this, welcome to fix this!
             13 | 14 => write!(f, "\n{}\n", &self.status.status_msg.yellow().bold(),)?,
             // Runtime error
-            15 => write!(f, "\n{}\n", &self.status.status_msg.red().bold())?,
+            15 => write!(f, "\n{}\n{}\n'", &self.status.status_msg.red().bold(), &self.status.runtime_error)?,
             // Compile Error
             20 => write!(
                 f,
@@ -479,6 +480,8 @@ mod verify {
         pub status_memory: String,
         #[serde(default)]
         pub status_runtime: String,
+        #[serde(default)]
+        pub runtime_error: String
     }
 
     #[derive(Debug, Default, Deserialize)]

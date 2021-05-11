@@ -43,6 +43,10 @@ pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
         stats: serde_json::from_str(o.get("stats")?.as_str()?)?,
         defs: serde_json::from_str(o.get("codeDefinition")?.as_str()?)?,
         case: o.get("sampleTestCase")?.as_str()?.to_string(),
+        all_cases: o.get("exampleTestcases")
+                .unwrap_or(o.get("sampleTestCase")?) // soft fail to the sampleTestCase
+                .as_str()?
+                .to_string(),
         metadata: serde_json::from_str(o.get("metaData")?.as_str()?)?,
         test: o.get("enableRunCode")?.as_bool()?,
         t_content: o
