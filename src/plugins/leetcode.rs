@@ -135,6 +135,7 @@ impl LeetCode {
                 "    stats",
                 "    codeDefinition",
                 "    sampleTestCase",
+                "    exampleTestcases",
                 "    enableRunCode",
                 "    metaData",
                 "    translatedContent",

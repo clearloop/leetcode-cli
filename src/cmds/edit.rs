@@ -64,6 +64,8 @@ impl Command for EditCommand {
 
         let lang = conf.code.lang;
         let path = crate::helper::code_path(&target, Some(lang.to_owned()))?;
+        let tests_path = crate::helper::test_cases_path(&target)?;
+
         if !Path::new(&path).exists() {
             let mut qr = serde_json::from_str(&target.desc);
             if qr.is_err() {
@@ -71,17 +73,24 @@ impl Command for EditCommand {
             }
 
             let question: Question = qr?;
-            let mut f = File::create(&path)?;
+
+            let mut file_code = File::create(&path)?;
+            let mut file_tests = File::create(&tests_path)?;
+
             let mut flag = false;
             for d in question.defs.0 {
                 if d.value == lang {
                     flag = true;
-                    f.write_all(d.code.to_string().as_bytes())?;
+                    file_code.write_all(d.code.to_string().as_bytes())?;
+                    file_tests.write_all(question.all_cases.as_bytes())?;
                 }
             }
 
+            // if language is not found in the list of supported languges clean up files
             if !flag {
                 std::fs::remove_file(&path)?;
+                std::fs::remove_file(&tests_path)?;
+
                 return Err(crate::Error::FeatureError(format!(
                     "This question doesn't support {}, please try another",
                     &lang

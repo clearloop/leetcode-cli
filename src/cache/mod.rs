@@ -202,7 +202,7 @@ impl Cache {
         testcase: Option<String>,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
-        use crate::helper::code_path;
+        use crate::helper::{code_path, test_cases_path};
         use std::fs::File;
         use std::io::Read;
 
@@ -218,6 +218,24 @@ impl Cache {
         let mut json: HashMap<&'static str, String> = HashMap::new();
         let mut code: String = "".to_string();
 
+        let maybe_file_testcases: Option<String> = test_cases_path(&p)
+                .map(|filename| {
+                    let mut tests = "".to_string();
+                    File::open(filename)
+                        .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
+                        .map(|_| Some(tests))
+                        .unwrap_or(None)
+                })
+                .unwrap_or(None);
+
+        // Takes test cases using following priority
+        // 1. cli parameter
+        // 2. test cases from the file
+        // 3. sample test case from the task
+        let testcase = testcase
+            .or(maybe_file_testcases)
+            .unwrap_or(d.case);
+
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
         json.insert("lang", conf.code.lang.to_string());
@@ -226,10 +244,7 @@ impl Cache {
 
         // pass manually data
         json.insert("name", p.name.to_string());
-        match testcase {
-            Some(case) => json.insert("data_input", case),
-            _ => json.insert("data_input", d.case),
-        };
+        json.insert("data_input", testcase);
 
         let url = match run {
             Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),
