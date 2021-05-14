@@ -6,18 +6,6 @@
 [![gitter](https://img.shields.io/gitter/room/odditypark/leetcode-cli)](https://gitter.im/Odditypark/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-## Contributors
-
-* [@frrad](https://github.com/frrad)
-+ [@shmuga](https://github.com/aymanbagabas)
-+ [@aymanbagabas](https://github.com/aymanbagabas)
-+ [@xiaoxiae](https://github.com/xiaoxiae)
-+ [@hulufei](https://github.com/hulufei)
-+ [@ldm0](https://github.com/ldm0)
-+ [@Raees678](https://github.com/Raees678)
-+ [@clearloop](https://github.com/clearloop)
-
-
 ## Features
 
 + [x] the edit flow —— solution files will generate automatically!
@@ -44,7 +32,7 @@ cargo +nightly install leetcode-cli
 **Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
-leetcode 0.3.3
+leetcode 0.3.5
 May the Code be with You 👻
 
 USAGE:
