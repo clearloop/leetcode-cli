@@ -90,12 +90,6 @@ impl Cache {
             ));
         }
 
-        if p.locked {
-            return Err(Error::FeatureError(
-                "Not support premium question for now".to_string(),
-            ));
-        }
-
         Ok(p)
     }
 
@@ -126,12 +120,6 @@ impl Cache {
         if target.category != "algorithms" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
-            ));
-        }
-
-        if target.locked {
-            return Err(Error::FeatureError(
-                "Not support premium question for now".to_string(),
             ));
         }
 
