@@ -14,7 +14,15 @@
 + [ ] support local signal to keep coding as longer as you want
 
 ## Installing
+
 ```sh
+# Required dependencies:
+# 
+#  gcc
+#  libssl-dev
+#  libdbus-1-dev
+#  libsqlite3-dev
+
 cargo install leetcode-cli
 ```
 
@@ -32,7 +40,7 @@ cargo +nightly install leetcode-cli
 **Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
-leetcode 0.3.5
+leetcode 0.3.6
 May the Code be with You 👻
 
 USAGE:
