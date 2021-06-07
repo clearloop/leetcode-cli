@@ -113,6 +113,7 @@ mod html {
 
     pub fn superscript(n: u8) -> String {
         match n {
+            x if x >= 10 => format!("{}{}", superscript(n / 10), superscript(n % 10)),
             0 => "⁰".to_string(),
             1 => "¹".to_string(),
             2 => "²".to_string(),
@@ -123,18 +124,13 @@ mod html {
             7 => "⁷".to_string(),
             8 => "⁸".to_string(),
             9 => "⁹".to_string(),
-            x if x > 10 => (superscript(n / 10).parse().unwrap_or(0)
-                + superscript(n % 10).parse().unwrap_or(0))
-            .to_string(),
             _ => n.to_string(),
         }
     }
 
     pub fn subscript(n: u8) -> String {
         match n {
-            x if x >= 10 => (subscript(n / 10).parse().unwrap_or(0)
-                + subscript(n % 10).parse().unwrap_or(0))
-            .to_string(),
+            x if x >= 10 => format!("{}{}", subscript(n / 10), subscript(n % 10)),
             0 => "₀".to_string(),
             1 => "₁".to_string(),
             2 => "₂".to_string(),
