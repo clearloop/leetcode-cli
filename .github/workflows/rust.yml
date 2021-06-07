@@ -18,7 +18,7 @@ jobs:
       - name: Set nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2021-05-16
           override: true
       - name: Environment
         run: |
