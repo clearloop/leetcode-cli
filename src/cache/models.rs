@@ -245,12 +245,12 @@ impl std::fmt::Display for VerifyResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let ca = match &self.code_answer.len() {
             1 => self.code_answer[0].to_string(),
-            _ => self.code_answer.join(""),
+            _ => self.code_answer.join("↩ "),
         };
 
         let eca = match &self.expected.expected_code_answer.len() {
             1 => self.expected.expected_code_answer[0].to_string(),
-            _ => self.expected.expected_code_answer.join(""),
+            _ => self.expected.expected_code_answer.join("↩ "),
         };
 
         debug!("{:#?}", &self);
