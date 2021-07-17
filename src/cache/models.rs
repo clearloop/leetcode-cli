@@ -314,9 +314,9 @@ impl std::fmt::Display for VerifyResult {
                          {}.\n\n\
                          {}{}\
                          , less than \
-                         {}{} \
+                         {}{}\
                          of \
-                         {}{}.\n\n",
+                         {} {}.\n\n",
                         "Success\n\n".green().bold(),
                         "Runtime: ".dimmed(),
                         &self.status.status_runtime.bold(),
