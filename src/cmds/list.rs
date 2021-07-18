@@ -184,7 +184,8 @@ impl Command for ListCommand {
 
         // retain if keyword exists
         if let Some(keyword) = m.value_of("keyword") {
-            ps.retain(|x| x.name.contains(&keyword));
+            let lowercase_kw = keyword.to_lowercase();
+            ps.retain(|x| x.name.to_lowercase().contains(&lowercase_kw));
         }
 
         let out: Vec<String> = ps.iter().map(ToString::to_string).collect();

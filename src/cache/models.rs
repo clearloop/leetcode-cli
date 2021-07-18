@@ -223,6 +223,8 @@ pub struct VerifyResult {
     code_answer: Vec<String>,
     #[serde(default, deserialize_with = "ssr")]
     code_output: Vec<String>,
+    #[serde(default, deserialize_with = "ssr")]
+    expected_output: Vec<String>,
     #[serde(default)]
     std_output: String,
 
@@ -351,7 +353,7 @@ impl std::fmt::Display for VerifyResult {
             // Failed some tests during submission
             11 => write!(
                 f,
-                "\n{}\n\n{}{}\n{}{}\n{}{}\n",
+                "\n{}\n\n{}{}\n{}{}\n{}{}{}{}{}{}\n",
                 &self.status.status_msg.red().bold(),
                 "Cases passed:".after_spaces(2).green(),
                 &self
@@ -371,7 +373,11 @@ impl std::fmt::Display for VerifyResult {
                     .bold()
                     .yellow(),
                 &"Last case:".after_spaces(5).dimmed(),
-                &self.submit.last_testcase.replace("\n", "↩ ").dimmed()
+                &self.submit.last_testcase.replace("\n", "↩ ").dimmed(),
+                &"\nOutput:".after_spaces(8),
+                self.code_output[0],
+                &"\nExpected:".after_spaces(6),
+                self.expected_output[0],
             )?,
             // Output Timeout Exceeded
             //
