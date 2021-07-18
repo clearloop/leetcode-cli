@@ -28,7 +28,7 @@
 //! **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 //!
 //! ```sh
-//! leetcode 0.3.8
+//! leetcode 0.3.9
 //! May the Code be with You 👻
 //!
 //! USAGE:
