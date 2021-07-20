@@ -379,6 +379,14 @@ impl std::fmt::Display for VerifyResult {
                 &"\nExpected:".after_spaces(6),
                 self.expected_output[0],
             )?,
+            // Memory Exceeded
+            12 => write!(
+                f,
+                "\n{}\n\n{}{}\n",
+                &self.status.status_msg.yellow().bold(),
+                &"Last case:".after_spaces(5).dimmed(),
+                &self.data_input.replace("\n", "↩ "),
+            )?,
             // Output Timeout Exceeded
             //
             // TODO: 13 and 14 might have some different,
