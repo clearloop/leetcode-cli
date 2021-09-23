@@ -139,10 +139,10 @@ leetcode test 1
 
 ```
 
-#### 4. <kbd>submit</kbd>
+#### 4. <kbd>exec</kbd>
 
 ```sh
-leetcode submit 1
+leetcode exec 1
 ```
 
 ```sh
