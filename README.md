@@ -123,10 +123,10 @@ impl Solution {
 }
 ```
 
-#### 3. <kbd>exec</kbd>
+#### 3. <kbd>test</kbd>
 
 ```sh
-leetcode exec 1
+leetcode test 1
 ```
 
 ```sh
@@ -139,10 +139,10 @@ leetcode exec 1
 
 ```
 
-#### 4. <kbd>submit</kbd>
+#### 4. <kbd>exec</kbd>
 
 ```sh
-leetcode submit 1
+leetcode exec 1
 ```
 
 ```sh
