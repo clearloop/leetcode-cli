@@ -1,6 +1,6 @@
 //! Cache managger
 use super::Command;
-use crate::{cache::Cache, helper::Digit};
+use crate::{cache::Cache, helper::Digit, Error};
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::Colorize;
@@ -46,7 +46,7 @@ impl Command for DataCommand {
     }
 
     /// `data` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::err::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
         use std::fs::File;
         use std::path::Path;
 
@@ -58,7 +58,7 @@ impl Command for DataCommand {
         let out = format!(
             "  {}{}",
             Path::new(&path)
-                .file_name()?
+                .file_name().ok_or(Error::NoneError)?
                 .to_string_lossy()
                 .to_string()
                 .digit(65 - (len.len() as i32))

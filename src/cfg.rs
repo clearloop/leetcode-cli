@@ -7,6 +7,7 @@
 //! + Use `leetcode config` to update it
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
+use crate::Error;
 
 const DEFAULT_CONFIG: &str = r#"
 # usually you don't wanna change those
@@ -81,8 +82,8 @@ pub struct Config {
 
 impl Config {
     /// Sync new config to config.toml
-    pub fn sync(&self) -> Result<(), crate::Error> {
-        let home = dirs::home_dir()?;
+    pub fn sync(&self) -> Result<(), Error> {
+        let home = dirs::home_dir().ok_or(Error::NoneError)?;
         let conf = home.join(".leetcode/leetcode.toml");
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
 
@@ -148,8 +149,8 @@ pub struct Storage {
 
 impl Storage {
     /// convert root path
-    pub fn root(&self) -> Result<String, crate::Error> {
-        let home = dirs::home_dir()?.to_string_lossy().to_string();
+    pub fn root(&self) -> Result<String, Error> {
+        let home = dirs::home_dir().ok_or(Error::NoneError)?.to_string_lossy().to_string();
         let path = self.root.replace("~", &home);
         Ok(path)
     }
@@ -179,10 +180,10 @@ impl Storage {
         let root = &self.root()?;
         if self.scripts.is_none() {
             let tmp = toml::from_str::<Config>(&DEFAULT_CONFIG)?;
-            self.scripts = Some(tmp.storage.scripts?);
+            self.scripts = Some(tmp.storage.scripts.ok_or(Error::NoneError)?);
         }
 
-        let p = PathBuf::from(root).join(&self.scripts?);
+        let p = PathBuf::from(root).join(&self.scripts.ok_or(Error::NoneError)?);
         if !PathBuf::from(&p).exists() {
             std::fs::create_dir(&p)?
         }
@@ -203,8 +204,8 @@ pub fn locate() -> Result<Config, crate::Error> {
 }
 
 /// Get root path of leetcode-cli
-pub fn root() -> Result<std::path::PathBuf, crate::Error> {
-    let dir = dirs::home_dir()?.join(".leetcode");
+pub fn root() -> Result<std::path::PathBuf, Error> {
+    let dir = dirs::home_dir().ok_or(Error::NoneError)?.join(".leetcode");
     if !dir.is_dir() {
         info!("Generate root dir at {:?}.", &dir);
         fs::DirBuilder::new().recursive(true).create(&dir)?;

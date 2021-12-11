@@ -1,4 +1,5 @@
 //! Edit command
+use crate::Error;
 use super::Command;
 use async_trait::async_trait;
 use clap::{App, ArgMatches};
@@ -51,14 +52,14 @@ impl Command for EditCommand {
         use std::io::Write;
         use std::path::Path;
 
-        let id: i32 = m.value_of("id")?.parse()?;
+        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
         let cache = Cache::new()?;
         let target = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
 
         // condition language
         if m.is_present("lang") {
-            conf.code.lang = m.value_of("lang")?.to_string();
+            conf.code.lang = m.value_of("lang").ok_or(Error::NoneError)?.to_string();
             conf.sync()?;
         }
 

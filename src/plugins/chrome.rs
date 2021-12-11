@@ -1,4 +1,4 @@
-use crate::cache;
+use crate::{cache, Error};
 use diesel::prelude::*;
 use keyring::Keyring;
 use openssl::{hash, pkcs5, symm};
@@ -52,7 +52,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     use self::schema::cookies::dsl::*;
     trace!("Derive cookies from google chrome...");
 
-    let home = dirs::home_dir()?;
+    let home = dirs::home_dir().ok_or(Error::NoneError)?;
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
         "linux" => home.join(".config/google-chrome/Default/Cookies"),
@@ -84,8 +84,8 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     }
 
     Ok(Ident {
-        csrf: m.get("csrftoken")?.to_string(),
-        session: m.get("LEETCODE_SESSION")?.to_string(),
+        csrf: m.get("csrftoken").ok_or(Error::NoneError)?.to_string(),
+        session: m.get("LEETCODE_SESSION").ok_or(Error::NoneError)?.to_string(),
     })
 }
 

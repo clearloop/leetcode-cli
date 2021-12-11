@@ -277,7 +277,7 @@ mod file {
         }
     }
 
-    use crate::cache::models::Problem;
+    use crate::{cache::models::Problem, Error};
 
     /// Generate test casese path by fid
     pub fn test_cases_path(target: &Problem) -> Result<String, crate::Error> {
@@ -300,7 +300,7 @@ mod file {
         let conf = crate::cfg::locate()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
-            lang = l?;
+            lang = l.ok_or(Error::NoneError)?;
         }
 
         let mut path = format!(

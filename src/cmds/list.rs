@@ -168,13 +168,13 @@ impl Command for ListCommand {
 
         // filter query
         if m.is_present("query") {
-            let query = m.value_of("query")?;
+            let query = m.value_of("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut ps, query.to_string());
         }
 
         // filter range
         if m.is_present("range") {
-            let range: Vec<_> = m.values_of("range")?.collect();
+            let range: Vec<_> = m.values_of("range").ok_or(Error::NoneError)?.collect();
             let num_range: Vec<i32> = range
                 .into_iter()
                 .map(|x| x.parse::<i32>().unwrap_or(0))

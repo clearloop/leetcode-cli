@@ -1,10 +1,9 @@
 //! Sub-Module for parsing resp data
 use super::models::*;
-use crate::err::Error;
 use serde_json::Value;
 
 /// problem parser
-pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
+pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
     let pairs = v.get("stat_status_pairs")?.as_array()?;
     for p in pairs {
         let stat = p.get("stat")?.as_object()?;
@@ -26,11 +25,11 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Result<(), Error> {
         });
     }
 
-    Ok(())
+    Some(())
 }
 
 /// desc parser
-pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
+pub fn desc(q: &mut Question, v: Value) -> Option<()> {
     let o = &v
         .as_object()?
         .get("data")?
@@ -40,14 +39,14 @@ pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
 
     *q = Question {
         content: o.get("content")?.as_str().unwrap_or("").to_string(),
-        stats: serde_json::from_str(o.get("stats")?.as_str()?)?,
-        defs: serde_json::from_str(o.get("codeDefinition")?.as_str()?)?,
+        stats: serde_json::from_str(o.get("stats")?.as_str()?).ok()?,
+        defs: serde_json::from_str(o.get("codeDefinition")?.as_str()?).ok()?,
         case: o.get("sampleTestCase")?.as_str()?.to_string(),
         all_cases: o.get("exampleTestcases")
                 .unwrap_or(o.get("sampleTestCase")?) // soft fail to the sampleTestCase
                 .as_str()?
                 .to_string(),
-        metadata: serde_json::from_str(o.get("metaData")?.as_str()?)?,
+        metadata: serde_json::from_str(o.get("metaData")?.as_str()?).ok()?,
         test: o.get("enableRunCode")?.as_bool()?,
         t_content: o
             .get("translatedContent")?
@@ -56,16 +55,16 @@ pub fn desc(q: &mut Question, v: Value) -> Result<(), Error> {
             .to_string(),
     };
 
-    Ok(())
+    Some(())
 }
 
 /// tag parser
-pub fn tags(v: Value) -> Result<Vec<String>, Error> {
+pub fn tags(v: Value) -> Option<Vec<String>> {
     trace!("Parse tags...");
     let tag = v.as_object()?.get("data")?.as_object()?.get("topicTag")?;
 
     if tag.is_null() {
-        return Ok(vec![]);
+        return Some(vec![]);
     }
 
     let arr = tag.as_object()?.get("questions")?.as_array()?;
@@ -75,7 +74,7 @@ pub fn tags(v: Value) -> Result<Vec<String>, Error> {
         res.push(q.as_object()?.get("questionId")?.as_str()?.to_string())
     }
 
-    Ok(res)
+    Some(res)
 }
 
 pub use ss::ssr;

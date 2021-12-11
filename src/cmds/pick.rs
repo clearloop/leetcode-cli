@@ -105,7 +105,7 @@ impl Command for PickCommand {
 
         // query filter
         if m.is_present("query") {
-            let query = m.value_of("query")?;
+            let query = m.value_of("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut problems, query.to_string());
         }
 
@@ -120,7 +120,7 @@ impl Command for PickCommand {
 
         let r = cache.get_question(fid).await;
         if r.is_err() {
-            let e = r.err()?;
+            let e = r.err().ok_or(Error::NoneError)?;
             eprintln!("{:?}", &e);
             if let Error::FeatureError(_) | Error::NetworkError(_) = e {
                 Self::handler(m).await?;
