@@ -21,6 +21,7 @@ mod schema {
 #[derive(Queryable, Debug, Clone)]
 struct Cookies {
     pub encrypted_value: Vec<u8>,
+    #[allow(dead_code)]
     pub host_key: String,
     pub name: String,
 }

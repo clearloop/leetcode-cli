@@ -209,14 +209,14 @@ pub struct VerifyResult {
     pub data_input: String,
     #[serde(skip)]
     pub result_type: Run,
-    #[serde(default)]
-    lang: String,
+    // #[serde(default)]
+    // lang: String,
     #[serde(default)]
     pretty_lang: String,
-    #[serde(default)]
-    submission_id: String,
-    #[serde(default)]
-    run_success: bool,
+    // #[serde(default)]
+    // submission_id: String,
+    // #[serde(default)]
+    // run_success: bool,
     #[serde(default)]
     correct_answer: bool,
     #[serde(default, deserialize_with = "ssr")]
@@ -229,8 +229,8 @@ pub struct VerifyResult {
     std_output: String,
 
     // flatten
-    #[serde(flatten, default)]
-    info: VerifyInfo,
+    // #[serde(flatten, default)]
+    // info: VerifyInfo,
     #[serde(flatten, default)]
     status: VerifyStatus,
     #[serde(flatten, default)]
@@ -462,15 +462,15 @@ mod verify {
         pub compare_result: String,
     }
 
-    #[derive(Debug, Default, Deserialize)]
-    pub struct VerifyInfo {
-        #[serde(default)]
-        memory: i64,
-        #[serde(default)]
-        elapsed_time: i64,
-        #[serde(default)]
-        task_finish_time: i64,
-    }
+    // #[derive(Debug, Default, Deserialize)]
+    // pub struct VerifyInfo {
+    //     #[serde(default)]
+    //     memory: i64,
+    //     #[serde(default)]
+    //     elapsed_time: i64,
+    //     #[serde(default)]
+    //     task_finish_time: i64,
+    // }
 
     #[derive(Debug, Default, Deserialize)]
     pub struct Analyse {
@@ -500,30 +500,30 @@ mod verify {
 
     #[derive(Debug, Default, Deserialize)]
     pub struct CompileError {
-        #[serde(default)]
-        compile_error: String,
+        // #[serde(default)]
+        // compile_error: String,
         #[serde(default)]
         pub full_compile_error: String,
     }
 
     #[derive(Debug, Default, Deserialize)]
     pub struct Expected {
-        #[serde(default)]
-        expected_status_code: i32,
-        #[serde(default)]
-        expected_lang: String,
-        #[serde(default)]
-        expected_run_success: bool,
-        #[serde(default)]
-        expected_status_runtime: String,
-        #[serde(default)]
-        expected_memory: i64,
-        #[serde(default, deserialize_with = "ssr")]
-        expected_code_output: Vec<String>,
-        #[serde(default)]
-        expected_elapsed_time: i64,
-        #[serde(default)]
-        expected_task_finish_time: i64,
+        // #[serde(default)]
+        // expected_status_code: i32,
+        // #[serde(default)]
+        // expected_lang: String,
+        // #[serde(default)]
+        // expected_run_success: bool,
+        // #[serde(default)]
+        // expected_status_runtime: String,
+        // #[serde(default)]
+        // expected_memory: i64,
+        // #[serde(default, deserialize_with = "ssr")]
+        // expected_code_output: Vec<String>,
+        // #[serde(default)]
+        // expected_elapsed_time: i64,
+        // #[serde(default)]
+        // expected_task_finish_time: i64,
         #[serde(default, deserialize_with = "ssr")]
         pub expected_code_answer: Vec<String>,
     }
