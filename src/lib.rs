@@ -241,7 +241,6 @@
 //!
 //! [pr]: https://github.com/clearloop/leetcode-cli/pulls
 //! [#1]: https://github.com/clearloop/leetcode-cli/issues/1
-#![feature(try_trait)]
 #[macro_use]
 extern crate log;
 #[macro_use]

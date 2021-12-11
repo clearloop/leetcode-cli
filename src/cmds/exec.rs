@@ -1,4 +1,5 @@
 //! Exec command
+use crate::Error;
 use super::Command;
 use async_trait::async_trait;
 use clap::{App, ArgMatches};
@@ -41,7 +42,7 @@ impl Command for ExecCommand {
     async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
-        let id: i32 = m.value_of("id")?.parse()?;
+        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
         let cache = Cache::new()?;
         let res = cache.exec_problem(id, Run::Submit, None).await?;
 
