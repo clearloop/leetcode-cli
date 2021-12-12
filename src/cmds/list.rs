@@ -174,8 +174,7 @@ impl Command for ListCommand {
 
         // filter range
         if m.is_present("range") {
-            let range: Vec<_> = m.values_of("range").ok_or(Error::NoneError)?.collect();
-            let num_range: Vec<i32> = range
+            let num_range: Vec<i32> = m.values_of("range").ok_or(Error::NoneError)?
                 .into_iter()
                 .map(|x| x.parse::<i32>().unwrap_or(0))
                 .collect();

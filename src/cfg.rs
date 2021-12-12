@@ -179,7 +179,7 @@ impl Storage {
     pub fn scripts(mut self) -> Result<String, crate::Error> {
         let root = &self.root()?;
         if self.scripts.is_none() {
-            let tmp = toml::from_str::<Config>(&DEFAULT_CONFIG)?;
+            let tmp = toml::from_str::<Config>(DEFAULT_CONFIG)?;
             self.scripts = Some(tmp.storage.scripts.ok_or(Error::NoneError)?);
         }
 

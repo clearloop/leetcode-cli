@@ -67,7 +67,7 @@ impl Cache {
             let json = self
                 .0
                 .clone()
-                .get_category_problems(&i)
+                .get_category_problems(i)
                 .await?
                 .json()
                 .await?;
@@ -160,7 +160,7 @@ impl Cache {
             ids = parser::tags(
                 self.clone()
                     .0
-                    .get_question_ids_by_tag(&rslug)
+                    .get_question_ids_by_tag(rslug)
                     .await?
                     .json()
                     .await?,

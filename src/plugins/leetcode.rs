@@ -93,7 +93,7 @@ impl LeetCode {
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "getTopicTag".to_string());
-        json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", &slug));
+        json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
         json.insert(
             "query",
             vec![
@@ -110,7 +110,7 @@ impl LeetCode {
 
         Req {
             default_headers: self.default_headers,
-            refer: Some((&self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
+            refer: Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
             info: false,
             json: Some(json),
             mode: Mode::Post,
@@ -147,7 +147,7 @@ impl LeetCode {
 
         json.insert(
             "variables",
-            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", &slug),
+            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", slug),
         );
 
         json.insert("operationName", "getQuestionDetail".to_string());

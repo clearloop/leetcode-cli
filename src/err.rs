@@ -46,11 +46,8 @@ impl std::fmt::Debug for Error {
             Error::ScriptError(s) => write!(f, "{} {}", e, s),
             Error::SilentError => write!(f, ""),
             Error::NoneError => write!(f,
-                "{}{}{}{}",
-                "json from response parse failed, ",
-                "please open a new issue at: ",
+                "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
-                "."
             )
         }
     }
@@ -96,7 +93,7 @@ impl std::convert::From<toml::de::Error> for Error {
     fn from(err: toml::de::Error) -> Self {
         Error::ParseError(format!(
             "{}, {}{}{}{}{}{}{}{}",
-            err.to_string(),
+            err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
             "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),

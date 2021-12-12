@@ -68,7 +68,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
         .expect("Loading cookies from google chrome failed.");
 
     debug!("res {:?}", &res);
-    if res.len() == (0 as usize) {
+    if res.is_empty() {
         return Err(crate::Error::CookieError);
     }
 
@@ -78,7 +78,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 
     // Decode cookies
     let mut m: HashMap<String, String> = HashMap::new();
-    for c in res.to_owned() {
+    for c in res {
         if (c.name == "csrftoken") || (c.name == "LEETCODE_SESSION") {
             m.insert(c.name, decode_cookies(&pass, c.encrypted_value)?);
         }
