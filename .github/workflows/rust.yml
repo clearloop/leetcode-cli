@@ -18,8 +18,7 @@ jobs:
       - name: Set nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2021-05-16
-          override: true
+          toolchain: stable
       - name: Environment
         run: |
           if [[ "$(uname)" == 'Darwin' ]]; then
@@ -30,6 +29,6 @@ jobs:
               sudo apt-get install -y libsqlite3-dev libdbus-1-dev
           fi
       - name: Build
-        run: cargo build --all-features -vv
+        run: cargo build
       - name: Run tests
-        run: cargo test --all-features -vv
+        run: cargo test

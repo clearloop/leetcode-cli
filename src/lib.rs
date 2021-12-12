@@ -4,20 +4,7 @@
 //! [![Crates.io](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 //! [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 //!
-//! ## Contributors
-//! + [@hulufi](https://github.com/hulufei)
-//! + [@ldm0](https://github.com/ldm0)
-//! + [@Raees678](https://github.com/Raees678)
-//! + [@clearloop](https://github.com/clearloop)
-//!
-//! ## Features
-//!
-//! + [x] the edit flow —— solution files will generate automatically!
-//! + [x] support python script to filter questions
-//! + [ ] doc support, `lc-rs` can compile the annotation of your solutions to markdown!
-//! + [ ]  support local signal to keep coding as longer as you want.
-//!
-//! ## Building
+//! ## Installing
 //!
 //! ```sh
 //! cargo install leetcode-cli
@@ -28,7 +15,7 @@
 //! **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
 //!
 //! ```sh
-//! leetcode 0.3.9
+//! leetcode 0.3.10
 //! May the Code be with You 👻
 //!
 //! USAGE:
@@ -241,7 +228,6 @@
 //!
 //! [pr]: https://github.com/clearloop/leetcode-cli/pulls
 //! [#1]: https://github.com/clearloop/leetcode-cli/issues/1
-#![feature(try_trait)]
 #[macro_use]
 extern crate log;
 #[macro_use]

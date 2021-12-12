@@ -1,4 +1,5 @@
 //! Test command
+use crate::Error;
 use super::Command;
 use async_trait::async_trait;
 use clap::{App, ArgMatches};
@@ -44,9 +45,9 @@ impl Command for TestCommand {
     }
 
     /// `test` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
         use crate::cache::{Cache, Run};
-        let id: i32 = m.value_of("id")?.parse()?;
+        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
         let testcase = m.value_of("testcase");
         let case_str: Option<String>;
         match testcase {

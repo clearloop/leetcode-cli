@@ -16,6 +16,7 @@ pub enum Error {
     CookieError,
     DecryptError,
     SilentError,
+    NoneError,
 }
 
 impl std::fmt::Debug for Error {
@@ -44,6 +45,10 @@ impl std::fmt::Debug for Error {
             Error::DecryptError => write!(f, "{} openssl decrypt failed", e),
             Error::ScriptError(s) => write!(f, "{} {}", e, s),
             Error::SilentError => write!(f, ""),
+            Error::NoneError => write!(f,
+                "json from response parse failed, please open a new issue at: {}.",
+                "https://github.com/clearloop/leetcode-cli/".underline(),
+            )
         }
     }
 }
@@ -88,7 +93,7 @@ impl std::convert::From<toml::de::Error> for Error {
     fn from(err: toml::de::Error) -> Self {
         Error::ParseError(format!(
             "{}, {}{}{}{}{}{}{}{}",
-            err.to_string(),
+            err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
             "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
@@ -111,19 +116,6 @@ impl std::convert::From<toml::ser::Error> for Error {
 impl std::convert::From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
         Error::CacheError(err.to_string())
-    }
-}
-
-// options
-impl std::convert::From<std::option::NoneError> for Error {
-    fn from(_: std::option::NoneError) -> Self {
-        Error::ParseError(format!(
-            "{}{}{}{}",
-            "json from response parse failed, ",
-            "please open a new issue at: ",
-            "https://github.com/clearloop/leetcode-cli/".underline(),
-            "."
-        ))
     }
 }
 

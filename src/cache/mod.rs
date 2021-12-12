@@ -67,11 +67,11 @@ impl Cache {
             let json = self
                 .0
                 .clone()
-                .get_category_problems(&i)
+                .get_category_problems(i)
                 .await?
                 .json()
                 .await?;
-            parser::problem(&mut ps, json)?;
+            parser::problem(&mut ps, json).ok_or(Error::NoneError)?;
         }
 
         diesel::replace_into(problems)
@@ -135,7 +135,7 @@ impl Cache {
                 .json()
                 .await?;
             debug!("{:#?}", &json);
-            parser::desc(&mut rdesc, json)?;
+            parser::desc(&mut rdesc, json).ok_or(Error::NoneError)?;
 
             // update the question
             let sdesc = serde_json::to_string(&rdesc)?;
@@ -160,11 +160,11 @@ impl Cache {
             ids = parser::tags(
                 self.clone()
                     .0
-                    .get_question_ids_by_tag(&rslug)
+                    .get_question_ids_by_tag(rslug)
                     .await?
                     .json()
                     .await?,
-            )?;
+            ).ok_or(Error::NoneError)?;
             let t = Tag {
                 r#tag: rslug.to_string(),
                 r#refs: serde_json::to_string(&ids)?,
@@ -235,10 +235,10 @@ impl Cache {
         json.insert("data_input", testcase);
 
         let url = match run {
-            Run::Test => conf.sys.urls.get("test")?.replace("$slug", &p.slug),
+            Run::Test => conf.sys.urls.get("test").ok_or(Error::NoneError)?.replace("$slug", &p.slug),
             Run::Submit => {
                 json.insert("judge_type", "large".to_string());
-                conf.sys.urls.get("submit")?.replace("$slug", &p.slug)
+                conf.sys.urls.get("submit").ok_or(Error::NoneError)?.replace("$slug", &p.slug)
             }
         };
 
@@ -246,7 +246,7 @@ impl Cache {
             json,
             [
                 url,
-                conf.sys.urls.get("problems")?.replace("$slug", &p.slug),
+                conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", &p.slug),
             ],
         ))
     }
@@ -308,8 +308,8 @@ impl Cache {
         }
         trace!("Recur verify result {:#?}", res);
 
-        res.name = json.get("name")?.to_string();
-        res.data_input = json.get("data_input")?.to_string();
+        res.name = json.get("name").ok_or(Error::NoneError)?.to_string();
+        res.data_input = json.get("data_input").ok_or(Error::NoneError)?.to_string();
         res.result_type = run;
         Ok(res)
     }
