@@ -6,13 +6,6 @@
 [![gitter](https://img.shields.io/gitter/room/odditypark/leetcode-cli)](https://gitter.im/Odditypark/leetcode-cli)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-## Features
-
-+ [x] the edit flow —— solution files will generate automatically!
-+ [x] support Python script to filter questions
-+ [ ] doc support, `lc-rs` can compile the annotation of your solutions to Markdown!
-+ [ ] support local signal to keep coding as longer as you want
-
 ## Installing
 
 ```sh
@@ -26,21 +19,12 @@
 cargo install leetcode-cli
 ```
 
-### `error[E0554]`
-
-If this happens when compiling the program, it means that the package cannot be compiled with stable Rust. To fix this, install Rust Nightly and try the following:
-
-```sh
-rustup install nightly
-cargo +nightly install leetcode-cli
-```
-
 ## Usage
 
 **Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
-leetcode 0.3.9
+leetcode 0.3.10
 May the Code be with You 👻
 
 USAGE:
