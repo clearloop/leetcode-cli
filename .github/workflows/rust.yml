@@ -19,7 +19,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-          override: true
       - name: Environment
         run: |
           if [[ "$(uname)" == 'Darwin' ]]; then
