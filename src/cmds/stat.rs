@@ -67,7 +67,7 @@ impl Command for StatCommand {
         }
 
         // level: len = 8
-        // count: len = 8
+        // count: len = 10
         // percent: len = 16
         // chart: len = 32
         // title
