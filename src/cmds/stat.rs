@@ -67,7 +67,7 @@ impl Command for StatCommand {
         }
 
         // level: len = 8
-        // count: len = 8
+        // count: len = 10
         // percent: len = 16
         // chart: len = 32
         // title
@@ -105,7 +105,7 @@ impl Command for StatCommand {
             let count = format!("{}/{}", l.1, l.0);
             let pct = format!("( {:.2} %)", checked_div(100.0 * l.1, l.0));
             let mut line = "".to_string();
-            line.push_str(&" ".digit(8 - (count.len() as i32)));
+            line.push_str(&" ".digit(10 - (count.len() as i32)));
             line.push_str(&count);
             line.push_str(&" ".digit(12 - (pct.len() as i32)));
             line.push_str(&pct);
