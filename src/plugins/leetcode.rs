@@ -121,6 +121,39 @@ impl LeetCode {
         .await
     }
 
+    /// Get daily problem
+    pub async fn get_question_daily(self) -> Result<Response, Error> {
+        trace!("Requesting daily problem...");
+        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let mut json: Json = HashMap::new();
+        json.insert("operationName", "daily".to_string());
+        json.insert(
+            "query",
+            vec![
+                "query daily {",
+                "  activeDailyCodingChallengeQuestion {",
+                "    question {",
+                "      questionFrontendId",
+                "    }",
+                "  }",
+                "}",
+            ]
+            .join("\n"),
+        );
+
+        Req {
+            default_headers: self.default_headers,
+            refer: None,
+            info: false,
+            json: Some(json),
+            mode: Mode::Post,
+            name: "get_question_daily",
+            url: (*url).to_string(),
+        }
+        .send(&self.client)
+        .await
+    }
+
     /// Get specific problem detail
     pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
