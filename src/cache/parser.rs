@@ -77,6 +77,17 @@ pub fn tags(v: Value) -> Option<Vec<String>> {
     Some(res)
 }
 
+/// daily parser 
+pub fn daily(v: Value) -> Option<i32> {
+    trace!("Parse daily...");
+    v.as_object()?
+        .get("data")?.as_object()?
+        .get("activeDailyCodingChallengeQuestion")?.as_object()?
+        .get("question")?.as_object()?
+        .get("questionFrontendId")?.as_str()?
+        .parse().ok()
+}
+
 pub use ss::ssr;
 /// string or squence
 mod ss {
