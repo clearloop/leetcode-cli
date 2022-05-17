@@ -93,6 +93,18 @@ impl Cache {
         Ok(p)
     }
 
+    /// Get daily problem 
+    pub async fn get_daily_problem_id(&self) -> Result<i32, Error> {
+        parser::daily(
+            self.clone()
+                .0
+                .get_question_daily()
+                .await?
+                .json()
+                .await?
+        ).ok_or(Error::NoneError)
+    }
+
     /// Get problems from cache
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
         Ok(problems.load::<Problem>(&self.conn()?)?)

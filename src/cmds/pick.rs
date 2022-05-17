@@ -69,6 +69,13 @@ impl Command for PickCommand {
                     .takes_value(true)
                     .help("Filter questions by tag"),
             )
+            .arg(
+                Arg::with_name("daily")
+                    .short("d")
+                    .long("daily")
+                    .takes_value(false)
+                    .help("Pick today's daily challenge"),
+            )
     }
 
     /// `pick` handler
@@ -109,9 +116,14 @@ impl Command for PickCommand {
             crate::helper::filter(&mut problems, query.to_string());
         }
 
+        let daily_id = if m.is_present("daily") {
+            Some(cache.get_daily_problem_id().await?)
+        } else { None };
+
         let fid = m
             .value_of("id")
             .and_then(|id| id.parse::<i32>().ok())
+            .or(daily_id)
             .unwrap_or_else(|| {
                 // Pick random without specify id
                 let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
