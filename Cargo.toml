@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.3.10"
+version = "0.3.11"
 authors = ["clearloop <cdr.today@foxmail.com>"]
 edition = "2018"
 description = "Leet your code in command-line."
