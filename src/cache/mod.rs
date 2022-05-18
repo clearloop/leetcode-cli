@@ -58,6 +58,27 @@ impl Cache {
         Ok(())
     }
 
+    async fn get_user_info(&self) -> Result<(String,bool), Error> {
+        let user = parser::user(
+            self.clone().0
+            .get_user_info().await?
+            .json().await?
+        );
+        match user {
+            None => Err(Error::NoneError),
+            Some(None) => Err(Error::CookieError),
+            Some(Some((s,b))) => Ok((s,b))
+        }
+    }
+
+    async fn is_session_bad(&self) -> bool {
+        // i.e. self.get_user_info().contains_err(Error::CookieError)
+        match self.get_user_info().await {
+            Err(Error::CookieError) => true,
+            _ => false
+        }
+    }
+
     /// Download leetcode problems to db
     pub async fn download_problems(self) -> Result<Vec<Problem>, Error> {
         info!("Fetching leetcode problems...");
