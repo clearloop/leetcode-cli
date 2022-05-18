@@ -311,6 +311,12 @@ impl Cache {
             .await?;
         trace!("Run code result {:#?}", run_res);
 
+        // Check if leetcode accepted the Run request
+        if match run {
+            Run::Test => run_res.interpret_id.is_empty(),
+            Run::Submit => run_res.submission_id == 0
+        } { return Err(Error::CookieError) }
+
         let mut res: VerifyResult = VerifyResult::default();
         while res.state != "SUCCESS" {
             res = match run {
