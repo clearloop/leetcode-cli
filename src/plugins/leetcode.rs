@@ -121,6 +121,34 @@ impl LeetCode {
         .await
     }
 
+    pub async fn get_user_info(self) -> Result<Response, Error> {
+        trace!("Requesting user info...");
+        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let mut json: Json = HashMap::new();
+        json.insert("operationName", "a".to_string());
+        json.insert(
+            "query",
+            "query a {
+                 user {
+                     username
+                     isCurrentUserPremium
+                 }
+             }".to_owned()
+        );
+
+        Req {
+            default_headers: self.default_headers,
+            refer: None,
+            info: false,
+            json: Some(json),
+            mode: Mode::Post,
+            name: "get_user_info",
+            url: (*url).to_string(),
+        }
+        .send(&self.client)
+        .await
+    }
+
     /// Get daily problem
     pub async fn get_question_daily(self) -> Result<Response, Error> {
         trace!("Requesting daily problem...");
