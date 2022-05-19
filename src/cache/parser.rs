@@ -88,6 +88,21 @@ pub fn daily(v: Value) -> Option<i32> {
         .parse().ok()
 }
 
+/// user parser
+pub fn user(v: Value) -> Option<Option<(String,bool)>> {
+    // None => error while parsing
+    // Some(None) => User not found
+    // Some("...") => username
+    let user = v.as_object()?.get("data")?
+        .as_object()?.get("user")?;
+    if *user == Value::Null { return Some(None) }
+    let user = user.as_object()?;
+    Some(Some((
+        user.get("username")?.as_str()?.to_owned(),
+        user.get("isCurrentUserPremium")?.as_bool()?
+    )))
+}
+
 pub use ss::ssr;
 /// string or squence
 mod ss {

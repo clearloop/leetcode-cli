@@ -9,8 +9,10 @@ use self::sql::*;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
+use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::collections::HashMap;
+use reqwest::Response;
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
@@ -58,6 +60,34 @@ impl Cache {
         Ok(())
     }
 
+    async fn get_user_info(&self) -> Result<(String,bool), Error> {
+        let user = parser::user(
+            self.clone().0
+            .get_user_info().await?
+            .json().await?
+        );
+        match user {
+            None => Err(Error::NoneError),
+            Some(None) => Err(Error::CookieError),
+            Some(Some((s,b))) => Ok((s,b))
+        }
+    }
+
+    async fn is_session_bad(&self) -> bool {
+        // i.e. self.get_user_info().contains_err(Error::CookieError)
+        match self.get_user_info().await {
+            Err(Error::CookieError) => true,
+            _ => false
+        }
+    }
+
+    async fn resp_to_json<T: DeserializeOwned>(&self, resp: Response) -> Result<T, Error> {
+        let maybe_json: Result<T,_> = resp.json().await;
+        if maybe_json.is_err() && self.is_session_bad().await {
+            Err(Error::CookieError)
+        } else { Ok(maybe_json?) }
+    }
+
     /// Download leetcode problems to db
     pub async fn download_problems(self) -> Result<Vec<Problem>, Error> {
         info!("Fetching leetcode problems...");
@@ -69,7 +99,7 @@ impl Cache {
                 .clone()
                 .get_category_problems(i)
                 .await?
-                .json()
+                .json() // does not require LEETCODE_SESSION
                 .await?;
             parser::problem(&mut ps, json).ok_or(Error::NoneError)?;
         }
@@ -100,7 +130,7 @@ impl Cache {
                 .0
                 .get_question_daily()
                 .await?
-                .json()
+                .json() // does not require LEETCODE_SESSION
                 .await?
         ).ok_or(Error::NoneError)
     }
@@ -265,30 +295,20 @@ impl Cache {
 
     /// TODO: The real delay
     async fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
-        use serde_json::{from_str, Error as SJError};
         use std::time::Duration;
 
         trace!("Run veriy recursion...");
         std::thread::sleep(Duration::from_micros(3000));
 
-        // debug resp raw text
-        let debug_raw = self
+        let json: VerifyResult = self.resp_to_json(
+            self
             .clone()
             .0
             .verify_result(rid.clone())
             .await?
-            .text()
-            .await?;
-        debug!("debug resp raw text: \n{:#?}", &debug_raw);
-        if debug_raw.is_empty() {
-            return Err(Error::CookieError);
-        }
+        ).await?;
 
-        // debug json deserializing
-        let debug_json: Result<VerifyResult, SJError> = from_str(&debug_raw);
-        debug!("debug json deserializing: \n{:#?}", &debug_json);
-
-        Ok(debug_json?)
+        Ok(json)
     }
 
     /// Exec problem filter —— Test or Submit
@@ -307,9 +327,15 @@ impl Cache {
             .clone()
             .run_code(json.clone(), url.clone(), refer.clone())
             .await?
-            .json()
+            .json() // does not require LEETCODE_SESSION (very oddly)
             .await?;
         trace!("Run code result {:#?}", run_res);
+
+        // Check if leetcode accepted the Run request
+        if match run {
+            Run::Test => run_res.interpret_id.is_empty(),
+            Run::Submit => run_res.submission_id == 0
+        } { return Err(Error::CookieError) }
 
         let mut res: VerifyResult = VerifyResult::default();
         while res.state != "SUCCESS" {
