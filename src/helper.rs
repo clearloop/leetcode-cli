@@ -147,7 +147,11 @@ mod html {
     impl HTML for String {
         fn ser(&self) -> Vec<Token> {
             // empty tags
-            let tks = self.to_string();
+            let tks = {
+                let mut s = self.clone();
+                // some problems (e.g. 1653) have ZWSPs.
+                s.retain(|x| x != '\u{200B}');
+                s };
             let res: Vec<Token>;
             // styled
             {
