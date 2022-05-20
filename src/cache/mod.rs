@@ -177,7 +177,16 @@ impl Cache {
                 .json()
                 .await?;
             debug!("{:#?}", &json);
-            parser::desc(&mut rdesc, json).ok_or(Error::NoneError)?;
+            match parser::desc(&mut rdesc, json) {
+                None => return Err(Error::NoneError),
+                Some(false) => return
+                    if self.is_session_bad().await {
+                        Err(Error::CookieError)
+                    } else {
+                        Err(Error::PremiumError)
+                    },
+                Some(true) => ()
+            }
 
             // update the question
             let sdesc = serde_json::to_string(&rdesc)?;
