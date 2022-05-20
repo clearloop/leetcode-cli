@@ -14,6 +14,7 @@ pub enum Error {
     FeatureError(String),
     ScriptError(String),
     CookieError,
+    PremiumError,
     DecryptError,
     SilentError,
     NoneError,
@@ -37,6 +38,13 @@ impl std::fmt::Debug for Error {
                     .yellow()
                     .bold(),
             ),
+            Error::PremiumError => write!(
+                f,
+                "{} \
+                Your leetcode account lacks a premium subscription, which the given problem requires.\n \
+                If this looks like a mistake, please open a new issue at: {}",
+                e,
+                "https://github.com/clearloop/leetcode-cli/".underline()),
             Error::DownloadError(s) => write!(f, "{} Download {} failed, please try again", e, s),
             Error::NetworkError(s) => write!(f, "{} {}, please try again", e, s),
             Error::ParseError(s) => write!(f, "{} {}", e, s),
