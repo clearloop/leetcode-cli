@@ -29,13 +29,21 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
 }
 
 /// desc parser
-pub fn desc(q: &mut Question, v: Value) -> Option<()> {
+pub fn desc(q: &mut Question, v: Value) -> Option<bool> {
+    /* None - parsing failed
+     * Some(false) - content was null (premium?)
+     * Some(true) - content was parsed
+     */
     let o = &v
         .as_object()?
         .get("data")?
         .as_object()?
         .get("question")?
         .as_object()?;
+
+    if *o.get("content")? == Value::Null {
+        return Some(false);
+    }
 
     *q = Question {
         content: o.get("content")?.as_str().unwrap_or("").to_string(),
@@ -55,7 +63,7 @@ pub fn desc(q: &mut Question, v: Value) -> Option<()> {
             .to_string(),
     };
 
-    Some(())
+    Some(true)
 }
 
 /// tag parser
