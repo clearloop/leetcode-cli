@@ -74,11 +74,7 @@ impl Cache {
     }
 
     async fn is_session_bad(&self) -> bool {
-        // i.e. self.get_user_info().contains_err(Error::CookieError)
-        match self.get_user_info().await {
-            Err(Error::CookieError) => true,
-            _ => false
-        }
+        matches!(self.get_user_info().await, Err(Error::CookieError))
     }
 
     async fn resp_to_json<T: DeserializeOwned>(&self, resp: Response) -> Result<T, Error> {
