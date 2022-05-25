@@ -32,6 +32,7 @@ serde = { version = "1.0.104", features = ["derive"] }
 serde_json = "1.0.44"
 toml = "0.5.5"
 regex = "1"
+function_name = "0.3"
 
 [dependencies.diesel]
 version = "1.4.3"
