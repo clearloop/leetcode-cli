@@ -21,7 +21,7 @@ pub struct LeetCode {
 
 macro_rules! make_req {
     ($self:ident, $url:expr) => {
-        Req::new($self.default_headers, function_name!(), $url)
+        Req::new($self.default_headers.to_owned(), function_name!(), $url)
     }
 }
 
@@ -74,7 +74,7 @@ impl LeetCode {
 
     /// Get category problems
     #[named]
-    pub async fn get_category_problems(self, category: &str) -> Result<Response, Error> {
+    pub async fn get_category_problems(&self, category: &str) -> Result<Response, Error> {
         trace!("Requesting {} problems...", &category);
         let url = &self
             .conf
@@ -89,7 +89,7 @@ impl LeetCode {
     }
 
     #[named]
-    pub async fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
+    pub async fn get_question_ids_by_tag(&self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} ref problems...", &slug);
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
@@ -115,7 +115,7 @@ impl LeetCode {
     }
 
     #[named]
-    pub async fn get_user_info(self) -> Result<Response, Error> {
+    pub async fn get_user_info(&self) -> Result<Response, Error> {
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "a".to_string());
@@ -138,7 +138,7 @@ impl LeetCode {
 
     /// Get daily problem
     #[named]
-    pub async fn get_question_daily(self) -> Result<Response, Error> {
+    pub async fn get_question_daily(&self) -> Result<Response, Error> {
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "daily".to_string());
@@ -162,7 +162,7 @@ impl LeetCode {
 
     /// Get specific problem detail
     #[named]
-    pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
+    pub async fn get_question_detail(&self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
         let refer = self.conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", slug);
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
@@ -200,7 +200,7 @@ impl LeetCode {
 
     /// Send code to judge
     #[named]
-    pub async fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
+    pub async fn run_code(&self, j: Json, url: String, refer: String) -> Result<Response, Error> {
         let mut req = make_req!(self, url);
         req.mode = Mode::Post(j);
         req.refer = Some(refer);
@@ -211,7 +211,7 @@ impl LeetCode {
 
     /// Get the result of submission / testing
     #[named]
-    pub async fn verify_result(self, id: String) -> Result<Response, Error> {
+    pub async fn verify_result(&self, id: String) -> Result<Response, Error> {
         let url = self.conf.sys.urls.get("verify").ok_or(Error::NoneError)?.replace("$id", &id);
         make_req!(self, url)
         .send(&self.client)

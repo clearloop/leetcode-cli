@@ -62,7 +62,7 @@ impl Cache {
 
     async fn get_user_info(&self) -> Result<(String,bool), Error> {
         let user = parser::user(
-            self.clone().0
+            self.0
             .get_user_info().await?
             .json().await?
         );
@@ -92,7 +92,6 @@ impl Cache {
         for i in &self.0.conf.sys.categories.to_owned() {
             let json = self
                 .0
-                .clone()
                 .get_category_problems(i)
                 .await?
                 .json() // does not require LEETCODE_SESSION
@@ -122,8 +121,7 @@ impl Cache {
     /// Get daily problem 
     pub async fn get_daily_problem_id(&self) -> Result<i32, Error> {
         parser::daily(
-            self.clone()
-                .0
+            self.0
                 .get_question_daily()
                 .await?
                 .json() // does not require LEETCODE_SESSION
@@ -167,7 +165,6 @@ impl Cache {
         } else {
             let json: Value = self
                 .0
-                .clone()
                 .get_question_detail(&target.slug)
                 .await?
                 .json()
@@ -205,8 +202,7 @@ impl Cache {
             ids = serde_json::from_str(&t.refs)?;
         } else {
             ids = parser::tags(
-                self.clone()
-                    .0
+                self.0
                     .get_question_ids_by_tag(rslug)
                     .await?
                     .json()
@@ -307,7 +303,6 @@ impl Cache {
 
         let json: VerifyResult = self.resp_to_json(
             self
-            .clone()
             .0
             .verify_result(rid.clone())
             .await?
@@ -329,7 +324,6 @@ impl Cache {
 
         let run_res: RunCode = self
             .0
-            .clone()
             .run_code(json.clone(), url.clone(), refer.clone())
             .await?
             .json() // does not require LEETCODE_SESSION (very oddly)
