@@ -80,7 +80,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            json: None,
             mode: Mode::Get,
             name: function_name!(),
             url: url.to_string(),
@@ -110,8 +109,7 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
-            json: Some(json),
-            mode: Mode::Post,
+            mode: Mode::Post(json),
             name: function_name!(),
             url: (*url).to_string(),
         }
@@ -138,8 +136,7 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            json: Some(json),
-            mode: Mode::Post,
+            mode: Mode::Post(json),
             name: function_name!(),
             url: (*url).to_string(),
         }
@@ -168,8 +165,7 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            json: Some(json),
-            mode: Mode::Post,
+            mode: Mode::Post(json),
             name: function_name!(),
             url: (*url).to_string(),
         }
@@ -209,8 +205,7 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
-            json: Some(json),
-            mode: Mode::Post,
+            mode: Mode::Post(json),
             name: function_name!(),
             url: (&self.conf.sys.urls["graphql"]).to_string(),
         }
@@ -225,8 +220,7 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
-            json: Some(j),
-            mode: Mode::Post,
+            mode: Mode::Post(j),
             name: function_name!(),
             url,
         }
@@ -242,7 +236,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            json: None,
             mode: Mode::Get,
             name: function_name!(),
             url,
@@ -265,14 +258,13 @@ mod req {
     /// Standardize request mode
     pub enum Mode {
         Get,
-        Post,
+        Post(Json),
     }
 
     /// LeetCode request prototype
     pub struct Req {
         pub default_headers: HeaderMap,
         pub refer: Option<String>,
-        pub json: Option<Json>,
         pub mode: Mode,
         pub name: &'static str,
         pub url: String,
@@ -289,7 +281,7 @@ mod req {
 
             let req = match self.mode {
                 Mode::Get => client.get(&self.url),
-                Mode::Post => client.post(&self.url).json(&self.json),
+                Mode::Post(ref json) => client.post(&self.url).json(json),
             };
 
             Ok(req.headers(headers).send().await?)
