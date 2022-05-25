@@ -116,7 +116,6 @@ impl LeetCode {
 
     #[named]
     pub async fn get_user_info(self) -> Result<Response, Error> {
-        trace!("Requesting user info...");
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "a".to_string());
@@ -140,7 +139,6 @@ impl LeetCode {
     /// Get daily problem
     #[named]
     pub async fn get_question_daily(self) -> Result<Response, Error> {
-        trace!("Requesting daily problem...");
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "daily".to_string());
@@ -167,6 +165,7 @@ impl LeetCode {
     pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
         let refer = self.conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", slug);
+        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
@@ -191,8 +190,7 @@ impl LeetCode {
 
         json.insert("operationName", "getQuestionDetail".to_string());
 
-        let mut req = make_req!(self, 
-            (&self.conf.sys.urls["graphql"]).to_string());
+        let mut req = make_req!(self, url.to_string());
         req.mode = Mode::Post(json);
         req.refer = Some(refer);
         req
@@ -203,7 +201,6 @@ impl LeetCode {
     /// Send code to judge
     #[named]
     pub async fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
-        info!("Sending code to judge...");
         let mut req = make_req!(self, url);
         req.mode = Mode::Post(j);
         req.refer = Some(refer);
@@ -215,7 +212,6 @@ impl LeetCode {
     /// Get the result of submission / testing
     #[named]
     pub async fn verify_result(self, id: String) -> Result<Response, Error> {
-        trace!("Verifying result...");
         let url = self.conf.sys.urls.get("verify").ok_or(Error::NoneError)?.replace("$id", &id);
         make_req!(self, url)
         .send(&self.client)
