@@ -9,6 +9,7 @@ use reqwest::{
     Client, ClientBuilder, Response,
 };
 use std::{collections::HashMap, str::FromStr, time::Duration};
+use ::function_name::named;
 
 /// LeetCode API set
 #[derive(Clone)]
@@ -66,6 +67,7 @@ impl LeetCode {
     }
 
     /// Get category problems
+    #[named]
     pub async fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         trace!("Requesting {} problems...", &category);
         let url = &self
@@ -81,13 +83,14 @@ impl LeetCode {
             info: false,
             json: None,
             mode: Mode::Get,
-            name: "get_category_problems",
+            name: function_name!(),
             url: url.to_string(),
         }
         .send(&self.client)
         .await
     }
 
+    #[named]
     pub async fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} ref problems...", &slug);
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
@@ -96,16 +99,13 @@ impl LeetCode {
         json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
         json.insert(
             "query",
-            vec![
-                "query getTopicTag($slug: String!) {",
-                "  topicTag(slug: $slug) {",
-                "    questions {",
-                "      questionId",
-                "    }",
-                "  }",
-                "}",
-            ]
-            .join("\n"),
+            "query getTopicTag($slug: String!) {
+               topicTag(slug: $slug) {
+                 questions {
+                  questionId
+                 }
+               }
+             }".to_owned()
         );
 
         Req {
@@ -114,13 +114,14 @@ impl LeetCode {
             info: false,
             json: Some(json),
             mode: Mode::Post,
-            name: "get_question_ids_by_tag",
+            name: function_name!(),
             url: (*url).to_string(),
         }
         .send(&self.client)
         .await
     }
 
+    #[named]
     pub async fn get_user_info(self) -> Result<Response, Error> {
         trace!("Requesting user info...");
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
@@ -142,7 +143,7 @@ impl LeetCode {
             info: false,
             json: Some(json),
             mode: Mode::Post,
-            name: "get_user_info",
+            name: function_name!(),
             url: (*url).to_string(),
         }
         .send(&self.client)
@@ -150,6 +151,7 @@ impl LeetCode {
     }
 
     /// Get daily problem
+    #[named]
     pub async fn get_question_daily(self) -> Result<Response, Error> {
         trace!("Requesting daily problem...");
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
@@ -157,16 +159,13 @@ impl LeetCode {
         json.insert("operationName", "daily".to_string());
         json.insert(
             "query",
-            vec![
-                "query daily {",
-                "  activeDailyCodingChallengeQuestion {",
-                "    question {",
-                "      questionFrontendId",
-                "    }",
-                "  }",
-                "}",
-            ]
-            .join("\n"),
+            "query daily {
+               activeDailyCodingChallengeQuestion {
+                 question {
+                   questionFrontendId
+                 }
+               }
+             }".to_owned()
         );
 
         Req {
@@ -175,7 +174,7 @@ impl LeetCode {
             info: false,
             json: Some(json),
             mode: Mode::Post,
-            name: "get_question_daily",
+            name: function_name!(),
             url: (*url).to_string(),
         }
         .send(&self.client)
@@ -183,27 +182,25 @@ impl LeetCode {
     }
 
     /// Get specific problem detail
+    #[named]
     pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
         let refer = self.conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", slug);
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
-            vec![
-                "query getQuestionDetail($titleSlug: String!) {",
-                "  question(titleSlug: $titleSlug) {",
-                "    content",
-                "    stats",
-                "    codeDefinition",
-                "    sampleTestCase",
-                "    exampleTestcases",
-                "    enableRunCode",
-                "    metaData",
-                "    translatedContent",
-                "  }",
-                "}",
-            ]
-            .join("\n"),
+            "query getQuestionDetail($titleSlug: String!) {
+               question(titleSlug: $titleSlug) {
+                 content
+                 stats
+                 codeDefinition
+                 sampleTestCase
+                 exampleTestcases
+                 enableRunCode
+                 metaData
+                 translatedContent
+               }
+             }".to_owned()
         );
 
         json.insert(
@@ -219,7 +216,7 @@ impl LeetCode {
             info: false,
             json: Some(json),
             mode: Mode::Post,
-            name: "get_problem_detail",
+            name: function_name!(),
             url: (&self.conf.sys.urls["graphql"]).to_string(),
         }
         .send(&self.client)
@@ -227,6 +224,7 @@ impl LeetCode {
     }
 
     /// Send code to judge
+    #[named]
     pub async fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
         info!("Sending code to judge...");
         Req {
@@ -235,7 +233,7 @@ impl LeetCode {
             info: false,
             json: Some(j),
             mode: Mode::Post,
-            name: "run_code",
+            name: function_name!(),
             url,
         }
         .send(&self.client)
@@ -243,6 +241,7 @@ impl LeetCode {
     }
 
     /// Get the result of submission / testing
+    #[named]
     pub async fn verify_result(self, id: String) -> Result<Response, Error> {
         trace!("Verifying result...");
         let url = self.conf.sys.urls.get("verify").ok_or(Error::NoneError)?.replace("$id", &id);
@@ -252,7 +251,7 @@ impl LeetCode {
             info: false,
             json: None,
             mode: Mode::Get,
-            name: "verify_result",
+            name: function_name!(),
             url,
         }
         .send(&self.client)
