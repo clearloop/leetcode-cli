@@ -19,6 +19,12 @@ pub struct LeetCode {
     default_headers: HeaderMap,
 }
 
+macro_rules! make_req {
+    ($self:ident, $url:expr) => {
+        Req::new($self.default_headers, function_name!(), $url)
+    }
+}
+
 impl LeetCode {
     /// Parse reqwest headers
     fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> Result<HeaderMap, Error> {
@@ -77,13 +83,7 @@ impl LeetCode {
             .get("problems").ok_or(Error::NoneError)?
             .replace("$category", category);
 
-        Req {
-            default_headers: self.default_headers,
-            refer: None,
-            mode: Mode::Get,
-            name: function_name!(),
-            url: url.to_string(),
-        }
+        make_req!(self, url.to_string())
         .send(&self.client)
         .await
     }
@@ -106,13 +106,10 @@ impl LeetCode {
              }".to_owned()
         );
 
-        Req {
-            default_headers: self.default_headers,
-            refer: Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
-            mode: Mode::Post(json),
-            name: function_name!(),
-            url: (*url).to_string(),
-        }
+        let mut req = make_req!(self, url.to_string());
+        req.mode = Mode::Post(json);
+        req.refer = Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug));
+        req
         .send(&self.client)
         .await
     }
@@ -133,13 +130,9 @@ impl LeetCode {
              }".to_owned()
         );
 
-        Req {
-            default_headers: self.default_headers,
-            refer: None,
-            mode: Mode::Post(json),
-            name: function_name!(),
-            url: (*url).to_string(),
-        }
+        let mut req = make_req!(self, url.to_string());
+        req.mode = Mode::Post(json);
+        req
         .send(&self.client)
         .await
     }
@@ -162,13 +155,9 @@ impl LeetCode {
              }".to_owned()
         );
 
-        Req {
-            default_headers: self.default_headers,
-            refer: None,
-            mode: Mode::Post(json),
-            name: function_name!(),
-            url: (*url).to_string(),
-        }
+        let mut req = make_req!(self, url.to_string());
+        req.mode = Mode::Post(json);
+        req
         .send(&self.client)
         .await
     }
@@ -202,13 +191,11 @@ impl LeetCode {
 
         json.insert("operationName", "getQuestionDetail".to_string());
 
-        Req {
-            default_headers: self.default_headers,
-            refer: Some(refer),
-            mode: Mode::Post(json),
-            name: function_name!(),
-            url: (&self.conf.sys.urls["graphql"]).to_string(),
-        }
+        let mut req = make_req!(self, 
+            (&self.conf.sys.urls["graphql"]).to_string());
+        req.mode = Mode::Post(json);
+        req.refer = Some(refer);
+        req
         .send(&self.client)
         .await
     }
@@ -217,13 +204,10 @@ impl LeetCode {
     #[named]
     pub async fn run_code(self, j: Json, url: String, refer: String) -> Result<Response, Error> {
         info!("Sending code to judge...");
-        Req {
-            default_headers: self.default_headers,
-            refer: Some(refer),
-            mode: Mode::Post(j),
-            name: function_name!(),
-            url,
-        }
+        let mut req = make_req!(self, url);
+        req.mode = Mode::Post(j);
+        req.refer = Some(refer);
+        req
         .send(&self.client)
         .await
     }
@@ -233,13 +217,7 @@ impl LeetCode {
     pub async fn verify_result(self, id: String) -> Result<Response, Error> {
         trace!("Verifying result...");
         let url = self.conf.sys.urls.get("verify").ok_or(Error::NoneError)?.replace("$id", &id);
-        Req {
-            default_headers: self.default_headers,
-            refer: None,
-            mode: Mode::Get,
-            name: function_name!(),
-            url,
-        }
+        make_req!(self, url)
         .send(&self.client)
         .await
     }
@@ -251,6 +229,7 @@ mod req {
     use crate::err::Error;
     use reqwest::{header::HeaderMap, Client, Response};
     use std::collections::HashMap;
+    use derive_new::new;
 
     /// Standardize json format
     pub type Json = HashMap<&'static str, String>;
@@ -262,12 +241,15 @@ mod req {
     }
 
     /// LeetCode request prototype
+    #[derive(new)]
     pub struct Req {
         pub default_headers: HeaderMap,
-        pub refer: Option<String>,
-        pub mode: Mode,
         pub name: &'static str,
         pub url: String,
+        #[new(value = "Mode::Get")]
+        pub mode: Mode,
+        #[new(default)]
+        pub refer: Option<String>,
     }
 
     impl Req {
