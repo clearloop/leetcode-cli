@@ -80,7 +80,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            info: false,
             json: None,
             mode: Mode::Get,
             name: function_name!(),
@@ -111,7 +110,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
-            info: false,
             json: Some(json),
             mode: Mode::Post,
             name: function_name!(),
@@ -140,7 +138,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            info: false,
             json: Some(json),
             mode: Mode::Post,
             name: function_name!(),
@@ -171,7 +168,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            info: false,
             json: Some(json),
             mode: Mode::Post,
             name: function_name!(),
@@ -213,7 +209,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
-            info: false,
             json: Some(json),
             mode: Mode::Post,
             name: function_name!(),
@@ -230,7 +225,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: Some(refer),
-            info: false,
             json: Some(j),
             mode: Mode::Post,
             name: function_name!(),
@@ -248,7 +242,6 @@ impl LeetCode {
         Req {
             default_headers: self.default_headers,
             refer: None,
-            info: false,
             json: None,
             mode: Mode::Get,
             name: function_name!(),
@@ -280,7 +273,6 @@ mod req {
         pub default_headers: HeaderMap,
         pub refer: Option<String>,
         pub json: Option<Json>,
-        pub info: bool,
         pub mode: Mode,
         pub name: &'static str,
         pub url: String,
@@ -289,9 +281,6 @@ mod req {
     impl Req {
         pub async fn send(self, client: &Client) -> Result<Response, Error> {
             trace!("Running leetcode::{}...", &self.name);
-            if self.info {
-                info!("{}", &self.name);
-            }
             let url = self.url.to_owned();
             let headers = LeetCode::headers(
                 self.default_headers,
