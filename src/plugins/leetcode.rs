@@ -114,6 +114,7 @@ impl LeetCode {
         .await
     }
 
+    /// Get user info
     #[named]
     pub async fn get_user_info(&self) -> Result<Response, Error> {
         let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
@@ -201,6 +202,7 @@ impl LeetCode {
     /// Send code to judge
     #[named]
     pub async fn run_code(&self, j: Json, url: String, refer: String) -> Result<Response, Error> {
+        info!("Sending code to judge...");
         let mut req = make_req!(self, url);
         req.mode = Mode::Post(j);
         req.refer = Some(refer);
