@@ -42,6 +42,12 @@ impl Command for TestCommand {
                     .required(false)
                     .help("custom testcase"),
             )
+            .arg(
+                Arg::with_name("contest")
+                .help("submit to contest")
+                .short("c")
+                .takes_value(true)
+            )
     }
 
     /// `test` handler
@@ -55,7 +61,7 @@ impl Command for TestCommand {
             _ => case_str = None,
         }
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Test, case_str).await?;
+        let res = cache.exec_problem(id, Run::Test, case_str, m.value_of("contest")).await?;
 
         println!("{}", res);
         Ok(())
