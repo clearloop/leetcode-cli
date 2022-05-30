@@ -136,52 +136,31 @@ impl LeetCode {
     }
 
     /// Get user info
-    #[named]
     pub async fn get_user_info(&self) -> Result<Response, Error> {
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
-        let mut json: Json = HashMap::new();
-        json.insert("operationName", "a".to_string());
-        json.insert(
-            "query",
-            "query a {
-                 user {
-                     username
-                     isCurrentUserPremium
-                 }
-             }".to_owned()
-        );
-
-        let mut req = make_req!(self, url.to_string());
-        req.mode = Mode::Post(json);
-        req
-        .send(&self.client)
-        .await
+        self.get_graphql("query a {
+           user {
+             username
+             isCurrentUserPremium
+           }
+         }".to_owned(),
+        None).await
     }
 
     /// Get daily problem
-    #[named]
     pub async fn get_question_daily(&self) -> Result<Response, Error> {
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
-        let mut json: Json = HashMap::new();
-        json.insert("operationName", "daily".to_string());
-        json.insert(
-            "query",
-            "query daily {
-               activeDailyCodingChallengeQuestion {
-                 question {
-                   questionFrontendId
-                 }
+        trace!("Requesting daily problem...");
+        self.get_graphql(
+          "query a {
+             activeDailyCodingChallengeQuestion {
+               question {
+                 questionFrontendId
                }
-             }".to_owned()
-        );
-
-        let mut req = make_req!(self, url.to_string());
-        req.mode = Mode::Post(json);
-        req
-        .send(&self.client)
-        .await
+             }
+           }".to_owned(), None
+        ).await
     }
 
+    //TODO: check if refer is necessary
     /// Get specific problem detail
     #[named]
     pub async fn get_question_detail(&self, slug: &str) -> Result<Response, Error> {
@@ -191,7 +170,7 @@ impl LeetCode {
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
-            "query getQuestionDetail($titleSlug: String!) {
+            "query a($titleSlug: String!) {
                question(titleSlug: $titleSlug) {
                  content
                  stats
@@ -210,7 +189,7 @@ impl LeetCode {
             r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", slug),
         );
 
-        json.insert("operationName", "getQuestionDetail".to_string());
+        json.insert("operationName", "a".to_string());
 
         let mut req = make_req!(self, url.to_string());
         req.mode = Mode::Post(json);
