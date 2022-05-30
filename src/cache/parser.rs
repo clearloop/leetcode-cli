@@ -52,6 +52,36 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
     Some(())
 }
 
+// TODO: implement test for this
+/// graphql problem && question parser
+pub fn graphql_problem_and_question(v: Value) -> Option<(Problem,Question)> {
+    let mut qn = Question::default();
+    assert_eq!(Some(true), desc(&mut qn, v.clone()));
+    let percent = &qn.stats.rate;
+    let percent = percent[..percent.len()-1].parse::<f32>().ok()?;
+    let v = v.as_object()?.get("data")?
+        .as_object()?.get("question")?
+        .as_object()?;
+    Some((Problem {
+        category: v.get("categoryTitle")?.as_str()?.to_ascii_lowercase(), // dangerous, since this is not actually the slug. But currently (May 2022) ok
+        fid: v.get("questionFrontendId")?.as_str()?.parse().ok()?,
+        id: v.get("questionId")?.as_str()?.parse().ok()?,
+        level: match v.get("difficulty")?.as_str()?.chars().next()? {
+            'E' => 1,
+            'M' => 2,
+            'H' => 3,
+            _ => 0,
+        },
+        locked: false, // lazy
+        name: v.get("title")?.as_str()?.to_string(),
+        percent,
+        slug: v.get("titleSlug")?.as_str()?.to_string(),
+        starred: v.get("isFavor")?.as_bool()?,
+        status: v.get("status")?.as_str().unwrap_or("Null").to_owned(),
+        desc: serde_json::to_string(&qn).ok()?,
+    }, qn))
+}
+
 /// desc parser
 pub fn desc(q: &mut Question, v: Value) -> Option<bool> {
     /* None - parsing failed
