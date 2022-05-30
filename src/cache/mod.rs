@@ -106,10 +106,30 @@ impl Cache {
         Ok(ps)
     }
 
+    // TODO: get rid of this
+    pub fn push_problem(&self, p: Problem) -> Result<(), Error> {
+        diesel::replace_into(problems)
+            .values(&vec![p])
+            .execute(&self.conn()?)?;
+        Ok(())
+    }
+
+    /// TODO: implement caching
+    /// Get contest 
+    pub async fn get_contest(&self, contest: &str) -> Result<Contest, Error> {
+        let ctest = self.0
+            .get_contest_info(contest)
+            .await?
+            .json()
+            .await?;
+        let ctest = parser::contest(ctest).ok_or(Error::NoneError)?;
+        Ok(ctest)
+    }
+
     /// Get problem
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
         let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
-        if p.category != "algorithms" {
+        if p.category != "algorithms" && p.category != "contest" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
             ));
@@ -191,6 +211,17 @@ impl Cache {
         Ok(rdesc)
     }
 
+    // TODO: we can probably use this for all questions in general, actually
+    /// Get contest question 
+    pub async fn get_contest_qnp(&self, problem: &str) -> Result<(Problem,Question), Error> {
+        let graphql_res = self.0
+            .get_contest_question_detail(problem)
+            .await?
+            .json()
+            .await?;
+        parser::graphql_problem_and_question(graphql_res).ok_or(Error::NoneError)
+    }
+
     pub async fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
         trace!("Geting {} questions...", &rslug);
         let ids: Vec<String>;
@@ -231,6 +262,7 @@ impl Cache {
         run: Run,
         rfid: i32,
         testcase: Option<String>,
+        contest: Option<&str>
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
         use crate::helper::{code_path, test_cases_path};
@@ -277,11 +309,21 @@ impl Cache {
         json.insert("name", p.name.to_string());
         json.insert("data_input", testcase);
 
+        // TODO: make this less ugly
+        let make_url = |s: &str| {
+            if let Some(c) = contest {
+                let s = format!("{}_contest", s);
+                conf.sys.urls.get(&s).map(|u| u.replace("$contest", &c))
+            } else {
+                conf.sys.urls.get(s).map(|u| u.to_owned())
+            }.ok_or(Error::NoneError)
+        };
+
         let url = match run {
-            Run::Test => conf.sys.urls.get("test").ok_or(Error::NoneError)?.replace("$slug", &p.slug),
+            Run::Test => make_url("test")?.replace("$slug", &p.slug),
             Run::Submit => {
                 json.insert("judge_type", "large".to_string());
-                conf.sys.urls.get("submit").ok_or(Error::NoneError)?.replace("$slug", &p.slug)
+                make_url("submit")?.replace("$slug", &p.slug)
             }
         };
 
@@ -317,9 +359,10 @@ impl Cache {
         rfid: i32,
         run: Run,
         testcase: Option<String>,
+        contest: Option<&str>
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, testcase).await?;
+        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, testcase, contest).await?;
         trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
 
         let run_res: RunCode = self
