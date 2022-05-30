@@ -13,6 +13,53 @@ pub struct Tag {
     pub refs: String,
 }
 
+
+// TODO: figure out how to put these things into db
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ContestQuestionStub {
+    pub question_id: i32,
+    pub credit: i32,
+    pub title: String,
+    pub title_slug: String,
+}
+/// Contest model
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Contest {
+    pub id: i32,
+    pub duration: i32,
+    pub start_time: i64,
+    pub title: String,
+    pub title_slug: String,
+    pub description: String,
+    pub is_virtual: bool,
+    pub contains_premium: bool,
+    pub registered: bool,
+    pub questions: Vec<ContestQuestionStub>,
+}
+// TODO: improve Display for Contest*
+impl std::fmt::Display for ContestQuestionStub {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:5} |{:5} | {}", 
+            self.question_id.to_string().bold(), self.credit, self.title)?;
+        Ok(())
+    }
+}
+impl std::fmt::Display for Contest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "[{}] {}",
+            self.title_slug.dimmed(),
+            self.title)?;
+        if !self.questions.is_empty() {
+            writeln!(f,"fID    Points Title")?;
+            writeln!(f,"------|------|----------------------")?;
+            for q in &self.questions {
+                writeln!(f,"{}", q)?;
+            }
+        }
+        Ok(())
+    }
+}
+
 /// Problem model
 #[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
 #[table_name = "problems"]
@@ -160,7 +207,7 @@ mod question {
         #[serde(alias = "totalSubmissionRaw")]
         tsmr: i32,
         #[serde(alias = "acRate")]
-        rate: String,
+        pub rate: String, // TODO: remove this pub
     }
 
     /// Algorithm metadata
