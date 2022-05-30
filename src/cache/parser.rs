@@ -2,6 +2,30 @@
 use super::models::*;
 use serde_json::Value;
 
+/// contest parser
+pub fn contest(v: Value) -> Option<Contest> {
+    let o = v.as_object()?;
+    let contest = o.get("contest")?.as_object()?;
+    let questions: Vec<ContestQuestionStub> = o
+        .get("questions")?.as_array()?
+        .into_iter().map(|q| {
+            let stub: Result<ContestQuestionStub, _> = serde_json::from_value(q.clone());
+            stub.unwrap()
+        }).collect();
+    Some(Contest {
+        id: contest.get("id")?.as_i64()? as i32,
+        duration: contest.get("duration")?.as_i64()? as i32,
+        start_time: contest.get("start_time")?.as_i64()?,
+        title: contest.get("title")?.as_str()?.to_string(),
+        title_slug: contest.get("title_slug")?.as_str()?.to_owned(),
+        description: "".to_owned(), // TODO: display description. contest.get("description")?.as_str()?.to_owned(), 
+        is_virtual: contest.get("is_virtual")?.as_bool()?,
+        contains_premium: o.get("containsPremium")?.as_bool()?,
+        registered: o.get("registered")?.as_bool()?,
+        questions
+    })
+}
+
 /// problem parser
 pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
     let pairs = v.get("stat_status_pairs")?.as_array()?;
