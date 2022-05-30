@@ -1,5 +1,11 @@
-use leetcode_cli::cache::models::VerifyResult;
+
+// TODO: add a lot more tests
+use leetcode_cli::cache::models::{
+    VerifyResult, ContestQuestionStub, Contest
+};
 use serde_json;
+use serde_json::Error as SerdeError;
+type SerdeResult<T> = Result<T, SerdeError>;
 
 #[test]
 fn de_from_test_success() {
@@ -80,3 +86,17 @@ fn de_unknown_error() {
     );
     assert!(r.is_ok());
 }
+
+#[test]
+fn de_from_contest_question_stub() {
+    let r: SerdeResult<ContestQuestionStub> = 
+        serde_json::from_str(r#"{
+            "id": 2701,
+            "question_id": 2368,
+            "credit": 6,
+            "title": "Sum of Total Strength of Wizards",
+            "title_slug": "sum-of-total-strength-of-wizards"
+        }"#);
+    assert!(r.is_ok());
+}
+
