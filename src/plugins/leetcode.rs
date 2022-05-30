@@ -199,6 +199,64 @@ impl LeetCode {
         .await
     }
 
+    /// Register for a contest
+    #[named]
+    pub async fn register_contest(&self, contest: &str) -> Result<Response,Error> {
+        let url = self.conf.sys.urls.get("contest_register")
+            .ok_or(Error::NoneError)?
+            .replace("$contest_slug", contest);
+        let mut req = make_req!(self, url);
+        req.mode = Mode::Post(HashMap::new());
+        req
+        .send(&self.client)
+        .await
+    }
+
+    /// Get contest info
+    #[named]
+    pub async fn get_contest_info(&self, contest: &str) -> Result<Response, Error> {
+        trace!("Requesting {} detail...", contest);
+        let url = &self.conf.sys.urls
+            .get("contest_info")
+            .ok_or(Error::NoneError)?
+            .replace("$contest_slug", contest);
+        make_req!(self, url.to_string())
+        .send(&self.client)
+        .await
+    }
+
+    /// Get contest problem detail
+    pub async fn get_contest_question_detail(&self, problem: &str) -> Result<Response,Error> {
+        self.get_graphql("query a($s: String!) {
+           question(titleSlug: $s) {
+             title
+             titleSlug
+             questionId
+             questionFrontendId
+             categoryTitle
+             content
+             codeDefinition
+             status
+             metaData
+             codeSnippets {
+               langSlug
+               lang
+               code
+             }
+             exampleTestcases
+             sampleTestCase
+             enableRunCode
+             stats
+             translatedContent
+             isFavor
+             difficulty
+           }
+         }".to_owned(), Some(
+            r#"{"s": "$s"}"#.replace("$s", problem)
+        )).await
+    }
+
+
     /// Send code to judge
     #[named]
     pub async fn run_code(&self, j: Json, url: String, refer: String) -> Result<Response, Error> {
