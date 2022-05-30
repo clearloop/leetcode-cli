@@ -2,7 +2,7 @@
 use crate::{
     cmds::{
         Command, DataCommand, EditCommand, ExecCommand, ListCommand, PickCommand, StatCommand,
-        TestCommand,
+        TestCommand, ContestCommand, FunCommand
     },
     err::Error,
     flag::{Debug, Flag},
@@ -36,6 +36,8 @@ pub async fn main() -> Result<(), Error> {
             PickCommand::usage().display_order(5),
             StatCommand::usage().display_order(6),
             TestCommand::usage().display_order(7),
+            ContestCommand::usage().display_order(8),
+            FunCommand::usage().display_order(9),
         ])
         .arg(Debug::usage())
         .setting(AppSettings::ArgRequiredElseHelp)
@@ -57,6 +59,8 @@ pub async fn main() -> Result<(), Error> {
         ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m).await?),
         ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m).await?),
         ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m).await?),
+        ("contest", Some(sub_m)) => Ok(ContestCommand::handler(sub_m).await?),
+        ("fun", Some(sub_m)) => Ok(FunCommand::handler(sub_m).await?),
         _ => Err(Error::MatchError),
     }
 }
