@@ -72,6 +72,26 @@ impl LeetCode {
         })
     }
 
+    /// Generic GraphQL query
+    #[named]
+    pub async fn get_graphql(&self, query: String, variables: Option<String>) -> Result<Response, Error> {
+        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let refer = self.conf.sys.urls.get("base").ok_or(Error::NoneError)?;
+        let mut json: Json = HashMap::new();
+        json.insert("operationName", "a".to_string());
+        if let Some(v) = variables {
+            json.insert("variables", v);
+        }
+        json.insert("query", query);
+
+        let mut req = make_req!(self, url.to_string());
+        req.mode = Mode::Post(json);
+        req.refer = Some(refer.to_string());
+        req
+        .send(&self.client)
+        .await
+    }
+
     /// Get category problems
     #[named]
     pub async fn get_category_problems(&self, category: &str) -> Result<Response, Error> {
