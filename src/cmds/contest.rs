@@ -85,7 +85,7 @@ impl Command for ContestCommand {
                 stdout().flush().unwrap();
                 sleep(Duration::from_secs(1));
             }
-            println!("");
+            println!();
             contest = cache.get_contest(contest_slug).await?;
         } else {
             println!("started {} seconds ago", -tdiff);

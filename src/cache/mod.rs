@@ -313,7 +313,7 @@ impl Cache {
         let make_url = |s: &str| {
             if let Some(c) = contest {
                 let s = format!("{}_contest", s);
-                conf.sys.urls.get(&s).map(|u| u.replace("$contest", &c))
+                conf.sys.urls.get(&s).map(|u| u.replace("$contest", c))
             } else {
                 conf.sys.urls.get(s).map(|u| u.to_owned())
             }.ok_or(Error::NoneError)

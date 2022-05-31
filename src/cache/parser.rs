@@ -8,7 +8,7 @@ pub fn contest(v: Value) -> Option<Contest> {
     let contest = o.get("contest")?.as_object()?;
     let questions: Vec<ContestQuestionStub> = o
         .get("questions")?.as_array()?
-        .into_iter().map(|q| {
+        .iter().map(|q| {
             let stub: Result<ContestQuestionStub, _> = serde_json::from_value(q.clone());
             stub.unwrap()
         }).collect();
