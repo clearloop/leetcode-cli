@@ -92,10 +92,18 @@ impl Command for ContestCommand {
         };
 
         println!("{}", contest);
+        println!("fID    Points Difficulty Title");
+        println!("------|------|----------|--------------------");
 
         for question_stub in contest.questions {
             let slug = &question_stub.title_slug;
             let (problem,_question) = cache.get_contest_qnp(slug).await?;
+            println!("{:5} |{:5} |{:9} |{}",
+                problem.fid,
+                question_stub.credit,
+                problem.level,
+                problem.name
+            );
             debug!("{:#?}", problem);
             //println!("{:#?}", cache.get_problem(problem.fid)?);
             debug!("----------------------------------");

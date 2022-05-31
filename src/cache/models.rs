@@ -37,25 +37,11 @@ pub struct Contest {
     pub questions: Vec<ContestQuestionStub>,
 }
 // TODO: improve Display for Contest*
-impl std::fmt::Display for ContestQuestionStub {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:5} |{:5} | {}", 
-            self.question_id.to_string().bold(), self.credit, self.title)?;
-        Ok(())
-    }
-}
 impl std::fmt::Display for Contest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "[{}] {}",
             self.title_slug.dimmed(),
             self.title)?;
-        if !self.questions.is_empty() {
-            writeln!(f,"fID    Points Title")?;
-            writeln!(f,"------|------|----------------------")?;
-            for q in &self.questions {
-                writeln!(f,"{}", q)?;
-            }
-        }
         Ok(())
     }
 }
