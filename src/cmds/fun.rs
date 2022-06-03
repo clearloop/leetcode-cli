@@ -1,51 +1,16 @@
 // TODO: get rid of this debug command? clean it && make it permanent?
 
-//! Pick command
+//! Fun command
 use super::Command;
 use crate::err::Error;
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
-/// Abstract contest command
-///
-/// ```sh
-/// leetcode-contest
-/// Pick a problem
-///
-/// USAGE:
-///     leetcode contest [OPTIONS] [id]
-///
-/// FLAGS:
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-///
-/// OPTIONS:
-///     -q, --query <query>    Fliter questions by conditions:
-///                            Uppercase means negative
-///                            e = easy     E = m+h
-///                            m = medium   M = e+h
-///                            h = hard     H = e+m
-///                            d = done     D = not done
-///                            l = locked   L = not locked
-///                            s = starred  S = not starred
-///
-/// ARGS:
-///     <id>    Problem id
-/// ```
 pub struct FunCommand;
-
-static _QUERY_HELP: &str = r#"Fliter questions by conditions:
-Uppercase means negative
-e = easy     E = m+h
-m = medium   M = e+h
-h = hard     H = e+m
-d = done     D = not done
-l = locked   L = not locked
-s = starred  S = not starred"#;
 
 #[async_trait]
 impl Command for FunCommand {
-    /// `contest` usage
-    fn usage<'a, 'contest>() -> App<'a, 'contest> {
+    /// `fun` usage
+    fn usage<'a, 'fun>() -> App<'a, 'fun> {
         SubCommand::with_name("fun")
             .about("fun")
             .visible_alias("f")
@@ -72,7 +37,7 @@ impl Command for FunCommand {
             )
     }
 
-    /// `contest` handler
+    /// `fun` handler
     async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
         use crate::cache::Cache;
 

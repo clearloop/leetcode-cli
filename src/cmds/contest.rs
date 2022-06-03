@@ -1,27 +1,30 @@
-// TODO: clean this entire file
-//! Pick command
+//! Contest command (WIP)
+/** TODO:
+ * Improve pretty printing of contest info 
+ * (maybe) make a UI to play a full contest in 
+ */
 use super::Command;
 use crate::err::Error;
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 
-/// TODO: put the actual correct docstring here
-/// ```
-pub struct ContestCommand;
+/**
+leetcode-contest 
+Run a contest
 
-// TODO: and here
-static _QUERY_HELP: &str = r#"Fliter questions by conditions:
-Uppercase means negative
-e = easy     E = m+h
-m = medium   M = e+h
-h = hard     H = e+m
-d = done     D = not done
-l = locked   L = not locked
-s = starred  S = not starred"#;
+USAGE:
+    leetcode contest [FLAGS] <title>
 
-/*
- *
+FLAGS:
+    -h, --help        Prints help information
+    -r, --register    register for contest
+    -u, --update      push contest problems into db
+    -V, --version     Prints version information
+
+ARGS:
+    <title>    Contest title (e.g. 'weekly-contest-999')
 */
+pub struct ContestCommand;
 
 fn time_diff_from_now(time_since_epoch: i64) -> i64 {
     use chrono::{Utc,TimeZone};
@@ -47,10 +50,12 @@ impl Command for ContestCommand {
                 Arg::with_name("update")
                 .help("push contest problems into db")
                 .short("u")
+                .long("update")
             ).arg(
                 Arg::with_name("register")
                 .help("register for contest")
                 .short("r")
+                .long("register")
             )
     }
 
@@ -61,10 +66,13 @@ impl Command for ContestCommand {
         use std::thread::sleep;
         use std::time::Duration;
 
+        // get contest info
         let cache = Cache::new()?;
         let contest_slug = m.value_of("title").unwrap();
         let mut contest = cache.get_contest(contest_slug).await?;
         debug!("{:#?}", contest);
+
+        // if requested, register for contest && update contest info
         if m.is_present("register") {
             if contest.registered {
                 println!("You are already registered for this contest.");
@@ -76,6 +84,7 @@ impl Command for ContestCommand {
             }
         }
 
+        // if contest has not started, print a countdown
         let tdiff = time_diff_from_now(contest.start_time);
         if tdiff > 0 {
             loop {
@@ -91,10 +100,12 @@ impl Command for ContestCommand {
             println!("started {} seconds ago", -tdiff);
         };
 
+        // display contest header
         println!("{}", contest);
         println!("fID    Points Difficulty Title");
         println!("------|------|----------|--------------------");
 
+        // get contest problems (pushing them to db if necessary), and display them
         for question_stub in contest.questions {
             let slug = &question_stub.title_slug;
             let (problem,_question) = cache.get_contest_qnp(slug).await?;
@@ -105,7 +116,6 @@ impl Command for ContestCommand {
                 problem.name
             );
             debug!("{:#?}", problem);
-            //println!("{:#?}", cache.get_problem(problem.fid)?);
             debug!("----------------------------------");
             if m.is_present("update") {
                 cache.push_problem(problem)?;
