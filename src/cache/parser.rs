@@ -1,29 +1,20 @@
 //! Sub-Module for parsing resp data
 use super::models::*;
-use serde_json::Value;
+use serde_json::{Value,from_value};
+
 
 /// contest parser
 pub fn contest(v: Value) -> Option<Contest> {
     let o = v.as_object()?;
-    let contest = o.get("contest")?.as_object()?;
-    let questions: Vec<ContestQuestionStub> = o
-        .get("questions")?.as_array()?
-        .iter().map(|q| {
-            let stub: Result<ContestQuestionStub, _> = serde_json::from_value(q.clone());
-            stub.unwrap()
-        }).collect();
-    Some(Contest {
-        id: contest.get("id")?.as_i64()? as i32,
-        duration: contest.get("duration")?.as_i64()? as i32,
-        start_time: contest.get("start_time")?.as_i64()?,
-        title: contest.get("title")?.as_str()?.to_string(),
-        title_slug: contest.get("title_slug")?.as_str()?.to_owned(),
-        description: "".to_owned(), // TODO: display description. contest.get("description")?.as_str()?.to_owned(), 
-        is_virtual: contest.get("is_virtual")?.as_bool()?,
-        contains_premium: o.get("containsPremium")?.as_bool()?,
-        registered: o.get("registered")?.as_bool()?,
-        questions
-    })
+    let mut contest: Contest = from_value(
+        o.get("contest")?.clone()
+    ).ok()?;
+    contest.questions = from_value(
+        o.get("questions")?.clone()
+    ).ok()?;
+    contest.contains_premium = o.get("containsPremium")?.as_bool()?;
+    contest.registered = o.get("registered")?.as_bool()?;
+    Some(contest)
 }
 
 /// problem parser
@@ -55,31 +46,29 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
 // TODO: implement test for this
 /// graphql problem && question parser
 pub fn graphql_problem_and_question(v: Value) -> Option<(Problem,Question)> {
+    // parse top-level data from API
     let mut qn = Question::default();
     assert_eq!(Some(true), desc(&mut qn, v.clone()));
     let percent = &qn.stats.rate;
     let percent = percent[..percent.len()-1].parse::<f32>().ok()?;
+
+    // parse v.question specifically
     let v = v.as_object()?.get("data")?
-        .as_object()?.get("question")?
-        .as_object()?;
-    Some((Problem {
-        category: v.get("categoryTitle")?.as_str()?.to_ascii_lowercase(), // dangerous, since this is not actually the slug. But currently (May 2022) ok
-        fid: v.get("questionFrontendId")?.as_str()?.parse().ok()?,
-        id: v.get("questionId")?.as_str()?.parse().ok()?,
-        level: match v.get("difficulty")?.as_str()?.chars().next()? {
-            'E' => 1,
-            'M' => 2,
-            'H' => 3,
-            _ => 0,
-        },
-        locked: false, // lazy
-        name: v.get("title")?.as_str()?.to_string(),
-        percent,
-        slug: v.get("titleSlug")?.as_str()?.to_string(),
-        starred: v.get("isFavor")?.as_bool()?,
-        status: v.get("status")?.as_str().unwrap_or("Null").to_owned(),
-        desc: serde_json::to_string(&qn).ok()?,
-    }, qn))
+        .as_object()?.get("question")?;
+    let mut p: Problem = from_value(v.clone()).unwrap();
+    p.percent = percent;
+    p.level = match v.as_object()?.get("difficulty")?.as_str()?.chars().next()? {
+        'E' => 1,
+        'M' => 2,
+        'H' => 3,
+        _ => 0,
+    };
+    p.status = v.get("status")?.as_str().unwrap_or("Null").to_owned();
+    p.desc = serde_json::to_string(&qn).ok()?;
+    /* The graphql API doesn't return the category slug, only the printed category title. */
+    p.category = p.category.to_ascii_lowercase(); // Currently working (June 2022)
+    /* But lowercasing is stupid. This will break if a category with whitespaces appears. */
+    Some((p,qn))
 }
 
 /// desc parser

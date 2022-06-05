@@ -216,6 +216,7 @@ impl LeetCode {
     #[named]
     pub async fn get_contest_info(&self, contest: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", contest);
+        // cannot use the graphql API here because it does not provide registration status
         let url = &self.conf.sys.urls
             .get("contest_info")
             .ok_or(Error::NoneError)?
@@ -243,6 +244,7 @@ impl LeetCode {
                lang
                code
              }
+             isPaidOnly
              exampleTestcases
              sampleTestCase
              enableRunCode

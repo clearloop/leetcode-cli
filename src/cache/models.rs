@@ -23,17 +23,22 @@ pub struct ContestQuestionStub {
     pub title_slug: String,
 }
 /// Contest model
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Contest {
     pub id: i32,
     pub duration: i32,
     pub start_time: i64,
     pub title: String,
     pub title_slug: String,
+    #[serde(skip)] // the description is not used at the moment,
+    #[serde(default)] // so we use an empty string instead
     pub description: String,
     pub is_virtual: bool,
+    #[serde(skip)]
     pub contains_premium: bool,
+    #[serde(skip)]
     pub registered: bool,
+    #[serde(skip)]
     pub questions: Vec<ContestQuestionStub>,
 }
 // TODO: improve Display for Contest*
@@ -46,20 +51,50 @@ impl std::fmt::Display for Contest {
     }
 }
 
+fn deserialize_string<'de,D,T>(deserializer: D) -> Result<T, D::Error>
+where D: serde::Deserializer<'de>,
+      T: std::str::FromStr {
+    let s: String = Deserialize::deserialize(deserializer)?;
+    s.parse::<T>().map_err(|_| serde::de::Error::invalid_value(
+        serde::de::Unexpected::Str(&s),
+        &"valid string"
+    ))
+}
+
 /// Problem model
-#[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
+#[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Deserialize, Debug)]
 #[table_name = "problems"]
 pub struct Problem {
+    #[serde(alias="category_slug")]
+    #[serde(alias="categoryTitle")]
     pub category: String,
+    #[serde(alias="frontend_question_id")]
+    #[serde(alias="questionFrontendId")]
+    #[serde(deserialize_with="deserialize_string")]
     pub fid: i32,
+    #[serde(alias="question_id")]
+    #[serde(alias="questionId")]
+    #[serde(deserialize_with="deserialize_string")]
     pub id: i32,
+    #[serde(skip)]
     pub level: i32,
+    #[serde(alias="paid_only")]
+    #[serde(alias="isPaidOnly")]
     pub locked: bool,
+    #[serde(alias="question__title")]
+    #[serde(alias="title")]
     pub name: String,
+    #[serde(skip)]
     pub percent: f32,
+    #[serde(alias="question__title_slug")]
+    #[serde(alias="titleSlug")]
     pub slug: String,
+    #[serde(alias="is_favor")]
+    #[serde(alias="isFavor")]
     pub starred: bool,
+    #[serde(skip)]
     pub status: String,
+    #[serde(skip)]
     pub desc: String,
 }
 
