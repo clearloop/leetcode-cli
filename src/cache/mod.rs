@@ -117,11 +117,12 @@ impl Cache {
     /// TODO: implement caching
     /// Get contest 
     pub async fn get_contest(&self, contest: &str) -> Result<Contest, Error> {
-        let ctest = self.0
+        let ctest: Value = self.0
             .get_contest_info(contest)
             .await?
             .json()
             .await?;
+        debug!("{:?}", ctest.to_string());
         let ctest = parser::contest(ctest).ok_or(Error::NoneError)?;
         Ok(ctest)
     }
@@ -211,11 +212,10 @@ impl Cache {
         Ok(rdesc)
     }
 
-    // TODO: we can probably use this for all questions in general, actually
     /// Get contest question 
     pub async fn get_contest_qnp(&self, problem: &str) -> Result<(Problem,Question), Error> {
         let graphql_res = self.0
-            .get_contest_question_detail(problem)
+            .get_question_detail(problem)
             .await?
             .json()
             .await?;

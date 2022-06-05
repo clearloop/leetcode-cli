@@ -160,45 +160,6 @@ impl LeetCode {
         ).await
     }
 
-    //TODO: check if refer is necessary
-    /// Get specific problem detail
-    #[named]
-    pub async fn get_question_detail(&self, slug: &str) -> Result<Response, Error> {
-        trace!("Requesting {} detail...", &slug);
-        let refer = self.conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", slug);
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
-        let mut json: Json = HashMap::new();
-        json.insert(
-            "query",
-            "query a($titleSlug: String!) {
-               question(titleSlug: $titleSlug) {
-                 content
-                 stats
-                 codeDefinition
-                 sampleTestCase
-                 exampleTestcases
-                 enableRunCode
-                 metaData
-                 translatedContent
-               }
-             }".to_owned()
-        );
-
-        json.insert(
-            "variables",
-            r#"{"titleSlug": "$titleSlug"}"#.replace("$titleSlug", slug),
-        );
-
-        json.insert("operationName", "a".to_string());
-
-        let mut req = make_req!(self, url.to_string());
-        req.mode = Mode::Post(json);
-        req.refer = Some(refer);
-        req
-        .send(&self.client)
-        .await
-    }
-
     /// Register for a contest
     #[named]
     pub async fn register_contest(&self, contest: &str) -> Result<Response,Error> {
@@ -226,8 +187,8 @@ impl LeetCode {
         .await
     }
 
-    /// Get contest problem detail
-    pub async fn get_contest_question_detail(&self, problem: &str) -> Result<Response,Error> {
+    /// Get full question detail
+    pub async fn get_question_detail(&self, problem: &str) -> Result<Response,Error> {
         self.get_graphql("query a($s: String!) {
            question(titleSlug: $s) {
              title
