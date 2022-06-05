@@ -108,31 +108,16 @@ impl LeetCode {
         .await
     }
 
-    /// TODO: check if refer is necessary
-    #[named]
     pub async fn get_question_ids_by_tag(&self, slug: &str) -> Result<Response, Error> {
-        trace!("Requesting {} ref problems...", &slug);
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
-        let mut json: Json = HashMap::new();
-        json.insert("operationName", "a".to_string());
-        json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
-        json.insert(
-            "query",
-            "query a($slug: String!) {
-               topicTag(slug: $slug) {
-                 questions {
-                  questionId
-                 }
-               }
-             }".to_owned()
-        );
-
-        let mut req = make_req!(self, url.to_string());
-        req.mode = Mode::Post(json);
-        req.refer = Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug));
-        req
-        .send(&self.client)
-        .await
+        self.get_graphql("query a {
+            topicTag(slug: \"$slug\") {
+              questions {
+               questionId
+              }
+            }
+          }"
+          .replace("$slug", slug),
+        None).await
     }
 
     /// Get user info
