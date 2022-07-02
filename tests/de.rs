@@ -1,5 +1,4 @@
 use leetcode_cli::cache::models::VerifyResult;
-use serde_json;
 
 #[test]
 fn de_from_test_success() {

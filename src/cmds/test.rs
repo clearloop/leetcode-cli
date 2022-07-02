@@ -1,6 +1,6 @@
 //! Test command
-use crate::Error;
 use super::Command;
+use crate::Error;
 use async_trait::async_trait;
 use clap::{App, ArgMatches};
 
@@ -49,11 +49,10 @@ impl Command for TestCommand {
         use crate::cache::{Cache, Run};
         let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
         let testcase = m.value_of("testcase");
-        let case_str: Option<String>;
-        match testcase {
-            Some(case) => case_str = Option::from(case.replace("\\n", "\n")),
-            _ => case_str = None,
-        }
+        let case_str: Option<String> = match testcase {
+            Some(case) => Option::from(case.replace("\\n", "\n")),
+            _ => None,
+        };
         let cache = Cache::new()?;
         let res = cache.exec_problem(id, Run::Test, case_str).await?;
 

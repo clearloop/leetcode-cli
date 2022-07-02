@@ -5,9 +5,9 @@
 //!
 //! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
 //! + Use `leetcode config` to update it
+use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
-use crate::Error;
 
 const DEFAULT_CONFIG: &str = r#"
 # usually you don't wanna change those
@@ -150,8 +150,11 @@ pub struct Storage {
 impl Storage {
     /// convert root path
     pub fn root(&self) -> Result<String, Error> {
-        let home = dirs::home_dir().ok_or(Error::NoneError)?.to_string_lossy().to_string();
-        let path = self.root.replace("~", &home);
+        let home = dirs::home_dir()
+            .ok_or(Error::NoneError)?
+            .to_string_lossy()
+            .to_string();
+        let path = self.root.replace('~', &home);
         Ok(path)
     }
 

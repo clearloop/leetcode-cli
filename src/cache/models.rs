@@ -57,15 +57,15 @@ impl std::fmt::Display for Problem {
             1 => {
                 id.push_str(&SPACE.repeat(2));
                 id.push_str(&self.fid.to_string());
-                id.push_str(&SPACE.to_string());
+                id.push_str(SPACE);
             }
             2 => {
-                id.push_str(&SPACE.to_string());
+                id.push_str(SPACE);
                 id.push_str(&self.fid.to_string());
-                id.push_str(&SPACE.to_string());
+                id.push_str(SPACE);
             }
             3 => {
-                id.push_str(&SPACE.to_string());
+                id.push_str(SPACE);
                 id.push_str(&self.fid.to_string());
             }
             4 => {
@@ -268,7 +268,7 @@ impl std::fmt::Display for VerifyResult {
                         &"Runtime: ".before_spaces(7).dimmed(),
                         &self.status.status_runtime.dimmed(),
                         &"\nYour input:".after_spaces(4),
-                        &self.data_input.replace("\n", "↩ "),
+                        &self.data_input.replace('\n', "↩ "),
                         &"\nOutput:".after_spaces(8),
                         ca,
                         &"\nExpected:".after_spaces(6),
@@ -342,7 +342,7 @@ impl std::fmt::Display for VerifyResult {
                         "   Runtime: ".dimmed(),
                         &self.status.status_runtime.dimmed(),
                         &"\nYour input:".after_spaces(4),
-                        &self.data_input.replace("\n", "↩ "),
+                        &self.data_input.replace('\n', "↩ "),
                         &"\nOutput:".after_spaces(8),
                         ca,
                         &"\nExpected:".after_spaces(6),
@@ -373,7 +373,7 @@ impl std::fmt::Display for VerifyResult {
                     .bold()
                     .yellow(),
                 &"Last case:".after_spaces(5).dimmed(),
-                &self.submit.last_testcase.replace("\n", "↩ ").dimmed(),
+                &self.submit.last_testcase.replace('\n', "↩ ").dimmed(),
                 &"\nOutput:".after_spaces(8),
                 self.code_output[0],
                 &"\nExpected:".after_spaces(6),
@@ -385,7 +385,7 @@ impl std::fmt::Display for VerifyResult {
                 "\n{}\n\n{}{}\n",
                 &self.status.status_msg.yellow().bold(),
                 &"Last case:".after_spaces(5).dimmed(),
-                &self.data_input.replace("\n", "↩ "),
+                &self.data_input.replace('\n', "↩ "),
             )?,
             // Output Timeout Exceeded
             //
@@ -393,7 +393,12 @@ impl std::fmt::Display for VerifyResult {
             // if anybody reach this, welcome to fix this!
             13 | 14 => write!(f, "\n{}\n", &self.status.status_msg.yellow().bold(),)?,
             // Runtime error
-            15 => write!(f, "\n{}\n{}\n'", &self.status.status_msg.red().bold(), &self.status.runtime_error)?,
+            15 => write!(
+                f,
+                "\n{}\n{}\n'",
+                &self.status.status_msg.red().bold(),
+                &self.status.runtime_error
+            )?,
             // Compile Error
             20 => write!(
                 f,
@@ -436,7 +441,7 @@ impl std::fmt::Display for VerifyResult {
                         f,
                         "{}{}",
                         &"Stdout:".after_spaces(8).purple(),
-                        &self.std_output.replace("\n", &"\n".after_spaces(15))
+                        &self.std_output.replace('\n', &"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
@@ -495,7 +500,7 @@ mod verify {
         #[serde(default)]
         pub status_runtime: String,
         #[serde(default)]
-        pub runtime_error: String
+        pub runtime_error: String,
     }
 
     #[derive(Debug, Default, Deserialize)]
