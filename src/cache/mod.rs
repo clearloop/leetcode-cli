@@ -236,10 +236,10 @@ impl Cache {
         &self,
         run: Run,
         rfid: i32,
-        testcase: Option<String>,
+        test_case: Option<String>,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
-        use crate::helper::{code_path, test_cases_path};
+        use crate::helper::code_path;
         use std::fs::File;
         use std::io::Read;
 
@@ -255,21 +255,17 @@ impl Cache {
         let mut json: HashMap<&'static str, String> = HashMap::new();
         let mut code: String = "".to_string();
 
-        let maybe_file_testcases: Option<String> = test_cases_path(&p)
-            .map(|filename| {
-                let mut tests = "".to_string();
-                File::open(filename)
-                    .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
-                    .map(|_| Some(tests))
-                    .unwrap_or(None)
-            })
-            .unwrap_or(None);
+        let maybe_all_testcases: Option<String> = if d.all_cases.is_empty() {
+            None
+        } else {
+            Some(d.all_cases.to_string())
+        };
 
         // Takes test cases using following priority
         // 1. cli parameter
-        // 2. test cases from the file
+        // 2. test cases from problem desc all test cases
         // 3. sample test case from the task
-        let testcase = testcase.or(maybe_file_testcases).unwrap_or(d.case);
+        let test_case = test_case.or(maybe_all_testcases).unwrap_or(d.case);
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
@@ -279,7 +275,7 @@ impl Cache {
 
         // pass manually data
         json.insert("name", p.name.to_string());
-        json.insert("data_input", testcase);
+        json.insert("data_input", test_case);
 
         let url = match run {
             Run::Test => conf
@@ -330,10 +326,10 @@ impl Cache {
         &self,
         rfid: i32,
         run: Run,
-        testcase: Option<String>,
+        test_case: Option<String>,
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, testcase).await?;
+        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case).await?;
         trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
 
         let run_res: RunCode = self
