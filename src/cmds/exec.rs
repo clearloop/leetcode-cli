@@ -2,7 +2,7 @@
 use crate::Error;
 use super::Command;
 use async_trait::async_trait;
-use clap::{App, ArgMatches};
+use clap::{Command as ClapCommand, ArgMatches, Arg};
 
 /// Abstract Exec Command
 ///
@@ -25,9 +25,8 @@ pub struct ExecCommand;
 #[async_trait]
 impl Command for ExecCommand {
     /// `exec` usage
-    fn usage<'a, 'edit>() -> App<'a, 'edit> {
-        use clap::{Arg, SubCommand};
-        SubCommand::with_name("exec")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("exec")
             .about("Submit solution")
             .visible_alias("x")
             .arg(
@@ -39,7 +38,7 @@ impl Command for ExecCommand {
     }
 
     /// `exec` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
         let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;

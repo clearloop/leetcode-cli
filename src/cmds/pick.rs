@@ -2,7 +2,7 @@
 use super::Command;
 use crate::err::Error;
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Arg, ArgMatches, Command as ClapCommand};
 /// Abstract pick command
 ///
 /// ```sh
@@ -43,35 +43,35 @@ s = starred  S = not starred"#;
 #[async_trait]
 impl Command for PickCommand {
     /// `pick` usage
-    fn usage<'a, 'pick>() -> App<'a, 'pick> {
-        SubCommand::with_name("pick")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("pick")
             .about("Pick a problem")
             .visible_alias("p")
             .arg(Arg::with_name("id").help("Problem id").takes_value(true))
             .arg(
                 Arg::with_name("plan")
-                    .short("p")
+                    .short('p')
                     .long("plan")
                     .takes_value(true)
                     .help("Invoking python scripts to filter questions"),
             )
             .arg(
                 Arg::with_name("query")
-                    .short("q")
+                    .short('q')
                     .long("query")
                     .takes_value(true)
                     .help(QUERY_HELP),
             )
             .arg(
                 Arg::with_name("tag")
-                    .short("t")
+                    .short('t')
                     .long("tag")
                     .takes_value(true)
                     .help("Filter questions by tag"),
             )
             .arg(
                 Arg::with_name("daily")
-                    .short("d")
+                    .short('d')
                     .long("daily")
                     .takes_value(false)
                     .help("Pick today's daily challenge"),
@@ -79,7 +79,7 @@ impl Command for PickCommand {
     }
 
     /// `pick` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::Cache;
         use rand::Rng;
 
@@ -118,7 +118,9 @@ impl Command for PickCommand {
 
         let daily_id = if m.is_present("daily") {
             Some(cache.get_daily_problem_id().await?)
-        } else { None };
+        } else {
+            None
+        };
 
         let fid = m
             .value_of("id")
@@ -126,7 +128,7 @@ impl Command for PickCommand {
             .or(daily_id)
             .unwrap_or_else(|| {
                 // Pick random without specify id
-                let problem = &problems[rand::thread_rng().gen_range(0, problems.len())];
+                let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
                 problem.fid
             });
 
