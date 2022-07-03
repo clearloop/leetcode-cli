@@ -138,7 +138,7 @@ impl Command for PickCommand {
             Ok(q) => println!("{}", q.desc()),
             Err(e) => {
                 eprintln!("{:?}", e);
-                if let Error::FeatureError(_) | Error::NetworkError(_) = e {
+                if let Error::NetworkError(_) = e {
                     Self::handler(m).await?;
                 }
             }
