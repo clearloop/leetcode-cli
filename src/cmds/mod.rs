@@ -12,7 +12,7 @@
 //! ```
 use crate::err::Error;
 use async_trait::async_trait;
-use clap::{Command as ClapCommand, ArgMatches};
+use clap::{ArgMatches, Command as ClapCommand};
 
 /// Abstract commands' trait.
 #[async_trait]
@@ -38,3 +38,5 @@ pub use list::ListCommand;
 pub use pick::PickCommand;
 pub use stat::StatCommand;
 pub use test::TestCommand;
+
+pub use edit::{CODE_END, CODE_START};

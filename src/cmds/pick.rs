@@ -135,7 +135,7 @@ impl Command for PickCommand {
         let r = cache.get_question(fid).await;
 
         match r {
-            Ok(r) => println!("{}", r),
+            Ok(q) => println!("{}", q.desc()),
             Err(e) => {
                 eprintln!("{:?}", e);
                 if let Error::FeatureError(_) | Error::NetworkError(_) = e {

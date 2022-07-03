@@ -144,7 +144,7 @@ mod file {
     use crate::{cache::models::Problem, Error};
 
     /// Generate code path by fid
-    pub fn code_path(target: &Problem, l: Option<String>) -> Result<String, crate::Error> {
+    pub fn code_path(problem: &Problem, l: Option<String>) -> Result<String, crate::Error> {
         let conf = crate::cfg::locate()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
@@ -158,8 +158,8 @@ mod file {
             suffix(&lang)?,
         );
 
-        path = path.replace("${fid}", &target.fid.to_string());
-        path = path.replace("${slug}", &target.slug.to_string());
+        path = path.replace("${fid}", &problem.fid.to_string());
+        path = path.replace("${slug}", &problem.slug.to_string());
 
         Ok(path)
     }

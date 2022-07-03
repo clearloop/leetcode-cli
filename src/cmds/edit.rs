@@ -22,6 +22,9 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 /// ```
 pub struct EditCommand;
 
+pub const CODE_START: &str = r#"// @lc code=start"#;
+pub const CODE_END: &str = r#"// @lc code=end"#;
+
 #[async_trait]
 impl Command for EditCommand {
     /// `edit` usage
@@ -53,9 +56,10 @@ impl Command for EditCommand {
 
         let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
         let cache = Cache::new()?;
-        let target = cache.get_problem(id)?;
+        let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
 
+        let p_desc_comment = problem.desc_comment();
         // condition language
         if m.contains_id("lang") {
             conf.code.lang = m.value_of("lang").ok_or(Error::NoneError)?.to_string();
@@ -63,10 +67,10 @@ impl Command for EditCommand {
         }
 
         let lang = conf.code.lang;
-        let path = crate::helper::code_path(&target, Some(lang.to_owned()))?;
+        let path = crate::helper::code_path(&problem, Some(lang.to_owned()))?;
 
         if !Path::new(&path).exists() {
-            let mut qr = serde_json::from_str(&target.desc);
+            let mut qr = serde_json::from_str(&problem.desc);
             if qr.is_err() {
                 qr = Ok(cache.get_question(id).await?);
             }
@@ -74,12 +78,17 @@ impl Command for EditCommand {
             let question: Question = qr?;
 
             let mut file_code = File::create(&path)?;
+            let question_desc = question.desc_comment() + "\n";
 
             let mut flag = false;
             for d in question.defs.0 {
                 if d.value == lang {
                     flag = true;
-                    file_code.write_all(d.code.to_string().as_bytes())?;
+                    file_code.write_all(p_desc_comment.as_bytes())?;
+                    file_code.write_all(question_desc.as_bytes())?;
+                    file_code.write_all((CODE_START.to_string() + "\n").as_bytes())?;
+                    file_code.write_all((d.code.to_string() + "\n").as_bytes())?;
+                    file_code.write_all((CODE_END.to_string() + "\n").as_bytes())?;
                 }
             }
 

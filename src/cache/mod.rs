@@ -6,6 +6,7 @@ mod sql;
 use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
+use crate::cmds::{CODE_END, CODE_START};
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
@@ -26,7 +27,7 @@ pub enum Run {
     Submit,
 }
 
-impl std::default::Default for Run {
+impl Default for Run {
     fn default() -> Self {
         Run::Submit
     }
@@ -37,7 +38,7 @@ impl std::default::Default for Run {
 pub struct Cache(pub LeetCode);
 
 impl Cache {
-    /// Ref to sqliteconnection
+    /// Ref to sqlite connection
     fn conn(&self) -> Result<SqliteConnection, Error> {
         Ok(conn(self.0.conf.storage.cache()?))
     }
@@ -269,6 +270,14 @@ impl Cache {
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
+        let begin = code.find(CODE_START).unwrap_or(0);
+        let end = code.find(CODE_END).unwrap_or(code.len());
+        let code = if let Some(solution) = code.get(begin..end) {
+            solution.to_string()
+        } else {
+            code
+        };
+
         json.insert("lang", conf.code.lang.to_string());
         json.insert("question_id", p.id.to_string());
         json.insert("typed_code", code);
@@ -311,7 +320,7 @@ impl Cache {
     async fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
         use std::time::Duration;
 
-        trace!("Run veriy recursion...");
+        trace!("Run verify recursion...");
         std::thread::sleep(Duration::from_micros(3000));
 
         let json: VerifyResult = self
