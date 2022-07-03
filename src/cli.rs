@@ -41,7 +41,7 @@ pub async fn main() -> Result<(), Error> {
         .setting(AppSettings::ArgRequiredElseHelp)
         .get_matches();
 
-    if m.is_present("debug") {
+    if m.contains_id("debug") {
         Debug::handler()?;
     } else {
         env_logger::Builder::from_env(env_logger::Env::new().default_filter_or("info"))

@@ -57,7 +57,7 @@ impl Command for EditCommand {
         let mut conf = cache.to_owned().0.conf;
 
         // condition language
-        if m.is_present("lang") {
+        if m.contains_id("lang") {
             conf.code.lang = m.value_of("lang").ok_or(Error::NoneError)?.to_string();
             conf.sync()?;
         }
