@@ -133,14 +133,15 @@ impl Command for PickCommand {
             });
 
         let r = cache.get_question(fid).await;
-        if r.is_err() {
-            let e = r.err().ok_or(Error::NoneError)?;
-            eprintln!("{:?}", &e);
-            if let Error::FeatureError(_) | Error::NetworkError(_) = e {
-                Self::handler(m).await?;
+
+        match r {
+            Ok(r) => println!("{}", r),
+            Err(e) => {
+                eprintln!("{:?}", e);
+                if let Error::FeatureError(_) | Error::NetworkError(_) = e {
+                    Self::handler(m).await?;
+                }
             }
-        } else {
-            println!("{}", r?);
         }
 
         Ok(())
