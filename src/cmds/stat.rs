@@ -1,7 +1,7 @@
 //! status command
 use super::Command;
 use async_trait::async_trait;
-use clap::{App, ArgMatches, SubCommand};
+use clap::{Command as ClapCommand, ArgMatches};
 use colored::Colorize;
 
 /// Abstract statues command
@@ -22,14 +22,14 @@ pub struct StatCommand;
 #[async_trait]
 impl Command for StatCommand {
     /// `stat` usage
-    fn usage<'a, 'stat>() -> App<'a, 'stat> {
-        SubCommand::with_name("stat")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("stat")
             .about("Show simple chart about submissions")
             .visible_alias("s")
     }
 
     /// `stat` handler
-    async fn handler(_m: &ArgMatches<'_>) -> Result<(), crate::err::Error> {
+    async fn handler(_m: &ArgMatches) -> Result<(), crate::err::Error> {
         use crate::{helper::Digit, Cache};
 
         let cache = Cache::new()?;

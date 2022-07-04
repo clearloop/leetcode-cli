@@ -1,6 +1,6 @@
 use crate::{cache, Error};
 use diesel::prelude::*;
-use keyring::Keyring;
+use keyring::Entry;
 use openssl::{hash, pkcs5, symm};
 use std::collections::HashMap;
 
@@ -73,7 +73,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     }
 
     // Get system password
-    let ring = Keyring::new("Chrome Safe Storage", "Chrome");
+    let ring = Entry::new("Chrome Safe Storage", "Chrome");
     let pass = ring.get_password().expect("Get Password failed");
 
     // Decode cookies
@@ -86,7 +86,10 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 
     Ok(Ident {
         csrf: m.get("csrftoken").ok_or(Error::NoneError)?.to_string(),
-        session: m.get("LEETCODE_SESSION").ok_or(Error::NoneError)?.to_string(),
+        session: m
+            .get("LEETCODE_SESSION")
+            .ok_or(Error::NoneError)?
+            .to_string(),
     })
 }
 

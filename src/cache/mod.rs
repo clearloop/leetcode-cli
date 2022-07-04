@@ -9,10 +9,10 @@ use self::sql::*;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
+use reqwest::Response;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::collections::HashMap;
-use reqwest::Response;
 
 /// sqlite connection
 pub fn conn(p: String) -> SqliteConnection {
@@ -60,32 +60,27 @@ impl Cache {
         Ok(())
     }
 
-    async fn get_user_info(&self) -> Result<(String,bool), Error> {
-        let user = parser::user(
-            self.clone().0
-            .get_user_info().await?
-            .json().await?
-        );
+    async fn get_user_info(&self) -> Result<(String, bool), Error> {
+        let user = parser::user(self.clone().0.get_user_info().await?.json().await?);
         match user {
             None => Err(Error::NoneError),
             Some(None) => Err(Error::CookieError),
-            Some(Some((s,b))) => Ok((s,b))
+            Some(Some((s, b))) => Ok((s, b)),
         }
     }
 
     async fn is_session_bad(&self) -> bool {
         // i.e. self.get_user_info().contains_err(Error::CookieError)
-        match self.get_user_info().await {
-            Err(Error::CookieError) => true,
-            _ => false
-        }
+        matches!(self.get_user_info().await, Err(Error::CookieError))
     }
 
     async fn resp_to_json<T: DeserializeOwned>(&self, resp: Response) -> Result<T, Error> {
-        let maybe_json: Result<T,_> = resp.json().await;
+        let maybe_json: Result<T, _> = resp.json().await;
         if maybe_json.is_err() && self.is_session_bad().await {
             Err(Error::CookieError)
-        } else { Ok(maybe_json?) }
+        } else {
+            Ok(maybe_json?)
+        }
     }
 
     /// Download leetcode problems to db
@@ -123,7 +118,7 @@ impl Cache {
         Ok(p)
     }
 
-    /// Get daily problem 
+    /// Get daily problem
     pub async fn get_daily_problem_id(&self) -> Result<i32, Error> {
         parser::daily(
             self.clone()
@@ -131,8 +126,9 @@ impl Cache {
                 .get_question_daily()
                 .await?
                 .json() // does not require LEETCODE_SESSION
-                .await?
-        ).ok_or(Error::NoneError)
+                .await?,
+        )
+        .ok_or(Error::NoneError)
     }
 
     /// Get problems from cache
@@ -179,13 +175,14 @@ impl Cache {
             debug!("{:#?}", &json);
             match parser::desc(&mut rdesc, json) {
                 None => return Err(Error::NoneError),
-                Some(false) => return
-                    if self.is_session_bad().await {
+                Some(false) => {
+                    return if self.is_session_bad().await {
                         Err(Error::CookieError)
                     } else {
                         Err(Error::PremiumError)
-                    },
-                Some(true) => ()
+                    }
+                }
+                Some(true) => (),
             }
 
             // update the question
@@ -215,7 +212,8 @@ impl Cache {
                     .await?
                     .json()
                     .await?,
-            ).ok_or(Error::NoneError)?;
+            )
+            .ok_or(Error::NoneError)?;
             let t = Tag {
                 r#tag: rslug.to_string(),
                 r#refs: serde_json::to_string(&ids)?,
@@ -258,22 +256,20 @@ impl Cache {
         let mut code: String = "".to_string();
 
         let maybe_file_testcases: Option<String> = test_cases_path(&p)
-                .map(|filename| {
-                    let mut tests = "".to_string();
-                    File::open(filename)
-                        .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
-                        .map(|_| Some(tests))
-                        .unwrap_or(None)
-                })
-                .unwrap_or(None);
+            .map(|filename| {
+                let mut tests = "".to_string();
+                File::open(filename)
+                    .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
+                    .map(|_| Some(tests))
+                    .unwrap_or(None)
+            })
+            .unwrap_or(None);
 
         // Takes test cases using following priority
         // 1. cli parameter
         // 2. test cases from the file
         // 3. sample test case from the task
-        let testcase = testcase
-            .or(maybe_file_testcases)
-            .unwrap_or(d.case);
+        let testcase = testcase.or(maybe_file_testcases).unwrap_or(d.case);
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
@@ -286,10 +282,19 @@ impl Cache {
         json.insert("data_input", testcase);
 
         let url = match run {
-            Run::Test => conf.sys.urls.get("test").ok_or(Error::NoneError)?.replace("$slug", &p.slug),
+            Run::Test => conf
+                .sys
+                .urls
+                .get("test")
+                .ok_or(Error::NoneError)?
+                .replace("$slug", &p.slug),
             Run::Submit => {
                 json.insert("judge_type", "large".to_string());
-                conf.sys.urls.get("submit").ok_or(Error::NoneError)?.replace("$slug", &p.slug)
+                conf.sys
+                    .urls
+                    .get("submit")
+                    .ok_or(Error::NoneError)?
+                    .replace("$slug", &p.slug)
             }
         };
 
@@ -297,7 +302,11 @@ impl Cache {
             json,
             [
                 url,
-                conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", &p.slug),
+                conf.sys
+                    .urls
+                    .get("problems")
+                    .ok_or(Error::NoneError)?
+                    .replace("$slug", &p.slug),
             ],
         ))
     }
@@ -309,13 +318,9 @@ impl Cache {
         trace!("Run veriy recursion...");
         std::thread::sleep(Duration::from_micros(3000));
 
-        let json: VerifyResult = self.resp_to_json(
-            self
-            .clone()
-            .0
-            .verify_result(rid.clone())
-            .await?
-        ).await?;
+        let json: VerifyResult = self
+            .resp_to_json(self.clone().0.verify_result(rid.clone()).await?)
+            .await?;
 
         Ok(json)
     }
@@ -343,8 +348,10 @@ impl Cache {
         // Check if leetcode accepted the Run request
         if match run {
             Run::Test => run_res.interpret_id.is_empty(),
-            Run::Submit => run_res.submission_id == 0
-        } { return Err(Error::CookieError) }
+            Run::Submit => run_res.submission_id == 0,
+        } {
+            return Err(Error::CookieError);
+        }
 
         let mut res: VerifyResult = VerifyResult::default();
         while res.state != "SUCCESS" {

@@ -12,16 +12,16 @@
 //! ```
 use crate::err::Error;
 use async_trait::async_trait;
-use clap::{App, ArgMatches};
+use clap::{Command as ClapCommand, ArgMatches};
 
 /// Abstract commands' trait.
 #[async_trait]
 pub trait Command {
-    /// Usage of the spefic command
-    fn usage<'a, 'c>() -> App<'a, 'c>;
+    /// Usage of the specific command
+    fn usage<'a>() -> ClapCommand<'a>;
 
     /// The handler will deal [args, options,...] from the command-line
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error>;
+    async fn handler(m: &ArgMatches) -> Result<(), Error>;
 }
 
 mod data;

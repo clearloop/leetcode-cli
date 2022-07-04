@@ -44,19 +44,19 @@ pub async fn main() -> Result<(), Error> {
     if m.is_present("debug") {
         Debug::handler()?;
     } else {
-        env_logger::from_env(env_logger::Env::new().default_filter_or("info"))
+        env_logger::Builder::from_env(env_logger::Env::new().default_filter_or("info"))
             .format_timestamp(None)
             .init();
     }
 
     match m.subcommand() {
-        ("data", Some(sub_m)) => Ok(DataCommand::handler(sub_m).await?),
-        ("edit", Some(sub_m)) => Ok(EditCommand::handler(sub_m).await?),
-        ("exec", Some(sub_m)) => Ok(ExecCommand::handler(sub_m).await?),
-        ("list", Some(sub_m)) => Ok(ListCommand::handler(sub_m).await?),
-        ("pick", Some(sub_m)) => Ok(PickCommand::handler(sub_m).await?),
-        ("stat", Some(sub_m)) => Ok(StatCommand::handler(sub_m).await?),
-        ("test", Some(sub_m)) => Ok(TestCommand::handler(sub_m).await?),
+        Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
+        Some(("edit", sub_m)) => Ok(EditCommand::handler(sub_m).await?),
+        Some(("exec", sub_m)) => Ok(ExecCommand::handler(sub_m).await?),
+        Some(("list", sub_m)) => Ok(ListCommand::handler(sub_m).await?),
+        Some(("pick", sub_m)) => Ok(PickCommand::handler(sub_m).await?),
+        Some(("stat", sub_m)) => Ok(StatCommand::handler(sub_m).await?),
+        Some(("test", sub_m)) => Ok(TestCommand::handler(sub_m).await?),
         _ => Err(Error::MatchError),
     }
 }

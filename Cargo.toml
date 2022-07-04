@@ -6,7 +6,7 @@ path = "src/bin/lc.rs"
 name = "leetcode-cli"
 version = "0.3.11"
 authors = ["clearloop <cdr.today@foxmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Leet your code in command-line."
 repository = "https://github.com/clearloop/leetcode-cli"
 license = "MIT"
@@ -16,33 +16,33 @@ keywords = ["cli", "games", "leetcode"]
 readme = './README.md'
 
 [dependencies]
-async-trait = "0.1.41"
-tokio = "0.2.22"
-clap = "2.33.0"
-colored = "1.9.1"
-dirs = "2.0.2"
-env_logger = "0.7.1"
-escaper = "0.1.0"
-keyring = "0.8.0"
-log = "0.4"
-openssl = "0.10.26"
-pyo3 = { version = "0.8.5", optional = true }
-rand = "0.7.2"
-serde = { version = "1.0.104", features = ["derive"] }
-serde_json = "1.0.44"
-toml = "0.5.5"
-regex = "1"
+async-trait = "0.1.56"
+tokio = { version = "1", features = ["full"] }
+clap = { version = "3.2.8", features = ["cargo"] }
+colored = "2.0.0"
+dirs = "4.0.0"
+env_logger = "0.9.0"
+escaper = "0.1.1"
+keyring = "1.1.2"
+log = "0.4.17"
+openssl = "0.10.40"
+pyo3 = { version = "0.16.5", optional = true }
+rand = "0.8.5"
+serde = { version = "1.0.138", features = ["derive"] }
+serde_json = "1.0.82"
+toml = "0.5.9"
+regex = "1.5.6"
 
 [dependencies.diesel]
-version = "1.4.3"
+version = "1.4.8"
 features = ["sqlite"]
 
 [dependencies.reqwest]
-version = "0.10.3"
+version = "0.11.11"
 features = ["gzip", "json"]
 
 [dev-dependencies.cargo-husky]
-version = "1"
+version = "1.5.0"
 default-features = false
 features = ["precommit-hook", "user-hooks"]
 
@@ -50,4 +50,4 @@ features = ["precommit-hook", "user-hooks"]
 pym = ["pyo3"]
 
 [target.'cfg(target_family = "unix")'.dependencies]
-nix = "0.17.0"
+nix = "0.24.1"

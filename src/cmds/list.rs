@@ -36,7 +36,7 @@
 use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Command as ClapCommand, Arg, ArgMatches};
 /// Abstract `list` command
 ///
 /// ## handler
@@ -72,34 +72,34 @@ static LIST_AFTER_HELP: &str = r#"EXAMPLES:
 #[async_trait]
 impl Command for ListCommand {
     /// `list` command usage
-    fn usage<'a, 'list>() -> App<'a, 'list> {
-        SubCommand::with_name("list")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("list")
             .about("List problems")
             .visible_alias("l")
             .arg(
                 Arg::with_name("category")
-                    .short("c")
+                    .short('c')
                     .long("category")
                     .takes_value(true)
                     .help(CATEGORY_HELP),
             )
             .arg(
                 Arg::with_name("plan")
-                    .short("p")
+                    .short('p')
                     .long("plan")
                     .takes_value(true)
                     .help("Invoking python scripts to filter questions"),
             )
             .arg(
                 Arg::with_name("query")
-                    .short("q")
+                    .short('q')
                     .long("query")
                     .takes_value(true)
                     .help(QUERY_HELP),
             )
             .arg(
                 Arg::with_name("range")
-                    .short("r")
+                    .short('r')
                     .long("range")
                     .takes_value(true)
                     .min_values(2)
@@ -108,13 +108,13 @@ impl Command for ListCommand {
             .after_help(LIST_AFTER_HELP)
             .arg(
                 Arg::with_name("stat")
-                    .short("s")
+                    .short('s')
                     .long("stat")
                     .help("Show statistics of listed problems"),
             )
             .arg(
                 Arg::with_name("tag")
-                    .short("t")
+                    .short('t')
                     .long("tag")
                     .takes_value(true)
                     .help("Filter questions by tag"),
@@ -131,7 +131,7 @@ impl Command for ListCommand {
     /// List commands contains "-c", "-q", "-s" flags.
     /// + matches with `-c` will override the default <all> keyword.
     /// + `-qs`
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<(), Error> {
         trace!("Input list command...");
 
         let cache = Cache::new()?;

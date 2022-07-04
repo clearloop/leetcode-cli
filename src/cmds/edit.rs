@@ -2,7 +2,7 @@
 use crate::Error;
 use super::Command;
 use async_trait::async_trait;
-use clap::{App, ArgMatches};
+use clap::{Command as ClapCommand, ArgMatches, Arg};
 
 /// Abstract `edit` command
 ///
@@ -25,14 +25,13 @@ pub struct EditCommand;
 #[async_trait]
 impl Command for EditCommand {
     /// `edit` usage
-    fn usage<'a, 'edit>() -> App<'a, 'edit> {
-        use clap::{Arg, SubCommand};
-        SubCommand::with_name("edit")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("edit")
             .about("Edit question by id")
             .visible_alias("e")
             .arg(
                 Arg::with_name("lang")
-                    .short("l")
+                    .short('l')
                     .long("lang")
                     .takes_value(true)
                     .help("Edit with specific language"),
@@ -46,7 +45,7 @@ impl Command for EditCommand {
     }
 
     /// `edit` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
         use crate::{cache::models::Question, Cache};
         use std::fs::File;
         use std::io::Write;

@@ -2,7 +2,7 @@
 use super::Command;
 use crate::{cache::Cache, helper::Digit, Error};
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Command as ClapCommand, Arg, ArgMatches};
 use colored::Colorize;
 
 /// Abstract `data` command
@@ -25,28 +25,28 @@ pub struct DataCommand;
 #[async_trait]
 impl Command for DataCommand {
     /// `data` command usage
-    fn usage<'a, 'cache>() -> App<'a, 'cache> {
-        SubCommand::with_name("data")
+    fn usage<'a>() -> ClapCommand<'a> {
+        ClapCommand::new("data")
             .about("Manage Cache")
             .visible_alias("d")
             .arg(
                 Arg::with_name("delete")
                     .display_order(1)
-                    .short("d")
+                    .short('d')
                     .long("delete")
                     .help("Delete cache"),
             )
             .arg(
                 Arg::with_name("update")
                     .display_order(2)
-                    .short("u")
+                    .short('u')
                     .long("update")
                     .help("Update cache"),
             )
     }
 
     /// `data` handler
-    async fn handler(m: &ArgMatches<'_>) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<(), Error> {
         use std::fs::File;
         use std::path::Path;
 
