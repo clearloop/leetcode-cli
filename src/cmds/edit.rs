@@ -45,6 +45,13 @@ impl Command for EditCommand {
                     .required(true)
                     .help("question id"),
             )
+            .arg(
+                Arg::with_name("test")
+                    .long("test")
+                    .short('t')
+                    .required(false)
+                    .help("write test file"),
+            )
     }
 
     /// `edit` handler
@@ -58,6 +65,8 @@ impl Command for EditCommand {
         let cache = Cache::new()?;
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
+
+        let test_flag = m.contains_id("test");
 
         let p_desc_comment = problem.desc_comment();
         // condition language
@@ -80,6 +89,9 @@ impl Command for EditCommand {
             let mut file_code = File::create(&path)?;
             let question_desc = question.desc_comment() + "\n";
 
+            let test_path = crate::helper::test_cases_path(&problem)?;
+            let mut file_tests = File::create(&test_path)?;
+
             let mut flag = false;
             for d in question.defs.0 {
                 if d.value == lang {
@@ -89,12 +101,19 @@ impl Command for EditCommand {
                     file_code.write_all((CODE_START.to_string() + "\n").as_bytes())?;
                     file_code.write_all((d.code.to_string() + "\n").as_bytes())?;
                     file_code.write_all((CODE_END.to_string() + "\n").as_bytes())?;
+
+                    if test_flag {
+                        file_tests.write_all(question.all_cases.as_bytes())?;
+                    }
                 }
             }
 
             // if language is not found in the list of supported languges clean up files
             if !flag {
                 std::fs::remove_file(&path)?;
+                if test_flag {
+                    std::fs::remove_file(&test_path)?;
+                }
                 return Err(crate::Error::FeatureError(format!(
                     "This question doesn't support {}, please try another",
                     &lang

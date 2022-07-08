@@ -24,7 +24,7 @@ pub fn reset_signal_pipe_handler() {
 
 /// Get maches
 pub async fn main() -> Result<(), Error> {
-    let _ = reset_signal_pipe_handler();
+    reset_signal_pipe_handler();
     let m = clap::Command::new(crate_name!())
         .version(crate_version!())
         .about("May the Code be with You 👻")

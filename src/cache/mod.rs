@@ -7,6 +7,7 @@ use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
 use crate::cmds::{CODE_END, CODE_START};
+use crate::helper::test_cases_path;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
@@ -256,6 +257,16 @@ impl Cache {
         let mut json: HashMap<&'static str, String> = HashMap::new();
         let mut code: String = "".to_string();
 
+        let maybe_file_testcases: Option<String> = test_cases_path(&p)
+            .map(|file_name| {
+                let mut tests = "".to_string();
+                File::open(file_name)
+                    .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
+                    .map(|_| Some(tests))
+                    .unwrap_or(None)
+            })
+            .unwrap_or(None);
+
         let maybe_all_testcases: Option<String> = if d.all_cases.is_empty() {
             None
         } else {
@@ -264,9 +275,13 @@ impl Cache {
 
         // Takes test cases using following priority
         // 1. cli parameter
-        // 2. test cases from problem desc all test cases
-        // 3. sample test case from the task
-        let test_case = test_case.or(maybe_all_testcases).unwrap_or(d.case);
+        // 2. if test cases file exist, use the file test cases(user can edit it)
+        // 3. test cases from problem desc all test cases
+        // 4. sample test case from the task
+        let test_case = test_case
+            .or(maybe_file_testcases)
+            .or(maybe_all_testcases)
+            .unwrap_or(d.case);
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
