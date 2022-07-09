@@ -1,8 +1,8 @@
 //! Exec command
-use crate::Error;
 use super::Command;
+use crate::Error;
 use async_trait::async_trait;
-use clap::{Command as ClapCommand, ArgMatches, Arg};
+use clap::{Arg, ArgMatches, Command as ClapCommand};
 
 /// Abstract Exec Command
 ///

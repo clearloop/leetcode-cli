@@ -30,6 +30,25 @@ pub struct Problem {
     pub desc: String,
 }
 
+impl Problem {
+    fn display_level(&self) -> &str {
+        match self.level {
+            1 => "Easy",
+            2 => "Medium",
+            3 => "Hard",
+            _ => "Unknown",
+        }
+    }
+    pub fn desc_comment(&self) -> String {
+        let mut res = String::new();
+        res += format!("// Category: {}\n", self.category).as_str();
+        res += format!("// Level: {}\n", self.display_level(),).as_str();
+        res += format!("// Percent: {}%\n\n", self.percent).as_str();
+
+        res + "\n"
+    }
+}
+
 static DONE: &str = " ✔";
 static ETC: &str = "...";
 static LOCK: &str = "🔒";
@@ -124,9 +143,20 @@ pub struct Question {
     pub t_content: String,
 }
 
-impl std::fmt::Display for Question {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.content.render())
+impl Question {
+    pub fn desc(&self) -> String {
+        self.content.render()
+    }
+
+    pub fn desc_comment(&self) -> String {
+        let desc = self.content.render();
+
+        let mut res = desc
+            .lines()
+            .fold("/*\n".to_string(), |acc, e| acc + " * " + e + "\n");
+        res += " */\n";
+
+        res
     }
 }
 

@@ -36,7 +36,7 @@
 use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
 use async_trait::async_trait;
-use clap::{Command as ClapCommand, Arg, ArgMatches};
+use clap::{Arg, ArgMatches, Command as ClapCommand};
 /// Abstract `list` command
 ///
 /// ## handler
@@ -147,14 +147,14 @@ impl Command for ListCommand {
         // pym scripts
         #[cfg(feature = "pym")]
         {
-            if m.is_present("plan") {
+            if m.contains_id("plan") {
                 let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
                 crate::helper::squash(&mut ps, ids)?;
             }
         }
 
         // filter tag
-        if m.is_present("tag") {
+        if m.contains_id("tag") {
             let ids = cache
                 .get_tagged_questions(m.value_of("tag").unwrap_or(""))
                 .await?;
@@ -162,19 +162,21 @@ impl Command for ListCommand {
         }
 
         // filter category
-        if m.is_present("category") {
+        if m.contains_id("category") {
             ps.retain(|x| x.category == m.value_of("category").unwrap_or("algorithms"));
         }
 
         // filter query
-        if m.is_present("query") {
+        if m.contains_id("query") {
             let query = m.value_of("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut ps, query.to_string());
         }
 
         // filter range
-        if m.is_present("range") {
-            let num_range: Vec<i32> = m.values_of("range").ok_or(Error::NoneError)?
+        if m.contains_id("range") {
+            let num_range: Vec<i32> = m
+                .values_of("range")
+                .ok_or(Error::NoneError)?
                 .into_iter()
                 .map(|x| x.parse::<i32>().unwrap_or(0))
                 .collect();
@@ -191,7 +193,7 @@ impl Command for ListCommand {
         println!("{}", out.join("\n"));
 
         // one more thing, filter stat
-        if m.is_present("stat") {
+        if m.contains_id("stat") {
             let mut listed = 0;
             let mut locked = 0;
             let mut starred = 0;

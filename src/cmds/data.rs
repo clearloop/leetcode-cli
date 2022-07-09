@@ -2,7 +2,7 @@
 use super::Command;
 use crate::{cache::Cache, helper::Digit, Error};
 use async_trait::async_trait;
-use clap::{Command as ClapCommand, Arg, ArgMatches};
+use clap::{Arg, ArgMatches, Command as ClapCommand};
 use colored::Colorize;
 
 /// Abstract `data` command
@@ -58,7 +58,8 @@ impl Command for DataCommand {
         let out = format!(
             "  {}{}",
             Path::new(&path)
-                .file_name().ok_or(Error::NoneError)?
+                .file_name()
+                .ok_or(Error::NoneError)?
                 .to_string_lossy()
                 .to_string()
                 .digit(65 - (len.len() as i32))
@@ -72,13 +73,13 @@ impl Command for DataCommand {
         title.push_str(&"-".repeat(65));
 
         let mut flags = 0;
-        if m.is_present("delete") {
+        if m.contains_id("delete") {
             flags += 1;
             cache.clean()?;
             println!("{}", "ok!".bright_green());
         }
 
-        if m.is_present("update") {
+        if m.contains_id("update") {
             flags += 1;
             cache.update().await?;
             println!("{}", "ok!".bright_green());

@@ -6,6 +6,8 @@ mod sql;
 use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
+use crate::cmds::{CODE_END, CODE_START};
+use crate::helper::test_cases_path;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
@@ -26,7 +28,7 @@ pub enum Run {
     Submit,
 }
 
-impl std::default::Default for Run {
+impl Default for Run {
     fn default() -> Self {
         Run::Submit
     }
@@ -37,7 +39,7 @@ impl std::default::Default for Run {
 pub struct Cache(pub LeetCode);
 
 impl Cache {
-    /// Ref to sqliteconnection
+    /// Ref to sqlite connection
     fn conn(&self) -> Result<SqliteConnection, Error> {
         Ok(conn(self.0.conf.storage.cache()?))
     }
@@ -236,10 +238,10 @@ impl Cache {
         &self,
         run: Run,
         rfid: i32,
-        testcase: Option<String>,
+        test_case: Option<String>,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
-        use crate::helper::{code_path, test_cases_path};
+        use crate::helper::code_path;
         use std::fs::File;
         use std::io::Read;
 
@@ -256,22 +258,40 @@ impl Cache {
         let mut code: String = "".to_string();
 
         let maybe_file_testcases: Option<String> = test_cases_path(&p)
-            .map(|filename| {
+            .map(|file_name| {
                 let mut tests = "".to_string();
-                File::open(filename)
+                File::open(file_name)
                     .and_then(|mut file_descriptor| file_descriptor.read_to_string(&mut tests))
                     .map(|_| Some(tests))
                     .unwrap_or(None)
             })
             .unwrap_or(None);
 
+        let maybe_all_testcases: Option<String> = if d.all_cases.is_empty() {
+            None
+        } else {
+            Some(d.all_cases.to_string())
+        };
+
         // Takes test cases using following priority
         // 1. cli parameter
-        // 2. test cases from the file
-        // 3. sample test case from the task
-        let testcase = testcase.or(maybe_file_testcases).unwrap_or(d.case);
+        // 2. if test cases file exist, use the file test cases(user can edit it)
+        // 3. test cases from problem desc all test cases
+        // 4. sample test case from the task
+        let test_case = test_case
+            .or(maybe_file_testcases)
+            .or(maybe_all_testcases)
+            .unwrap_or(d.case);
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
+
+        let begin = code.find(CODE_START).unwrap_or(0);
+        let end = code.find(CODE_END).unwrap_or(code.len());
+        let code = if let Some(solution) = code.get(begin..end) {
+            solution.to_string()
+        } else {
+            code
+        };
 
         json.insert("lang", conf.code.lang.to_string());
         json.insert("question_id", p.id.to_string());
@@ -279,7 +299,7 @@ impl Cache {
 
         // pass manually data
         json.insert("name", p.name.to_string());
-        json.insert("data_input", testcase);
+        json.insert("data_input", test_case);
 
         let url = match run {
             Run::Test => conf
@@ -315,7 +335,7 @@ impl Cache {
     async fn recur_verify(&self, rid: String) -> Result<VerifyResult, Error> {
         use std::time::Duration;
 
-        trace!("Run veriy recursion...");
+        trace!("Run verify recursion...");
         std::thread::sleep(Duration::from_micros(3000));
 
         let json: VerifyResult = self
@@ -330,10 +350,10 @@ impl Cache {
         &self,
         rfid: i32,
         run: Run,
-        testcase: Option<String>,
+        test_case: Option<String>,
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, testcase).await?;
+        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case).await?;
         trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
 
         let run_res: RunCode = self

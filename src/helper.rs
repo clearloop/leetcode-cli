@@ -92,167 +92,27 @@ mod filter {
 
 /// Render html to command-line
 mod html {
-    // use crate::Error;
-    use colored::{Color, Colorize};
-    use escaper::decode_html;
-    use regex::Regex;
-    pub enum Token {
-        Plain(String),
-        Bold(String),
-        Sup(String),
-        Sub(String),
-        Font((String, Color)),
-        Eof(String),
-    }
-
+    use scraper::Html;
     /// Html render plugin
     pub trait HTML {
-        fn ser(&self) -> Vec<Token>;
         fn render(&self) -> String;
     }
 
-    pub fn superscript(n: u8) -> String {
-        match n {
-            x if x >= 10 => format!("{}{}", superscript(n / 10), superscript(n % 10)),
-            0 => "⁰".to_string(),
-            1 => "¹".to_string(),
-            2 => "²".to_string(),
-            3 => "³".to_string(),
-            4 => "⁴".to_string(),
-            5 => "⁵".to_string(),
-            6 => "⁶".to_string(),
-            7 => "⁷".to_string(),
-            8 => "⁸".to_string(),
-            9 => "⁹".to_string(),
-            _ => n.to_string(),
-        }
-    }
-
-    pub fn subscript(n: u8) -> String {
-        match n {
-            x if x >= 10 => format!("{}{}", subscript(n / 10), subscript(n % 10)),
-            0 => "₀".to_string(),
-            1 => "₁".to_string(),
-            2 => "₂".to_string(),
-            3 => "₃".to_string(),
-            4 => "₄".to_string(),
-            5 => "₅".to_string(),
-            6 => "₆".to_string(),
-            7 => "₇".to_string(),
-            8 => "₈".to_string(),
-            9 => "₉".to_string(),
-            _ => n.to_string(),
-        }
-    }
     impl HTML for String {
-        fn ser(&self) -> Vec<Token> {
-            // empty tags
-            let tks = {
-                let mut s = self.clone();
-                // some problems (e.g. 1653) have ZWSPs.
-                s.retain(|x| x != '\u{200B}');
-                s };
-            let res: Vec<Token>;
-            // styled
-            {
-                let mut ptr = 0;
-                let mut output = vec![];
-                let mut bold = false;
-                let mut sup = false;
-                let mut sub = false;
-                let mut color: Option<Color> = None;
+        fn render(&self) -> String {
+            let rep = self
+                .replace(r#"</sup>"#, "")
+                .replace(r#"<sup>"#, "^")
+                .replace(r#"</sub>"#, "")
+                .replace(r#"<sub>"#, "_");
+            let frag = Html::parse_fragment(rep.as_str());
 
-                // TODO: check how to make this `unwrap` more flexible..
-                //
-                // or looks better.
-                //
-                // or do some handwrite matching.
-                let re_color = Regex::new(r#"color=['"]([^'"]+)"#).unwrap();
-                for (i, e) in tks.chars().enumerate() {
-                    match e {
-                        '<' => {
-                            if bold {
-                                output.push(Token::Bold(tks[ptr..i].to_string()));
-                                bold = false;
-                            } else if sup {
-                                output.push(Token::Sup(tks[ptr..i].to_string()));
-                                sup = false;
-                            } else if sub {
-                                output.push(Token::Sub(tks[ptr..i].to_string()));
-                                sub = false;
-                            } else if color.is_some() {
-                                output.push(Token::Font((tks[ptr..i].to_string(), color.unwrap())));
-                                color = None;
-                            } else {
-                                output.push(Token::Plain(tks[ptr..i].to_string()));
-                            }
-                            ptr = i;
-                        }
-                        '>' => {
-                            match &tks[i - 1..i] {
-                                "-" => continue,
-                                _ => match &tks[(ptr + 1)..i] {
-                                    "b" | "strong" => bold = true,
-                                    "sup" => sup = true,
-                                    "sub" => sub = true,
-                                    s if s.starts_with("font") => {
-                                        color = re_color
-                                            .captures(s)
-                                            .and_then(|caps| caps.get(1))
-                                            .and_then(|cap| cap.as_str().parse().ok());
-                                    }
-                                    _ => {}
-                                },
-                            }
-                            ptr = i + 1;
-                        }
-                        _ => {}
-                    }
-                }
-                output.push(Token::Eof(tks[ptr..tks.len()].to_string()));
-                res = output;
-            }
+            let res = frag
+                .root_element()
+                .text()
+                .fold(String::new(), |acc, e| acc + e);
 
             res
-        }
-
-        fn render(&self) -> String {
-            let ts = self.ser();
-            let mut tks: Vec<String> = vec![];
-
-            for i in ts {
-                match i {
-                    Token::Plain(s) => tks.push(s.normal().to_string()),
-                    Token::Bold(s) => {
-                        if s.contains("Example") {
-                            let mut br = "-".repeat(50).dimmed().to_string();
-                            br.push_str("\n\n");
-                            tks.push(br);
-                        } else if s.contains("Note") {
-                            let mut br = "* ".repeat(25).dimmed().to_string();
-                            br.push_str("\n\n");
-                            tks.push(br);
-                        }
-
-                        tks.push(s.bold().to_string());
-                    }
-                    Token::Sup(s) => tks.push(match s.parse::<u8>() {
-                        Ok(n) => superscript(n),
-                        _ => s,
-                    }),
-                    Token::Sub(s) => tks.push(match s.parse::<u8>() {
-                        Ok(n) => subscript(n),
-                        _ => s,
-                    }),
-                    Token::Font((s, color)) => tks.push(s.color(color).to_string()),
-                    Token::Eof(s) => tks.push(s.normal().to_string()),
-                }
-            }
-
-            // post replace
-            let tks = tks.join("");
-
-            decode_html(&tks).unwrap_or(tks)
         }
     }
 }
@@ -283,24 +143,18 @@ mod file {
 
     use crate::{cache::models::Problem, Error};
 
-    /// Generate test casese path by fid
-    pub fn test_cases_path(target: &Problem) -> Result<String, crate::Error> {
+    /// Generate test cases path by fid
+    pub fn test_cases_path(problem: &Problem) -> Result<String, Error> {
         let conf = crate::cfg::locate()?;
+        let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
 
-        let mut path = format!(
-            "{}/{}.tests.dat",
-            conf.storage.code()?,
-            conf.code.pick,
-        );
-
-        path = path.replace("${fid}", &target.fid.to_string());
-        path = path.replace("${slug}", &target.slug.to_string());
-
+        path = path.replace("${fid}", &problem.fid.to_string());
+        path = path.replace("${slug}", &problem.slug.to_string());
         Ok(path)
     }
 
     /// Generate code path by fid
-    pub fn code_path(target: &Problem, l: Option<String>) -> Result<String, crate::Error> {
+    pub fn code_path(problem: &Problem, l: Option<String>) -> Result<String, Error> {
         let conf = crate::cfg::locate()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
@@ -314,8 +168,8 @@ mod file {
             suffix(&lang)?,
         );
 
-        path = path.replace("${fid}", &target.fid.to_string());
-        path = path.replace("${slug}", &target.slug.to_string());
+        path = path.replace("${fid}", &problem.fid.to_string());
+        path = path.replace("${slug}", &problem.slug.to_string());
 
         Ok(path)
     }
