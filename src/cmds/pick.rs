@@ -95,14 +95,14 @@ impl Command for PickCommand {
         // pym scripts
         #[cfg(feature = "pym")]
         {
-            if m.is_present("plan") {
+            if m.contains_id("plan") {
                 let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
                 crate::helper::squash(&mut problems, ids)?;
             }
         }
 
         // tag filter
-        if m.is_present("tag") {
+        if m.contains_id("tag") {
             let ids = cache
                 .clone()
                 .get_tagged_questions(m.value_of("tag").unwrap_or(""))
@@ -111,12 +111,12 @@ impl Command for PickCommand {
         }
 
         // query filter
-        if m.is_present("query") {
+        if m.contains_id("query") {
             let query = m.value_of("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut problems, query.to_string());
         }
 
-        let daily_id = if m.is_present("daily") {
+        let daily_id = if m.contains_id("daily") {
             Some(cache.get_daily_problem_id().await?)
         } else {
             None
@@ -133,14 +133,15 @@ impl Command for PickCommand {
             });
 
         let r = cache.get_question(fid).await;
-        if r.is_err() {
-            let e = r.err().ok_or(Error::NoneError)?;
-            eprintln!("{:?}", &e);
-            if let Error::FeatureError(_) | Error::NetworkError(_) = e {
-                Self::handler(m).await?;
+
+        match r {
+            Ok(q) => println!("{}", q.desc()),
+            Err(e) => {
+                eprintln!("{:?}", e);
+                if let Error::NetworkError(_) = e {
+                    Self::handler(m).await?;
+                }
             }
-        } else {
-            println!("{}", r?);
         }
 
         Ok(())

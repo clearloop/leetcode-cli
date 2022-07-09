@@ -72,7 +72,8 @@ impl LeetCode {
             .conf
             .sys
             .urls
-            .get("problems").ok_or(Error::NoneError)?
+            .get("problems")
+            .ok_or(Error::NoneError)?
             .replace("$category", category);
 
         Req {
@@ -110,7 +111,9 @@ impl LeetCode {
 
         Req {
             default_headers: self.default_headers,
-            refer: Some((self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug)),
+            refer: Some(
+                (self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug),
+            ),
             info: false,
             json: Some(json),
             mode: Mode::Post,
@@ -133,7 +136,8 @@ impl LeetCode {
                      username
                      isCurrentUserPremium
                  }
-             }".to_owned()
+             }"
+            .to_owned(),
         );
 
         Req {
@@ -185,7 +189,13 @@ impl LeetCode {
     /// Get specific problem detail
     pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
-        let refer = self.conf.sys.urls.get("problems").ok_or(Error::NoneError)?.replace("$slug", slug);
+        let refer = self
+            .conf
+            .sys
+            .urls
+            .get("problems")
+            .ok_or(Error::NoneError)?
+            .replace("$slug", slug);
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
@@ -245,7 +255,13 @@ impl LeetCode {
     /// Get the result of submission / testing
     pub async fn verify_result(self, id: String) -> Result<Response, Error> {
         trace!("Verifying result...");
-        let url = self.conf.sys.urls.get("verify").ok_or(Error::NoneError)?.replace("$id", &id);
+        let url = self
+            .conf
+            .sys
+            .urls
+            .get("verify")
+            .ok_or(Error::NoneError)?
+            .replace("$id", &id);
         Req {
             default_headers: self.default_headers,
             refer: None,

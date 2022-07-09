@@ -50,10 +50,11 @@ pub fn desc(q: &mut Question, v: Value) -> Option<bool> {
         stats: serde_json::from_str(o.get("stats")?.as_str()?).ok()?,
         defs: serde_json::from_str(o.get("codeDefinition")?.as_str()?).ok()?,
         case: o.get("sampleTestCase")?.as_str()?.to_string(),
-        all_cases: o.get("exampleTestcases")
-                .unwrap_or(o.get("sampleTestCase")?) // soft fail to the sampleTestCase
-                .as_str()?
-                .to_string(),
+        all_cases: o
+            .get("exampleTestcases")
+            .unwrap_or(o.get("sampleTestCase")?) // soft fail to the sampleTestCase
+            .as_str()?
+            .to_string(),
         metadata: serde_json::from_str(o.get("metaData")?.as_str()?).ok()?,
         test: o.get("enableRunCode")?.as_bool()?,
         t_content: o
@@ -85,29 +86,35 @@ pub fn tags(v: Value) -> Option<Vec<String>> {
     Some(res)
 }
 
-/// daily parser 
+/// daily parser
 pub fn daily(v: Value) -> Option<i32> {
     trace!("Parse daily...");
     v.as_object()?
-        .get("data")?.as_object()?
-        .get("activeDailyCodingChallengeQuestion")?.as_object()?
-        .get("question")?.as_object()?
-        .get("questionFrontendId")?.as_str()?
-        .parse().ok()
+        .get("data")?
+        .as_object()?
+        .get("activeDailyCodingChallengeQuestion")?
+        .as_object()?
+        .get("question")?
+        .as_object()?
+        .get("questionFrontendId")?
+        .as_str()?
+        .parse()
+        .ok()
 }
 
 /// user parser
-pub fn user(v: Value) -> Option<Option<(String,bool)>> {
+pub fn user(v: Value) -> Option<Option<(String, bool)>> {
     // None => error while parsing
     // Some(None) => User not found
     // Some("...") => username
-    let user = v.as_object()?.get("data")?
-        .as_object()?.get("user")?;
-    if *user == Value::Null { return Some(None) }
+    let user = v.as_object()?.get("data")?.as_object()?.get("user")?;
+    if *user == Value::Null {
+        return Some(None);
+    }
     let user = user.as_object()?;
     Some(Some((
         user.get("username")?.as_str()?.to_owned(),
-        user.get("isCurrentUserPremium")?.as_bool()?
+        user.get("isCurrentUserPremium")?.as_bool()?,
     )))
 }
 

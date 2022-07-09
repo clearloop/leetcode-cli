@@ -1,7 +1,7 @@
 //! status command
 use super::Command;
 use async_trait::async_trait;
-use clap::{Command as ClapCommand, ArgMatches};
+use clap::{ArgMatches, Command as ClapCommand};
 use colored::Colorize;
 
 /// Abstract statues command

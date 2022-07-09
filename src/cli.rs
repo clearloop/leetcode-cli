@@ -7,7 +7,7 @@ use crate::{
     err::Error,
     flag::{Debug, Flag},
 };
-use clap::{crate_name, crate_version, App, AppSettings};
+use clap::{crate_name, crate_version};
 
 /// This should be called before calling any cli method or printing any output.
 pub fn reset_signal_pipe_handler() {
@@ -24,8 +24,8 @@ pub fn reset_signal_pipe_handler() {
 
 /// Get maches
 pub async fn main() -> Result<(), Error> {
-    let _ = reset_signal_pipe_handler();
-    let m = App::new(crate_name!())
+    reset_signal_pipe_handler();
+    let m = clap::Command::new(crate_name!())
         .version(crate_version!())
         .about("May the Code be with You 👻")
         .subcommands(vec![
@@ -38,10 +38,10 @@ pub async fn main() -> Result<(), Error> {
             TestCommand::usage().display_order(7),
         ])
         .arg(Debug::usage())
-        .setting(AppSettings::ArgRequiredElseHelp)
+        .arg_required_else_help(true)
         .get_matches();
 
-    if m.is_present("debug") {
+    if m.contains_id("debug") {
         Debug::handler()?;
     } else {
         env_logger::Builder::from_env(env_logger::Env::new().default_filter_or("info"))

@@ -9,7 +9,7 @@ use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
 
-const DEFAULT_CONFIG: &str = r#"
+const DEFAULT_CONFIG: &str = r##"
 # usually you don't wanna change those
 [sys]
 categories = [
@@ -65,11 +65,12 @@ csrf = ""
 session = ""
 
 [storage]
-cache = "Problems"
-code = "code"
 root = "~/.leetcode"
+cache = "Problems"
 scripts = "scripts"
-"#;
+# absolutely path for the code, other use root as parent dir
+code = "code"
+"##;
 
 /// Sync with `~/.leetcode/config.toml`
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -169,10 +170,9 @@ impl Storage {
 
     /// get code path
     pub fn code(&self) -> Result<String, crate::Error> {
-        let root = &self.root()?;
-        let p = PathBuf::from(root).join(&self.code);
+        let p = PathBuf::from(&self.code);
         if !PathBuf::from(&p).exists() {
-            std::fs::create_dir(&p)?
+            fs::create_dir(&p)?
         }
 
         Ok(p.to_string_lossy().to_string())

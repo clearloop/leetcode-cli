@@ -22,7 +22,6 @@ clap = { version = "3.2.8", features = ["cargo"] }
 colored = "2.0.0"
 dirs = "4.0.0"
 env_logger = "0.9.0"
-escaper = "0.1.1"
 keyring = "1.1.2"
 log = "0.4.17"
 openssl = "0.10.40"
@@ -32,6 +31,7 @@ serde = { version = "1.0.138", features = ["derive"] }
 serde_json = "1.0.82"
 toml = "0.5.9"
 regex = "1.5.6"
+scraper = "0.13.0"
 
 [dependencies.diesel]
 version = "1.4.8"
