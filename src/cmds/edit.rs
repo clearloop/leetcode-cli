@@ -121,7 +121,7 @@ impl Command for EditCommand {
             }
         }
 
-        // Get arguments of editor
+        // Get arguments of the editor
         //
         // for example:
         //
