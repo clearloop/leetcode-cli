@@ -121,8 +121,27 @@ impl Command for EditCommand {
             }
         }
 
+        // Get arguments of editor
+        //
+        // for example:
+        //
+        // ```toml
+        // [code]
+        // editor = "emacsclient"
+        // editor-args = [ "-n", "-s", "doom" ]
+        // ```
+        //
+        // ```rust
+        // Command::new("emacsclient").args(&[ "-n", "-s", "doom", "<problem>" ])
+        // ```
+        let mut args: Vec<String> = Default::default();
+        if let Some(editor_args) = conf.code.editor_args {
+            args.extend_from_slice(&editor_args);
+        }
+
+        args.push(path);
         std::process::Command::new(conf.code.editor)
-            .arg(path)
+            .args(args)
             .status()?;
         Ok(())
     }
