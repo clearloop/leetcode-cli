@@ -6,7 +6,6 @@ mod sql;
 use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
-use crate::cmds::{CODE_END, CODE_START};
 use crate::helper::test_cases_path;
 use crate::{cfg, err::Error, plugins::LeetCode};
 use colored::Colorize;
@@ -285,9 +284,9 @@ impl Cache {
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
-        let begin = code.find(CODE_START).unwrap_or(0);
-        let end = code.find(CODE_END).unwrap_or(code.len());
-        let code = if let Some(solution) = code.get(begin..end) {
+        let begin = code.find(&conf.code.start_marker).unwrap_or(0);
+        let end = code.find(&conf.code.end_marker).unwrap_or(code.len());
+        let code = if let Some(solution) = code.get((begin + conf.code.start_marker.len())..end) {
             solution.to_string()
         } else {
             code

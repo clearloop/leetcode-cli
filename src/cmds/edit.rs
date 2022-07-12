@@ -22,9 +22,6 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 /// ```
 pub struct EditCommand;
 
-pub const CODE_START: &str = r#"// @lc code=start"#;
-pub const CODE_END: &str = r#"// @lc code=end"#;
-
 #[async_trait]
 impl Command for EditCommand {
     /// `edit` usage
@@ -45,13 +42,6 @@ impl Command for EditCommand {
                     .required(true)
                     .help("question id"),
             )
-            .arg(
-                Arg::with_name("test")
-                    .long("test")
-                    .short('t')
-                    .required(false)
-                    .help("write test file"),
-            )
     }
 
     /// `edit` handler
@@ -66,16 +56,16 @@ impl Command for EditCommand {
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
 
-        let test_flag = m.contains_id("test");
+        let test_flag = conf.code.test;
 
-        let p_desc_comment = problem.desc_comment();
+        let p_desc_comment = problem.desc_comment(&conf);
         // condition language
         if m.contains_id("lang") {
             conf.code.lang = m.value_of("lang").ok_or(Error::NoneError)?.to_string();
             conf.sync()?;
         }
 
-        let lang = conf.code.lang;
+        let lang = &conf.code.lang;
         let path = crate::helper::code_path(&problem, Some(lang.to_owned()))?;
 
         if !Path::new(&path).exists() {
@@ -87,20 +77,28 @@ impl Command for EditCommand {
             let question: Question = qr?;
 
             let mut file_code = File::create(&path)?;
-            let question_desc = question.desc_comment() + "\n";
+            let question_desc = question.desc_comment(&conf) + "\n";
 
             let test_path = crate::helper::test_cases_path(&problem)?;
             let mut file_tests = File::create(&test_path)?;
 
             let mut flag = false;
             for d in question.defs.0 {
-                if d.value == lang {
+                if d.value == *lang {
                     flag = true;
-                    file_code.write_all(p_desc_comment.as_bytes())?;
-                    file_code.write_all(question_desc.as_bytes())?;
-                    file_code.write_all((CODE_START.to_string() + "\n").as_bytes())?;
+                    if conf.code.comment_problem_desc {
+                        file_code.write_all(p_desc_comment.as_bytes())?;
+                        file_code.write_all(question_desc.as_bytes())?;
+                    }
+                    file_code.write_all(
+                        (conf.code.comment_leading.clone() + " " + &conf.code.start_marker + "\n")
+                            .as_bytes(),
+                    )?;
                     file_code.write_all((d.code.to_string() + "\n").as_bytes())?;
-                    file_code.write_all((CODE_END.to_string() + "\n").as_bytes())?;
+                    file_code.write_all(
+                        (conf.code.comment_leading.clone() + " " + &conf.code.end_marker + "\n")
+                            .as_bytes(),
+                    )?;
 
                     if test_flag {
                         file_tests.write_all(question.all_cases.as_bytes())?;

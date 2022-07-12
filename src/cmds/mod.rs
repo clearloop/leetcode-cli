@@ -38,5 +38,3 @@ pub use list::ListCommand;
 pub use pick::PickCommand;
 pub use stat::StatCommand;
 pub use test::TestCommand;
-
-pub use edit::{CODE_END, CODE_START};

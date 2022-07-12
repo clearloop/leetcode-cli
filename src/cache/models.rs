@@ -39,11 +39,12 @@ impl Problem {
             _ => "Unknown",
         }
     }
-    pub fn desc_comment(&self) -> String {
+    pub fn desc_comment(&self, conf: &Config) -> String {
         let mut res = String::new();
-        res += format!("// Category: {}\n", self.category).as_str();
-        res += format!("// Level: {}\n", self.display_level(),).as_str();
-        res += format!("// Percent: {}%\n\n", self.percent).as_str();
+        let comment_leading = &conf.code.comment_leading;
+        res += format!("{} Category: {}\n", comment_leading, self.category).as_str();
+        res += format!("{} Level: {}\n", comment_leading, self.display_level(),).as_str();
+        res += format!("{} Percent: {}%\n\n", comment_leading, self.percent).as_str();
 
         res + "\n"
     }
@@ -148,13 +149,13 @@ impl Question {
         self.content.render()
     }
 
-    pub fn desc_comment(&self) -> String {
+    pub fn desc_comment(&self, conf: &Config) -> String {
         let desc = self.content.render();
 
-        let mut res = desc
-            .lines()
-            .fold("/*\n".to_string(), |acc, e| acc + " * " + e + "\n");
-        res += " */\n";
+        let mut res = desc.lines().fold("\n".to_string(), |acc, e| {
+            acc + " " + conf.code.comment_leading.as_str() + " " + e + "\n"
+        });
+        res += " \n";
 
         res
     }
@@ -481,7 +482,9 @@ impl std::fmt::Display for VerifyResult {
     }
 }
 
+use crate::Config;
 use verify::*;
+
 mod verify {
     use super::super::parser::ssr;
     use serde::Deserialize;
