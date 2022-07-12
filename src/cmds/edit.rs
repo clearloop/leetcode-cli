@@ -80,7 +80,6 @@ impl Command for EditCommand {
             let question_desc = question.desc_comment(&conf) + "\n";
 
             let test_path = crate::helper::test_cases_path(&problem)?;
-            let mut file_tests = File::create(&test_path)?;
 
             let mut flag = false;
             for d in question.defs.0 {
@@ -101,6 +100,7 @@ impl Command for EditCommand {
                     )?;
 
                     if test_flag {
+                        let mut file_tests = File::create(&test_path)?;
                         file_tests.write_all(question.all_cases.as_bytes())?;
                     }
                 }
