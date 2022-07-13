@@ -140,13 +140,13 @@ mod html {
             let sup_re = regex::Regex::new(r"<sup>(?P<num>[0-9]*)</sup>").unwrap();
             let sub_re = regex::Regex::new(r"<sub>(?P<num>[0-9]*)</sub>").unwrap();
 
-            let res = sup_re.replace_all(&self, |cap: &Captures| {
-                let num: u8 = format!("{}", &cap["num"]).parse().unwrap();
+            let res = sup_re.replace_all(self, |cap: &Captures| {
+                let num: u8 = cap["num"].to_string().parse().unwrap();
                 superscript(num)
             });
 
             let res = sub_re.replace_all(&res, |cap: &Captures| {
-                let num: u8 = format!("{}", &cap["num"]).parse().unwrap();
+                let num: u8 = cap["num"].to_string().parse().unwrap();
                 subscript(num)
             });
 
