@@ -9,7 +9,7 @@ use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
 
-const DEFAULT_CONFIG: &str = r##"
+pub const DEFAULT_CONFIG: &str = r##"
 # usually you don't wanna change those
 [sys]
 categories = [
