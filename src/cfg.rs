@@ -57,6 +57,7 @@ favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
 [code]
 editor = "vim"
 lang = "rust"
+edit_code_marker = false
 comment_problem_desc = false
 comment_leading = "///"
 start_marker = "@lc code=start"
@@ -139,6 +140,7 @@ pub struct Code {
     pub editor: String,
     #[serde(rename(serialize = "editor-args", deserialize = "editor-args"))]
     pub editor_args: Option<Vec<String>>,
+    pub edit_code_marker: bool,
     pub start_marker: String,
     pub end_marker: String,
     pub comment_problem_desc: bool,

@@ -284,12 +284,16 @@ impl Cache {
 
         File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
 
-        let begin = code.find(&conf.code.start_marker);
-        let end = code.find(&conf.code.end_marker);
-        let code = if let (Some(l), Some(r)) = (begin, end) {
-            code.get((l + conf.code.start_marker.len())..r)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| code)
+        let code = if conf.code.edit_code_marker {
+            let begin = code.find(&conf.code.start_marker);
+            let end = code.find(&conf.code.end_marker);
+            if let (Some(l), Some(r)) = (begin, end) {
+                code.get((l + conf.code.start_marker.len())..r)
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| code)
+            } else {
+                code
+            }
         } else {
             code
         };

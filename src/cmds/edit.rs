@@ -89,15 +89,25 @@ impl Command for EditCommand {
                         file_code.write_all(p_desc_comment.as_bytes())?;
                         file_code.write_all(question_desc.as_bytes())?;
                     }
-                    file_code.write_all(
-                        (conf.code.comment_leading.clone() + " " + &conf.code.start_marker + "\n")
-                            .as_bytes(),
-                    )?;
+                    if conf.code.edit_code_marker {
+                        file_code.write_all(
+                            (conf.code.comment_leading.clone()
+                                + " "
+                                + &conf.code.start_marker
+                                + "\n")
+                                .as_bytes(),
+                        )?;
+                    }
                     file_code.write_all((d.code.to_string() + "\n").as_bytes())?;
-                    file_code.write_all(
-                        (conf.code.comment_leading.clone() + " " + &conf.code.end_marker + "\n")
-                            .as_bytes(),
-                    )?;
+                    if conf.code.edit_code_marker {
+                        file_code.write_all(
+                            (conf.code.comment_leading.clone()
+                                + " "
+                                + &conf.code.end_marker
+                                + "\n")
+                                .as_bytes(),
+                        )?;
+                    }
 
                     if test_flag {
                         let mut file_tests = File::create(&test_path)?;
