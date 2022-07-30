@@ -102,6 +102,7 @@ impl Command for EditCommand {
                     file_code.write_all((d.code.to_string() + "\n").as_bytes())?;
                     file_code.write_all((CODE_END.to_string() + "\n").as_bytes())?;
                 }
+
                 if test_flag {
                     file_tests.write_all(question.all_cases.as_bytes())?;
                 }
