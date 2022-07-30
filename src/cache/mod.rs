@@ -80,7 +80,7 @@ impl Cache {
         if maybe_json.is_err() && self.is_session_bad().await {
             Err(Error::CookieError)
         } else {
-            Ok(maybe_json?)
+            Ok(maybe_json.unwrap())
         }
     }
 

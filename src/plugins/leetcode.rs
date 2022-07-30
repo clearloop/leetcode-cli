@@ -30,7 +30,6 @@ impl LeetCode {
 
             headers.insert(name.unwrap(), value.unwrap());
         }
-
         Ok(headers)
     }
 
