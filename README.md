@@ -48,7 +48,7 @@ SUBCOMMANDS:
 
 ## Example
 
-For example, given this config (can be found in `~/.leetcode/leetcode.toml`):
+For example, given this config (can be found in `~/.leetcode/leetcode.toml`, it can be generated automatically with command: `leetcode list` if you are a new user):
 
 ```toml
 [code]
