@@ -256,8 +256,8 @@ pub struct VerifyResult {
     code_output: Vec<String>,
     #[serde(default, deserialize_with = "ssr")]
     expected_output: Vec<String>,
-    #[serde(default)]
-    std_output: String,
+    #[serde(default, deserialize_with = "ssr")]
+    std_output: Vec<String>,
 
     // flatten
     // #[serde(flatten, default)]
@@ -472,7 +472,7 @@ impl std::fmt::Display for VerifyResult {
                         f,
                         "{}{}",
                         &"Stdout:".after_spaces(8).purple(),
-                        &self.std_output.replace('\n', &"\n".after_spaces(15))
+                        &self.std_output[0].replace('\n', &"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
