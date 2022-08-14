@@ -7,7 +7,7 @@ use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
 use crate::helper::test_cases_path;
-use crate::{config, err::Error, plugins::LeetCode};
+use crate::{config::Config, err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
 use reqwest::Response;
@@ -376,7 +376,7 @@ impl Cache {
 
     /// New cache
     pub fn new() -> Result<Self, Error> {
-        let conf = config::locate()?;
+        let conf = Config::locate()?;
         let c = conn(conf.storage.cache()?);
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
         diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&c)?;

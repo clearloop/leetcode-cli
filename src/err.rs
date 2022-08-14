@@ -1,6 +1,6 @@
 //! Errors in leetcode-cli
 use crate::cmds::{Command, DataCommand};
-use crate::config::{root, DEFAULT_CONFIG};
+use crate::config::{Config, DEFAULT_CONFIG};
 use colored::Colorize;
 use std::fmt;
 
@@ -100,7 +100,7 @@ impl std::convert::From<serde_json::error::Error> for Error {
 // toml
 impl std::convert::From<toml::de::Error> for Error {
     fn from(_err: toml::de::Error) -> Self {
-        let conf = root().unwrap().join("leetcode_tmp.toml");
+        let conf = Config::root().unwrap().join("leetcode_tmp.toml");
         std::fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
         #[cfg(debug_assertions)]
         let err_msg = format!(

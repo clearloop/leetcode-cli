@@ -190,7 +190,7 @@ mod file {
 
     /// Generate test cases path by fid
     pub fn test_cases_path(problem: &Problem) -> Result<String, Error> {
-        let conf = crate::config::locate()?;
+        let conf = crate::config::Config::locate()?;
         let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
 
         path = path.replace("${fid}", &problem.fid.to_string());
@@ -200,7 +200,7 @@ mod file {
 
     /// Generate code path by fid
     pub fn code_path(problem: &Problem, l: Option<String>) -> Result<String, Error> {
-        let conf = crate::config::locate()?;
+        let conf = crate::config::Config::locate()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
             lang = l.ok_or(Error::NoneError)?;
@@ -223,7 +223,7 @@ mod file {
     pub fn load_script(module: &str) -> Result<String, crate::Error> {
         use std::fs::File;
         use std::io::Read;
-        let conf = crate::config::locate()?;
+        let conf = crate::config::Config::locate()?;
         let mut script = "".to_string();
         File::open(format!("{}/{}.py", conf.storage.scripts()?, module))?
             .read_to_string(&mut script)?;

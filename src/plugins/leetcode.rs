@@ -36,7 +36,7 @@ impl LeetCode {
 
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
-        let conf = config::locate()?;
+        let conf = config::Config::locate()?;
         let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
