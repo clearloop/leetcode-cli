@@ -307,33 +307,14 @@ impl Cache {
         json.insert("data_input", test_case);
 
         let url = match run {
-            Run::Test => conf
-                .sys
-                .urls
-                .get("test")
-                .ok_or(Error::NoneError)?
-                .replace("$slug", &p.slug),
+            Run::Test => conf.sys.urls.test(&p.slug),
             Run::Submit => {
                 json.insert("judge_type", "large".to_string());
-                conf.sys
-                    .urls
-                    .get("submit")
-                    .ok_or(Error::NoneError)?
-                    .replace("$slug", &p.slug)
+                conf.sys.urls.submit(&p.slug)
             }
         };
 
-        Ok((
-            json,
-            [
-                url,
-                conf.sys
-                    .urls
-                    .get("problems")
-                    .ok_or(Error::NoneError)?
-                    .replace("$slug", &p.slug),
-            ],
-        ))
+        Ok((json, [url, conf.sys.urls.problem(&p.slug)]))
     }
 
     /// TODO: The real delay

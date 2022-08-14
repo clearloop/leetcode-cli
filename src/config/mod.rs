@@ -5,36 +5,13 @@
 //!
 //! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
 //! + Use `leetcode config` to update it
-use crate::Error;
+use crate::{config::sys::Sys, Error};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
-pub const DEFAULT_CONFIG: &str = r##"
-# usually you don't wanna change those
-[sys]
-categories = [
-  "algorithms",
-  "concurrency",
-  "database",
-  "shell"
-]
+mod sys;
 
-[sys.urls]
-base = "https://leetcode.com"
-graphql = "https://leetcode.com/graphql"
-login = "https://leetcode.com/accounts/login/"
-problems = "https://leetcode.com/api/problems/$category/"
-problem = "https://leetcode.com/problems/$slug/description/"
-tag = "https://leetcode.com/tag/$slug/"
-test = "https://leetcode.com/problems/$slug/interpret_solution/"
-session = "https://leetcode.com/session/"
-submit = "https://leetcode.com/problems/$slug/submit/"
-submissions = "https://leetcode.com/api/submissions/$slug"
-submission = "https://leetcode.com/submissions/detail/$id/"
-verify = "https://leetcode.com/submissions/detail/$id/check/"
-favorites = "https://leetcode.com/list/api/questions"
-favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
-
+pub const DEFAULT_CONFIG: &str = r#"
 [code]
 editor = "vim"
 lang = "rust"
@@ -55,13 +32,13 @@ session = ""
 root = "~/.leetcode"
 scripts = "scripts"
 code = "code"
-# Relative path for the cache, otherwise use root as parent dir
 cache = "Problems"
-"##;
+"#;
 
 /// Sync with `~/.leetcode/config.toml`
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
+    #[serde(skip)]
     pub sys: Sys,
     pub code: Code,
     pub cookies: Cookies,
@@ -84,31 +61,6 @@ impl Config {
 pub struct Cookies {
     pub csrf: String,
     pub session: String,
-}
-
-/// System settings, for leetcode api mainly
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Sys {
-    pub categories: Vec<String>,
-    pub urls: HashMap<String, String>,
-}
-
-/// Leetcode API
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Urls {
-    pub base: String,
-    pub graphql: String,
-    pub login: String,
-    pub problems: String,
-    pub problem: String,
-    pub test: String,
-    pub session: String,
-    pub submit: String,
-    pub submissions: String,
-    pub submission: String,
-    pub verify: String,
-    pub favorites: String,
-    pub favorite_delete: String,
 }
 
 /// Code config
@@ -197,7 +149,7 @@ impl Storage {
 pub fn locate() -> Result<Config, crate::Error> {
     let conf = root()?.join("leetcode.toml");
     if !conf.is_file() {
-        fs::write(&conf, &DEFAULT_CONFIG[1..])?;
+        fs::write(&conf, &DEFAULT_CONFIG.trim())?;
     }
 
     let s = fs::read_to_string(&conf)?;

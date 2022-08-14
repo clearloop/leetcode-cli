@@ -44,7 +44,7 @@ impl LeetCode {
                 ("Cookie", cookies.to_string().as_str()),
                 ("x-csrftoken", &cookies.csrf),
                 ("x-requested-with", "XMLHttpRequest"),
-                ("Origin", &conf.sys.urls["base"]),
+                ("Origin", &conf.sys.urls.base),
             ],
         )?;
 
@@ -68,13 +68,7 @@ impl LeetCode {
     /// Get category problems
     pub async fn get_category_problems(self, category: &str) -> Result<Response, Error> {
         trace!("Requesting {} problems...", &category);
-        let url = &self
-            .conf
-            .sys
-            .urls
-            .get("problems")
-            .ok_or(Error::NoneError)?
-            .replace("$category", category);
+        let url = &self.conf.sys.urls.problems(category);
 
         Req {
             default_headers: self.default_headers,
@@ -91,7 +85,7 @@ impl LeetCode {
 
     pub async fn get_question_ids_by_tag(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} ref problems...", &slug);
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let url = &self.conf.sys.urls.graphql;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "getTopicTag".to_string());
         json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
@@ -111,9 +105,7 @@ impl LeetCode {
 
         Req {
             default_headers: self.default_headers,
-            refer: Some(
-                (self.conf.sys.urls.get("tag").ok_or(Error::NoneError)?).replace("$slug", slug),
-            ),
+            refer: Some(self.conf.sys.urls.tag(slug)),
             info: false,
             json: Some(json),
             mode: Mode::Post,
@@ -126,7 +118,7 @@ impl LeetCode {
 
     pub async fn get_user_info(self) -> Result<Response, Error> {
         trace!("Requesting user info...");
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let url = &self.conf.sys.urls.graphql;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "a".to_string());
         json.insert(
@@ -156,7 +148,7 @@ impl LeetCode {
     /// Get daily problem
     pub async fn get_question_daily(self) -> Result<Response, Error> {
         trace!("Requesting daily problem...");
-        let url = &self.conf.sys.urls.get("graphql").ok_or(Error::NoneError)?;
+        let url = &self.conf.sys.urls.graphql;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "daily".to_string());
         json.insert(
@@ -189,13 +181,7 @@ impl LeetCode {
     /// Get specific problem detail
     pub async fn get_question_detail(self, slug: &str) -> Result<Response, Error> {
         trace!("Requesting {} detail...", &slug);
-        let refer = self
-            .conf
-            .sys
-            .urls
-            .get("problems")
-            .ok_or(Error::NoneError)?
-            .replace("$slug", slug);
+        let refer = self.conf.sys.urls.problem(slug);
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
@@ -230,7 +216,7 @@ impl LeetCode {
             json: Some(json),
             mode: Mode::Post,
             name: "get_problem_detail",
-            url: (&self.conf.sys.urls["graphql"]).to_string(),
+            url: self.conf.sys.urls.graphql.into(),
         }
         .send(&self.client)
         .await
@@ -255,13 +241,8 @@ impl LeetCode {
     /// Get the result of submission / testing
     pub async fn verify_result(self, id: String) -> Result<Response, Error> {
         trace!("Verifying result...");
-        let url = self
-            .conf
-            .sys
-            .urls
-            .get("verify")
-            .ok_or(Error::NoneError)?
-            .replace("$id", &id);
+        let url = self.conf.sys.urls.verify(&id);
+
         Req {
             default_headers: self.default_headers,
             refer: None,
