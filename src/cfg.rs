@@ -9,7 +9,7 @@ use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, path::PathBuf};
 
-const DEFAULT_CONFIG: &str = r##"
+pub const DEFAULT_CONFIG: &str = r##"
 # usually you don't wanna change those
 [sys]
 categories = [
@@ -57,6 +57,12 @@ favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
 [code]
 editor = "vim"
 lang = "rust"
+edit_code_marker = false
+comment_problem_desc = false
+comment_leading = "///"
+start_marker = "@lc code=start"
+end_marker = "@lc code=start"
+test = true
 pick = "${fid}.${slug}"
 submission = "${fid}.${slug}.${sid}.${ac}"
 
@@ -66,10 +72,10 @@ session = ""
 
 [storage]
 root = "~/.leetcode"
-cache = "Problems"
 scripts = "scripts"
-# absolutely path for the code, other use root as parent dir
 code = "code"
+# absolutely path for the cache, other use root as parent dir
+cache = "~/.cache/leetcode"
 "##;
 
 /// Sync with `~/.leetcode/config.toml`
@@ -134,6 +140,12 @@ pub struct Code {
     pub editor: String,
     #[serde(rename(serialize = "editor-args", deserialize = "editor-args"))]
     pub editor_args: Option<Vec<String>>,
+    pub edit_code_marker: bool,
+    pub start_marker: String,
+    pub end_marker: String,
+    pub comment_problem_desc: bool,
+    pub comment_leading: String,
+    pub test: bool,
     pub lang: String,
     pub pick: String,
     pub submission: String,
@@ -163,16 +175,23 @@ impl Storage {
 
     /// get cache path
     pub fn cache(&self) -> Result<String, crate::Error> {
-        let root = &self.root()?;
-        Ok(PathBuf::from(root)
-            .join(&self.cache)
+        let home = dirs::home_dir()
+            .ok_or(Error::NoneError)?
             .to_string_lossy()
-            .to_string())
+            .to_string();
+        let path = PathBuf::from(self.cache.replace('~', &home));
+        if !path.is_dir() {
+            info!("Generate cache dir at {:?}.", &path);
+            fs::DirBuilder::new().recursive(true).create(&path)?;
+        }
+
+        Ok(path.join("Problems").to_string_lossy().to_string())
     }
 
     /// get code path
     pub fn code(&self) -> Result<String, crate::Error> {
-        let p = PathBuf::from(&self.code);
+        let root = &self.root()?;
+        let p = PathBuf::from(root).join(&self.code);
         if !PathBuf::from(&p).exists() {
             fs::create_dir(&p)?
         }

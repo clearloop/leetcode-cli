@@ -90,9 +90,46 @@ mod filter {
     }
 }
 
+pub fn superscript(n: u8) -> String {
+    match n {
+        x if x >= 10 => format!("{}{}", superscript(n / 10), superscript(n % 10)),
+        0 => "⁰".to_string(),
+        1 => "¹".to_string(),
+        2 => "²".to_string(),
+        3 => "³".to_string(),
+        4 => "⁴".to_string(),
+        5 => "⁵".to_string(),
+        6 => "⁶".to_string(),
+        7 => "⁷".to_string(),
+        8 => "⁸".to_string(),
+        9 => "⁹".to_string(),
+        _ => n.to_string(),
+    }
+}
+
+pub fn subscript(n: u8) -> String {
+    match n {
+        x if x >= 10 => format!("{}{}", subscript(n / 10), subscript(n % 10)),
+        0 => "₀".to_string(),
+        1 => "₁".to_string(),
+        2 => "₂".to_string(),
+        3 => "₃".to_string(),
+        4 => "₄".to_string(),
+        5 => "₅".to_string(),
+        6 => "₆".to_string(),
+        7 => "₇".to_string(),
+        8 => "₈".to_string(),
+        9 => "₉".to_string(),
+        _ => n.to_string(),
+    }
+}
+
 /// Render html to command-line
 mod html {
+    use crate::helper::{subscript, superscript};
+    use regex::Captures;
     use scraper::Html;
+
     /// Html render plugin
     pub trait HTML {
         fn render(&self) -> String;
@@ -100,12 +137,20 @@ mod html {
 
     impl HTML for String {
         fn render(&self) -> String {
-            let rep = self
-                .replace(r#"</sup>"#, "")
-                .replace(r#"<sup>"#, "^")
-                .replace(r#"</sub>"#, "")
-                .replace(r#"<sub>"#, "_");
-            let frag = Html::parse_fragment(rep.as_str());
+            let sup_re = regex::Regex::new(r"<sup>(?P<num>[0-9]*)</sup>").unwrap();
+            let sub_re = regex::Regex::new(r"<sub>(?P<num>[0-9]*)</sub>").unwrap();
+
+            let res = sup_re.replace_all(self, |cap: &Captures| {
+                let num: u8 = cap["num"].to_string().parse().unwrap();
+                superscript(num)
+            });
+
+            let res = sub_re.replace_all(&res, |cap: &Captures| {
+                let num: u8 = cap["num"].to_string().parse().unwrap();
+                subscript(num)
+            });
+
+            let frag = Html::parse_fragment(&res);
 
             let res = frag
                 .root_element()
