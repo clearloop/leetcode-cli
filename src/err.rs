@@ -1,6 +1,6 @@
 //! Errors in leetcode-cli
-use crate::cfg::{root, DEFAULT_CONFIG};
 use crate::cmds::{Command, DataCommand};
+use crate::config::{root, DEFAULT_CONFIG};
 use colored::Colorize;
 use std::fmt;
 

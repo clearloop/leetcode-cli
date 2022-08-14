@@ -39,6 +39,7 @@ impl Problem {
             _ => "Unknown",
         }
     }
+
     pub fn desc_comment(&self, conf: &Config) -> String {
         let mut res = String::new();
         let comment_leading = &conf.code.comment_leading;

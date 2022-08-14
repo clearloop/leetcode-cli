@@ -235,9 +235,9 @@ extern crate diesel;
 
 // show docs
 pub mod cache;
-pub mod cfg;
 pub mod cli;
 pub mod cmds;
+pub mod config;
 pub mod err;
 pub mod flag;
 pub mod helper;
@@ -247,5 +247,5 @@ pub mod pym;
 
 // re-exports
 pub use cache::Cache;
-pub use cfg::Config;
+pub use config::Config;
 pub use err::Error;

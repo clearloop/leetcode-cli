@@ -19,25 +19,6 @@ categories = [
   "shell"
 ]
 
-langs = [
-  "bash",
-  "c",
-  "cpp",
-  "csharp",
-  "golang",
-  "java",
-  "javascript",
-  "kotlin",
-  "mysql",
-  "php",
-  "python",
-  "python3",
-  "ruby",
-  "rust",
-  "scala",
-  "swift"
-]
-
 [sys.urls]
 base = "https://leetcode.com"
 graphql = "https://leetcode.com/graphql"
@@ -74,8 +55,8 @@ session = ""
 root = "~/.leetcode"
 scripts = "scripts"
 code = "code"
-# absolutely path for the cache, other use root as parent dir
-cache = "~/.cache/leetcode"
+# Relative path for the cache, otherwise use root as parent dir
+cache = "Problems"
 "##;
 
 /// Sync with `~/.leetcode/config.toml`
@@ -109,7 +90,6 @@ pub struct Cookies {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Sys {
     pub categories: Vec<String>,
-    pub langs: Vec<String>,
     pub urls: HashMap<String, String>,
 }
 
@@ -131,10 +111,7 @@ pub struct Urls {
     pub favorite_delete: String,
 }
 
-/// default editor and langs
-///
-/// + support editor: [emacs, vim]
-/// + support langs: all in config
+/// Code config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
     pub editor: String,

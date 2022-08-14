@@ -1,6 +1,6 @@
 use self::req::{Json, Mode, Req};
 use crate::{
-    cfg::{self, Config},
+    config::{self, Config},
     err::Error,
     plugins::chrome,
 };
@@ -36,7 +36,7 @@ impl LeetCode {
 
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
-        let conf = cfg::locate()?;
+        let conf = config::locate()?;
         let cookies = chrome::cookies()?;
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
