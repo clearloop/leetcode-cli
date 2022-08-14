@@ -14,6 +14,17 @@ pub struct Storage {
     scripts: Option<String>,
 }
 
+impl Default for Storage {
+    fn default() -> Self {
+        Self {
+            cache: "Problems".into(),
+            code: "code".into(),
+            scripts: Some("scripts".into()),
+            root: "~/.leetcode".into(),
+        }
+    }
+}
+
 impl Storage {
     /// convert root path
     pub fn root(&self) -> Result<String, Error> {

@@ -17,3 +17,21 @@ pub struct Code {
     pub pick: String,
     pub submission: String,
 }
+
+impl Default for Code {
+    fn default() -> Self {
+        Self {
+            editor: "vim".into(),
+            editor_args: None,
+            edit_code_marker: false,
+            start_marker: "".into(),
+            end_marker: "".into(),
+            comment_problem_desc: false,
+            comment_leading: "".into(),
+            test: true,
+            lang: "rust".into(),
+            pick: "${fid}.${slug}".into(),
+            submission: "${fid}.${slug}.${sid}.${ac}".into(),
+        }
+    }
+}

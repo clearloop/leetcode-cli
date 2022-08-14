@@ -17,32 +17,8 @@ mod cookies;
 mod storage;
 mod sys;
 
-pub const DEFAULT_CONFIG: &str = r#"
-[code]
-editor = "vim"
-lang = "rust"
-edit_code_marker = false
-comment_problem_desc = false
-comment_leading = "///"
-start_marker = "@lc code=start"
-end_marker = "@lc code=start"
-test = true
-pick = "${fid}.${slug}"
-submission = "${fid}.${slug}.${sid}.${ac}"
-
-[cookies]
-csrf = ""
-session = ""
-
-[storage]
-root = "~/.leetcode"
-scripts = "scripts"
-code = "code"
-cache = "Problems"
-"#;
-
 /// Sync with `~/.leetcode/config.toml`
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Config {
     #[serde(skip)]
     pub sys: Sys,
@@ -56,7 +32,7 @@ impl Config {
     pub fn locate() -> Result<Config, crate::Error> {
         let conf = Self::root()?.join("leetcode.toml");
         if !conf.is_file() {
-            fs::write(&conf, &DEFAULT_CONFIG.trim())?;
+            fs::write(&conf, toml::ser::to_string_pretty(&Self::default())?)?;
         }
 
         let s = fs::read_to_string(&conf)?;
