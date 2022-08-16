@@ -19,6 +19,7 @@ pub enum Error {
     DecryptError,
     SilentError,
     NoneError,
+    ChromeNotLogin,
 }
 
 impl std::fmt::Debug for Error {
@@ -57,7 +58,8 @@ impl std::fmt::Debug for Error {
             Error::NoneError => write!(f,
                 "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
-            )
+            ),
+            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry.")
         }
     }
 }
