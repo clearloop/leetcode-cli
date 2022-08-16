@@ -85,10 +85,10 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     }
 
     Ok(Ident {
-        csrf: m.get("csrftoken").ok_or(Error::NoneError)?.to_string(),
+        csrf: m.get("csrftoken").ok_or(Error::ChromeNotLogin)?.to_string(),
         session: m
             .get("LEETCODE_SESSION")
-            .ok_or(Error::NoneError)?
+            .ok_or(Error::ChromeNotLogin)?
             .to_string(),
     })
 }
