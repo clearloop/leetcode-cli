@@ -1,4 +1,5 @@
 //! Errors in leetcode-cli
+use crate::cfg::{root, DEFAULT_CONFIG};
 use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
 use std::fmt;
@@ -18,6 +19,7 @@ pub enum Error {
     DecryptError,
     SilentError,
     NoneError,
+    ChromeNotLogin,
 }
 
 impl std::fmt::Debug for Error {
@@ -56,7 +58,8 @@ impl std::fmt::Debug for Error {
             Error::NoneError => write!(f,
                 "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
-            )
+            ),
+            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry.")
         }
     }
 }
@@ -98,19 +101,31 @@ impl std::convert::From<serde_json::error::Error> for Error {
 
 // toml
 impl std::convert::From<toml::de::Error> for Error {
-    fn from(err: toml::de::Error) -> Self {
-        Error::ParseError(format!(
-            "{}, {}{}{}{}{}{}{}{}",
-            err,
+    fn from(_err: toml::de::Error) -> Self {
+        let conf = root().unwrap().join("leetcode_tmp.toml");
+        std::fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
+        #[cfg(debug_assertions)]
+        let err_msg = format!(
+            "{}, {}{}{}{}{}{}",
+            _err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
             "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
             " the current one at ",
             "~/.leetcode/leetcode.toml".yellow().bold().underline(),
-            "seems missing some keys, please compare to ",
-            "the tmp one and add them up : )\n",
-            ".",
-        ))
+            " seems missing some keys, Please compare the new file and add the missing keys.\n",
+        );
+        #[cfg(not(debug_assertions))]
+        let err_msg = format!(
+            "{}{}{}{}{}{}",
+            "Parse config file failed, ",
+            "leetcode-cli has just generated a new leetcode.toml at ",
+            "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
+            " the current one at ",
+            "~/.leetcode/leetcode.toml".yellow().bold().underline(),
+            " seems missing some keys, Please compare the new file and add the missing keys.\n",
+        );
+        Error::ParseError(err_msg)
     }
 }
 
