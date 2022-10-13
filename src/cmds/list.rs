@@ -189,6 +189,11 @@ impl Command for ListCommand {
             ps.retain(|x| x.name.to_lowercase().contains(&lowercase_kw));
         }
 
+        // output problem lines sorted by [problem number] like
+        // [ 1 ] Two Sum
+        // [ 2 ] Add Two Numbers
+        ps.sort_unstable_by_key(|p| p.fid);
+
         let out: Vec<String> = ps.iter().map(ToString::to_string).collect();
         println!("{}", out.join("\n"));
 
