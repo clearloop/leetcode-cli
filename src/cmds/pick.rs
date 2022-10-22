@@ -43,37 +43,37 @@ s = starred  S = not starred"#;
 #[async_trait]
 impl Command for PickCommand {
     /// `pick` usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("pick")
             .about("Pick a problem")
             .visible_alias("p")
-            .arg(Arg::with_name("id").help("Problem id").takes_value(true))
+            .arg(Arg::new("id").help("Problem id").num_args(1))
             .arg(
-                Arg::with_name("plan")
+                Arg::new("plan")
                     .short('p')
                     .long("plan")
-                    .takes_value(true)
+                    .num_args(1)
                     .help("Invoking python scripts to filter questions"),
             )
             .arg(
-                Arg::with_name("query")
+                Arg::new("query")
                     .short('q')
                     .long("query")
-                    .takes_value(true)
+                    .num_args(1)
                     .help(QUERY_HELP),
             )
             .arg(
-                Arg::with_name("tag")
+                Arg::new("tag")
                     .short('t')
                     .long("tag")
-                    .takes_value(true)
+                    .num_args(1)
                     .help("Filter questions by tag"),
             )
             .arg(
-                Arg::with_name("daily")
+                Arg::new("daily")
                     .short('d')
                     .long("daily")
-                    .takes_value(false)
+                    .num_args(1)
                     .help("Pick today's daily challenge"),
             )
     }
@@ -96,7 +96,7 @@ impl Command for PickCommand {
         #[cfg(feature = "pym")]
         {
             if m.contains_id("plan") {
-                let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+                let ids = crate::pym::exec(m.get_one::<&str>("plan").unwrap_or(&""))?;
                 crate::helper::squash(&mut problems, ids)?;
             }
         }
@@ -105,14 +105,14 @@ impl Command for PickCommand {
         if m.contains_id("tag") {
             let ids = cache
                 .clone()
-                .get_tagged_questions(m.value_of("tag").unwrap_or(""))
+                .get_tagged_questions(m.get_one::<&str>("tag").unwrap_or(&""))
                 .await?;
             crate::helper::squash(&mut problems, ids)?;
         }
 
         // query filter
         if m.contains_id("query") {
-            let query = m.value_of("query").ok_or(Error::NoneError)?;
+            let query = m.get_one::<&str>("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut problems, query.to_string());
         }
 
@@ -123,7 +123,7 @@ impl Command for PickCommand {
         };
 
         let fid = m
-            .value_of("id")
+            .get_one::<&str>("id")
             .and_then(|id| id.parse::<i32>().ok())
             .or(daily_id)
             .unwrap_or_else(|| {

@@ -25,13 +25,13 @@ pub struct ExecCommand;
 #[async_trait]
 impl Command for ExecCommand {
     /// `exec` usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("exec")
             .about("Submit solution")
             .visible_alias("x")
             .arg(
-                Arg::with_name("id")
-                    .takes_value(true)
+                Arg::new("id")
+                    .num_args(1)
                     .required(true)
                     .help("question id"),
             )
@@ -41,7 +41,7 @@ impl Command for ExecCommand {
     async fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
-        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
+        let id: i32 = m.get_one::<&str>("id").ok_or(Error::NoneError)?.parse()?;
         let cache = Cache::new()?;
         let res = cache.exec_problem(id, Run::Submit, None).await?;
 

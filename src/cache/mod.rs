@@ -55,7 +55,7 @@ impl Cache {
     }
 
     pub fn update_after_ac(self, rid: i32) -> Result<(), Error> {
-        let c = conn((&self.0.conf.storage.cache()?).to_owned());
+        let c = conn(self.0.conf.storage.cache()?);
         let target = problems.filter(id.eq(rid));
         diesel::update(target).set(status.eq("ac")).execute(&c)?;
         Ok(())
