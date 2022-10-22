@@ -51,7 +51,11 @@ impl Command for EditCommand {
         use std::io::Write;
         use std::path::Path;
 
-        let id: i32 = m.get_one::<&str>("id").ok_or(Error::NoneError)?.parse()?;
+        let id: i32 = m
+            .get_one::<String>("id")
+            .map(|s| s.as_str())
+            .ok_or(Error::NoneError)?
+            .parse()?;
         let cache = Cache::new()?;
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
@@ -62,7 +66,8 @@ impl Command for EditCommand {
         // condition language
         if m.contains_id("lang") {
             conf.code.lang = m
-                .get_one::<&str>("lang")
+                .get_one::<String>("lang")
+                .map(|s| s.as_str())
                 .ok_or(Error::NoneError)?
                 .to_string();
             conf.sync()?;

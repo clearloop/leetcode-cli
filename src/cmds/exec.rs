@@ -41,7 +41,11 @@ impl Command for ExecCommand {
     async fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
         use crate::cache::{Cache, Run};
 
-        let id: i32 = m.get_one::<&str>("id").ok_or(Error::NoneError)?.parse()?;
+        let id: i32 = m
+            .get_one::<String>("id")
+            .map(|s| s.as_str())
+            .ok_or(Error::NoneError)?
+            .parse()?;
         let cache = Cache::new()?;
         let res = cache.exec_problem(id, Run::Submit, None).await?;
 

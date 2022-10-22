@@ -156,7 +156,7 @@ impl Command for ListCommand {
         // filter tag
         if m.contains_id("tag") {
             let ids = cache
-                .get_tagged_questions(m.get_one::<&str>("tag").copied().unwrap_or(""))
+                .get_tagged_questions(m.get_one::<String>("tag").map(|s| s.as_str()).unwrap_or(""))
                 .await?;
             crate::helper::squash(&mut ps, ids)?;
         }
@@ -165,15 +165,18 @@ impl Command for ListCommand {
         if m.contains_id("category") {
             ps.retain(|x| {
                 x.category
-                    == m.get_one::<&str>("category")
-                        .copied()
+                    == m.get_one::<String>("category")
+                        .map(|s| s.as_str())
                         .unwrap_or("algorithms")
             });
         }
 
         // filter query
         if m.contains_id("query") {
-            let query = m.get_one::<&str>("query").ok_or(Error::NoneError)?;
+            let query = m
+                .get_one::<String>("query")
+                .map(|s| s.as_str())
+                .ok_or(Error::NoneError)?;
             crate::helper::filter(&mut ps, query.to_string());
         }
 
@@ -189,7 +192,7 @@ impl Command for ListCommand {
         }
 
         // retain if keyword exists
-        if let Some(keyword) = m.get_one::<&str>("keyword") {
+        if let Some(keyword) = m.get_one::<String>("keyword").map(|s| s.as_str()) {
             let lowercase_kw = keyword.to_lowercase();
             ps.retain(|x| x.name.to_lowercase().contains(&lowercase_kw));
         }

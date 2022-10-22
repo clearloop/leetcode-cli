@@ -46,8 +46,12 @@ impl Command for TestCommand {
     /// `test` handler
     async fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::{Cache, Run};
-        let id: i32 = m.get_one::<&str>("id").ok_or(Error::NoneError)?.parse()?;
-        let testcase = m.get_one::<&str>("testcase");
+        let id: i32 = m
+            .get_one::<String>("id")
+            .map(|s| s.as_str())
+            .ok_or(Error::NoneError)?
+            .parse()?;
+        let testcase = m.get_one::<String>("testcase").map(|s| s.as_str());
         let case_str: Option<String> = match testcase {
             Some(case) => Option::from(case.replace("\\n", "\n")),
             _ => None,
