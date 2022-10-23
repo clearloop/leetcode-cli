@@ -2,7 +2,7 @@
 use super::Command;
 use crate::{cache::Cache, helper::Digit, Error};
 use async_trait::async_trait;
-use clap::{Arg, ArgMatches, Command as ClapCommand};
+use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 use colored::Colorize;
 
 /// Abstract `data` command
@@ -25,23 +25,25 @@ pub struct DataCommand;
 #[async_trait]
 impl Command for DataCommand {
     /// `data` command usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("data")
             .about("Manage Cache")
             .visible_alias("d")
             .arg(
-                Arg::with_name("delete")
+                Arg::new("delete")
                     .display_order(1)
                     .short('d')
                     .long("delete")
-                    .help("Delete cache"),
+                    .help("Delete cache")
+                    .action(ArgAction::SetTrue),
             )
             .arg(
-                Arg::with_name("update")
+                Arg::new("update")
                     .display_order(2)
                     .short('u')
                     .long("update")
-                    .help("Update cache"),
+                    .help("Update cache")
+                    .action(ArgAction::SetTrue),
             )
     }
 
@@ -73,13 +75,13 @@ impl Command for DataCommand {
         title.push_str(&"-".repeat(65));
 
         let mut flags = 0;
-        if m.contains_id("delete") {
+        if m.get_flag("delete") {
             flags += 1;
             cache.clean()?;
             println!("{}", "ok!".bright_green());
         }
 
-        if m.contains_id("update") {
+        if m.get_flag("update") {
             flags += 1;
             cache.update().await?;
             println!("{}", "ok!".bright_green());
