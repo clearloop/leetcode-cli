@@ -40,6 +40,7 @@ impl Command for EditCommand {
                 Arg::new("id")
                     .num_args(1)
                     .required(true)
+                    .value_parser(clap::value_parser!(i32))
                     .help("question id"),
             )
     }
@@ -51,11 +52,7 @@ impl Command for EditCommand {
         use std::io::Write;
         use std::path::Path;
 
-        let id: i32 = m
-            .get_one::<String>("id")
-            .map(|s| s.as_str())
-            .ok_or(Error::NoneError)?
-            .parse()?;
+        let id = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
         let cache = Cache::new()?;
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
@@ -67,7 +64,6 @@ impl Command for EditCommand {
         if m.contains_id("lang") {
             conf.code.lang = m
                 .get_one::<String>("lang")
-                .map(|s| s.as_str())
                 .ok_or(Error::NoneError)?
                 .to_string();
             conf.sync()?;

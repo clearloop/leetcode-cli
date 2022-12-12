@@ -102,6 +102,7 @@ impl Command for ListCommand {
                     .short('r')
                     .long("range")
                     .num_args(2..)
+                    .value_parser(clap::value_parser!(i32))
                     .help("Filter questions by id range"),
             )
             .after_help(LIST_AFTER_HELP)
@@ -148,7 +149,7 @@ impl Command for ListCommand {
         #[cfg(feature = "pym")]
         {
             if m.contains_id("plan") {
-                let ids = crate::pym::exec(m.value_of("plan").unwrap_or(""))?;
+                let ids = crate::pym::exec(m.get_one::<String>("plan").unwrap_or(&"".to_string()))?;
                 crate::helper::squash(&mut ps, ids)?;
             }
         }
@@ -156,7 +157,7 @@ impl Command for ListCommand {
         // filter tag
         if m.contains_id("tag") {
             let ids = cache
-                .get_tagged_questions(m.get_one::<String>("tag").map(|s| s.as_str()).unwrap_or(""))
+                .get_tagged_questions(m.get_one::<String>("tag").unwrap_or(&"".to_string()))
                 .await?;
             crate::helper::squash(&mut ps, ids)?;
         }
@@ -165,34 +166,31 @@ impl Command for ListCommand {
         if m.contains_id("category") {
             ps.retain(|x| {
                 x.category
-                    == m.get_one::<String>("category")
-                        .map(|s| s.as_str())
-                        .unwrap_or("algorithms")
+                    == *m
+                        .get_one::<String>("category")
+                        .unwrap_or(&"algorithms".to_string())
             });
         }
 
         // filter query
         if m.contains_id("query") {
-            let query = m
-                .get_one::<String>("query")
-                .map(|s| s.as_str())
-                .ok_or(Error::NoneError)?;
+            let query = m.get_one::<String>("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut ps, query.to_string());
         }
 
         // filter range
         if m.contains_id("range") {
             let num_range: Vec<i32> = m
-                .get_many::<String>("range")
+                .get_many::<i32>("range")
                 .ok_or(Error::NoneError)?
+                .map(|id| *id)
                 .into_iter()
-                .map(|x| x.parse::<i32>().unwrap_or(0))
                 .collect();
             ps.retain(|x| num_range[0] <= x.fid && x.fid <= num_range[1]);
         }
 
         // retain if keyword exists
-        if let Some(keyword) = m.get_one::<String>("keyword").map(|s| s.as_str()) {
+        if let Some(keyword) = m.get_one::<String>("keyword") {
             let lowercase_kw = keyword.to_lowercase();
             ps.retain(|x| x.name.to_lowercase().contains(&lowercase_kw));
         }

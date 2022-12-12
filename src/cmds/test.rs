@@ -33,6 +33,7 @@ impl Command for TestCommand {
                 Arg::new("id")
                     .num_args(1)
                     .required(true)
+                    .value_parser(clap::value_parser!(i32))
                     .help("question id"),
             )
             .arg(
@@ -46,12 +47,8 @@ impl Command for TestCommand {
     /// `test` handler
     async fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::{Cache, Run};
-        let id: i32 = m
-            .get_one::<String>("id")
-            .map(|s| s.as_str())
-            .ok_or(Error::NoneError)?
-            .parse()?;
-        let testcase = m.get_one::<String>("testcase").map(|s| s.as_str());
+        let id: i32 = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
+        let testcase = m.get_one::<String>("testcase");
         let case_str: Option<String> = match testcase {
             Some(case) => Option::from(case.replace("\\n", "\n")),
             _ => None,
