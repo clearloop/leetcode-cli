@@ -23,7 +23,7 @@ pub fn reset_signal_pipe_handler() {
     }
 }
 
-/// Get maches
+/// Get matches
 pub async fn main() -> Result<(), Error> {
     reset_signal_pipe_handler();
     let m = clap::Command::new(crate_name!())
