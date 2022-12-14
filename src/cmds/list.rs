@@ -36,7 +36,7 @@
 use super::Command;
 use crate::{cache::Cache, err::Error, helper::Digit};
 use async_trait::async_trait;
-use clap::{Arg, ArgMatches, Command as ClapCommand};
+use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 /// Abstract `list` command
 ///
 /// ## handler
@@ -72,56 +72,56 @@ static LIST_AFTER_HELP: &str = r#"EXAMPLES:
 #[async_trait]
 impl Command for ListCommand {
     /// `list` command usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("list")
             .about("List problems")
             .visible_alias("l")
             .arg(
-                Arg::with_name("category")
+                Arg::new("category")
                     .short('c')
                     .long("category")
-                    .takes_value(true)
+                    .num_args(1)
                     .help(CATEGORY_HELP),
             )
             .arg(
-                Arg::with_name("plan")
+                Arg::new("plan")
                     .short('p')
                     .long("plan")
-                    .takes_value(true)
+                    .num_args(1)
                     .help("Invoking python scripts to filter questions"),
             )
             .arg(
-                Arg::with_name("query")
+                Arg::new("query")
                     .short('q')
                     .long("query")
-                    .takes_value(true)
+                    .num_args(1)
                     .help(QUERY_HELP),
             )
             .arg(
-                Arg::with_name("range")
+                Arg::new("range")
                     .short('r')
                     .long("range")
-                    .takes_value(true)
-                    .min_values(2)
+                    .num_args(2..)
                     .help("Filter questions by id range"),
             )
             .after_help(LIST_AFTER_HELP)
             .arg(
-                Arg::with_name("stat")
+                Arg::new("stat")
                     .short('s')
                     .long("stat")
-                    .help("Show statistics of listed problems"),
+                    .help("Show statistics of listed problems")
+                    .action(ArgAction::SetTrue),
             )
             .arg(
-                Arg::with_name("tag")
+                Arg::new("tag")
                     .short('t')
                     .long("tag")
-                    .takes_value(true)
+                    .num_args(1)
                     .help("Filter questions by tag"),
             )
             .arg(
-                Arg::with_name("keyword")
-                    .takes_value(true)
+                Arg::new("keyword")
+                    .num_args(1)
                     .help("Keyword in select query"),
             )
     }
@@ -156,26 +156,34 @@ impl Command for ListCommand {
         // filter tag
         if m.contains_id("tag") {
             let ids = cache
-                .get_tagged_questions(m.value_of("tag").unwrap_or(""))
+                .get_tagged_questions(m.get_one::<String>("tag").map(|s| s.as_str()).unwrap_or(""))
                 .await?;
             crate::helper::squash(&mut ps, ids)?;
         }
 
         // filter category
         if m.contains_id("category") {
-            ps.retain(|x| x.category == m.value_of("category").unwrap_or("algorithms"));
+            ps.retain(|x| {
+                x.category
+                    == m.get_one::<String>("category")
+                        .map(|s| s.as_str())
+                        .unwrap_or("algorithms")
+            });
         }
 
         // filter query
         if m.contains_id("query") {
-            let query = m.value_of("query").ok_or(Error::NoneError)?;
+            let query = m
+                .get_one::<String>("query")
+                .map(|s| s.as_str())
+                .ok_or(Error::NoneError)?;
             crate::helper::filter(&mut ps, query.to_string());
         }
 
         // filter range
         if m.contains_id("range") {
             let num_range: Vec<i32> = m
-                .values_of("range")
+                .get_many::<String>("range")
                 .ok_or(Error::NoneError)?
                 .into_iter()
                 .map(|x| x.parse::<i32>().unwrap_or(0))
@@ -184,10 +192,15 @@ impl Command for ListCommand {
         }
 
         // retain if keyword exists
-        if let Some(keyword) = m.value_of("keyword") {
+        if let Some(keyword) = m.get_one::<String>("keyword").map(|s| s.as_str()) {
             let lowercase_kw = keyword.to_lowercase();
             ps.retain(|x| x.name.to_lowercase().contains(&lowercase_kw));
         }
+
+        // output problem lines sorted by [problem number] like
+        // [ 1 ] Two Sum
+        // [ 2 ] Add Two Numbers
+        ps.sort_unstable_by_key(|p| p.fid);
 
         let out: Vec<String> = ps.iter().map(ToString::to_string).collect();
         println!("{}", out.join("\n"));

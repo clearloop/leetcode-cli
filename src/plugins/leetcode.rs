@@ -230,7 +230,7 @@ impl LeetCode {
             json: Some(json),
             mode: Mode::Post,
             name: "get_problem_detail",
-            url: (&self.conf.sys.urls["graphql"]).to_string(),
+            url: self.conf.sys.urls["graphql"].to_string(),
         }
         .send(&self.client)
         .await

@@ -22,7 +22,7 @@ pub struct StatCommand;
 #[async_trait]
 impl Command for StatCommand {
     /// `stat` usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("stat")
             .about("Show simple chart about submissions")
             .visible_alias("s")
