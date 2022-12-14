@@ -47,7 +47,12 @@ impl Command for PickCommand {
         ClapCommand::new("pick")
             .about("Pick a problem")
             .visible_alias("p")
-            .arg(Arg::new("id").help("Problem id").num_args(1))
+            .arg(
+                Arg::new("id")
+                    .value_parser(clap::value_parser!(i32))
+                    .help("Problem id")
+                    .num_args(1),
+            )
             .arg(
                 Arg::new("plan")
                     .short('p')
@@ -96,11 +101,7 @@ impl Command for PickCommand {
         #[cfg(feature = "pym")]
         {
             if m.contains_id("plan") {
-                let ids = crate::pym::exec(
-                    m.get_one::<String>("plan")
-                        .map(|s| s.as_str())
-                        .unwrap_or(""),
-                )?;
+                let ids = crate::pym::exec(m.get_one::<String>("plan").unwrap_or(&"".to_string()))?;
                 crate::helper::squash(&mut problems, ids)?;
             }
         }
@@ -109,17 +110,14 @@ impl Command for PickCommand {
         if m.contains_id("tag") {
             let ids = cache
                 .clone()
-                .get_tagged_questions(m.get_one::<String>("tag").map(|s| s.as_str()).unwrap_or(""))
+                .get_tagged_questions(m.get_one::<String>("tag").unwrap_or(&"".to_string()))
                 .await?;
             crate::helper::squash(&mut problems, ids)?;
         }
 
         // query filter
         if m.contains_id("query") {
-            let query = m
-                .get_one::<String>("query")
-                .map(|s| s.as_str())
-                .ok_or(Error::NoneError)?;
+            let query = m.get_one::<String>("query").ok_or(Error::NoneError)?;
             crate::helper::filter(&mut problems, query.to_string());
         }
 
@@ -130,9 +128,8 @@ impl Command for PickCommand {
         };
 
         let fid = m
-            .get_one::<String>("id")
-            .map(|s| s.as_str())
-            .and_then(|id| id.parse::<i32>().ok())
+            .get_one::<i32>("id")
+            .map(|id| *id)
             .or(daily_id)
             .unwrap_or_else(|| {
                 // Pick random without specify id

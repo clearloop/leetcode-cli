@@ -290,7 +290,7 @@ impl std::fmt::Display for VerifyResult {
 
         match &self.status.status_code {
             10 => {
-                if self.correct_answer {
+                if matches!(self.result_type, Run::Test) && self.correct_answer {
                     // Pass Tests
                     write!(
                         f,
@@ -305,9 +305,12 @@ impl std::fmt::Display for VerifyResult {
                         &"\nExpected:".after_spaces(6),
                         eca,
                     )?
-                } else if !self.submit.compare_result.is_empty() {
+                } else if matches!(self.result_type, Run::Submit)
+                    && !self.submit.compare_result.is_empty()
+                {
+                    // only Submit execute this branch
                     // Submit Successfully
-                    // TODO: result shoule be all 1;
+                    // TODO: result should be all 1;
                     // Lines below are sucks...
                     let cache = super::Cache::new().expect("cache gen failed");
                     cache
@@ -315,7 +318,7 @@ impl std::fmt::Display for VerifyResult {
                             self.submit
                                 .question_id
                                 .parse()
-                                .expect("submit succcessfully, parse question_id to i32 failed"),
+                                .expect("submit successfully, parse question_id to i32 failed"),
                         )
                         .expect("update ac to cache failed");
 
