@@ -8,6 +8,7 @@ use crate::{
     flag::{Debug, Flag},
 };
 use clap::{crate_name, crate_version};
+use log::LevelFilter;
 
 /// This should be called before calling any cli method or printing any output.
 pub fn reset_signal_pipe_handler() {
@@ -41,10 +42,11 @@ pub async fn main() -> Result<(), Error> {
         .arg_required_else_help(true)
         .get_matches();
 
-    if m.contains_id("debug") {
+    if m.get_flag("debug") {
         Debug::handler()?;
     } else {
-        env_logger::Builder::from_env(env_logger::Env::new().default_filter_or("info"))
+        env_logger::Builder::new()
+            .filter_level(LevelFilter::Info)
             .format_timestamp(None)
             .init();
     }

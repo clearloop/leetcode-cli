@@ -7,7 +7,7 @@
 //!     -V, --version    Prints version information
 //! ```
 use crate::err::Error;
-use clap::Arg;
+use clap::{Arg, ArgAction};
 use env_logger::Env;
 
 /// Abstract flag trait
@@ -25,10 +25,11 @@ impl Flag for Debug {
             .short('d')
             .long("debug")
             .help("debug mode")
+            .action(ArgAction::SetTrue)
     }
 
     fn handler() -> Result<(), Error> {
-        env_logger::Builder::from_env(Env::default().default_filter_or("leetcode")).init();
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
 
         Ok(())
     }
