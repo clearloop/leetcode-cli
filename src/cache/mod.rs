@@ -123,7 +123,7 @@ impl Cache {
     }
 
     /// Get problem from name
-    pub fn get_problem_from_name(&self, problem_name: &String) -> Result<Problem, Error> {
+    pub fn get_problem_id_from_name(&self, problem_name: &String) -> Result<i32, Error> {
         let p: Problem = problems
             .filter(name.eq(problem_name))
             .first(&self.conn()?)?;
@@ -132,7 +132,7 @@ impl Cache {
                 "Not support database and shell questions for now".to_string(),
             ));
         }
-        Ok(p)
+        Ok(p.fid)
     }
 
     /// Get daily problem
