@@ -76,6 +76,10 @@ leetcode pick 1
 ```
 
 ```sh
+leetcode pick --name "Two Sum"
+```
+
+```sh
 [1] Two Sum is on the run...
 
 
