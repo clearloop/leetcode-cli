@@ -159,10 +159,17 @@ impl Command for PickCommand {
                         let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
                         problem.fid
                     });
+
+        let id = match fid {
+            Ok(id) => id,
+            Err(_) => {
+                // Pick random without specify id
+                let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
+                problem.fid
             }
         };
 
-        let r = cache.get_question(fid).await;
+        let r = cache.get_question(id).await;
 
         match r {
             Ok(q) => println!("{}", q.desc()),
