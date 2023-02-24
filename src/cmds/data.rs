@@ -1,6 +1,6 @@
 //! Cache managger
 use super::Command;
-use crate::{cache::Cache, helper::Digit, Error};
+use crate::{cache::Cache, helper::Digit, Config, Error};
 use async_trait::async_trait;
 use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 use colored::Colorize;
@@ -53,7 +53,7 @@ impl Command for DataCommand {
         use std::path::Path;
 
         let cache = Cache::new()?;
-        let path = cache.0.conf.storage.cache()?;
+        let path = Config::problems_filepath()?;
         let f = File::open(&path)?;
         let len = format!("{}K", f.metadata()?.len() / 1000);
 

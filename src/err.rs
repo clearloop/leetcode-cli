@@ -1,6 +1,8 @@
 //! Errors in leetcode-cli
-use crate::cfg::{root, DEFAULT_CONFIG};
-use crate::cmds::{Command, DataCommand};
+use crate::{
+    cmds::{Command, DataCommand},
+    Config,
+};
 use colored::Colorize;
 use std::fmt;
 
@@ -102,17 +104,27 @@ impl std::convert::From<serde_json::error::Error> for Error {
 // toml
 impl std::convert::From<toml::de::Error> for Error {
     fn from(_err: toml::de::Error) -> Self {
-        let conf = root().unwrap().join("leetcode_tmp.toml");
-        std::fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
+        let conf = Config::config_dir().join("leetcode_tmp.toml");
+        std::fs::write(
+            &conf,
+            toml::ser::to_string_pretty(&Config::default()).unwrap(),
+        )
+        .unwrap();
         #[cfg(debug_assertions)]
         let err_msg = format!(
             "{}, {}{}{}{}{}{}",
             _err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
-            "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
+            conf.to_str().unwrap().green().bold().underline(),
             " the current one at ",
-            "~/.leetcode/leetcode.toml".yellow().bold().underline(),
+            Config::config_dir()
+                .join("leetcode.toml")
+                .to_str()
+                .unwrap()
+                .yellow()
+                .bold()
+                .underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",
         );
         #[cfg(not(debug_assertions))]
@@ -120,9 +132,15 @@ impl std::convert::From<toml::de::Error> for Error {
             "{}{}{}{}{}{}",
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
-            "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
+            conf.to_str().unwrap().green().bold().underline(),
             " the current one at ",
-            "~/.leetcode/leetcode.toml".yellow().bold().underline(),
+            Config::config_dir()
+                .join("leetcode.toml")
+                .to_str()
+                .unwrap()
+                .yellow()
+                .bold()
+                .underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",
         );
         Error::ParseError(err_msg)

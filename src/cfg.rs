@@ -3,103 +3,108 @@
 //! leetcode-cli will generate a `leetcode.toml` by default,
 //! if you wanna change to it, you can:
 //!
-//! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
+//! + Inspect code and problems at `cache_dir` directory:
+//! |Platform | Value                               | Example                      |
+//! | ------- | ----------------------------------- | ---------------------------- |
+//! | Unix    | `$XDG_CACHE_HOME` or `$HOME`/.cache | /home/alice/.cache           |
+//! | Windows | `{FOLDERID_LocalAppData}`           | C:\Users\Alice\AppData\Local |
+//!
+//! + Edit leetcode.toml at `config_dir` directly:
+//! |Platform | Value                                 | Example                                  |
+//! | ------- | ------------------------------------- | ---------------------------------------- |
+//! | Unix    | `$XDG_CONFIG_HOME` or `$HOME`/.config | /home/alice/.config                      |
+//! | Windows | `{FOLDERID_RoamingAppData}`           | C:\Users\Alice\AppData\Roaming           |
+//!
 //! + Use `leetcode config` to update it
 use crate::Error;
+use etcetera::base_strategy::{choose_base_strategy, BaseStrategy};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs, path::PathBuf};
-
-pub const DEFAULT_CONFIG: &str = r##"
-# usually you don't wanna change those
-[sys]
-categories = [
-  "algorithms",
-  "concurrency",
-  "database",
-  "shell"
-]
-
-langs = [
-  "bash",
-  "c",
-  "cpp",
-  "csharp",
-  "golang",
-  "java",
-  "javascript",
-  "kotlin",
-  "mysql",
-  "php",
-  "python",
-  "python3",
-  "ruby",
-  "rust",
-  "scala",
-  "swift"
-]
-
-[sys.urls]
-base = "https://leetcode.com"
-graphql = "https://leetcode.com/graphql"
-login = "https://leetcode.com/accounts/login/"
-problems = "https://leetcode.com/api/problems/$category/"
-problem = "https://leetcode.com/problems/$slug/description/"
-tag = "https://leetcode.com/tag/$slug/"
-test = "https://leetcode.com/problems/$slug/interpret_solution/"
-session = "https://leetcode.com/session/"
-submit = "https://leetcode.com/problems/$slug/submit/"
-submissions = "https://leetcode.com/api/submissions/$slug"
-submission = "https://leetcode.com/submissions/detail/$id/"
-verify = "https://leetcode.com/submissions/detail/$id/check/"
-favorites = "https://leetcode.com/list/api/questions"
-favorite_delete = "https://leetcode.com/list/api/questions/$hash/$id"
-
-[code]
-editor = "vim"
-lang = "rust"
-edit_code_marker = false
-comment_problem_desc = false
-comment_leading = "///"
-start_marker = "@lc code=start"
-end_marker = "@lc code=start"
-test = true
-pick = "${fid}.${slug}"
-submission = "${fid}.${slug}.${sid}.${ac}"
-
-[cookies]
-csrf = ""
-session = ""
-
-[storage]
-root = "~/.leetcode"
-scripts = "scripts"
-code = "code"
-# absolutely path for the cache, other use root as parent dir
-cache = "~/.cache/leetcode"
-"##;
+use std::{fs, path::PathBuf};
 
 /// Sync with `~/.leetcode/config.toml`
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub sys: Sys,
     pub code: Code,
     pub cookies: Cookies,
-    pub storage: Storage,
 }
 
 impl Config {
     /// Sync new config to config.toml
     pub fn sync(&self) -> Result<(), Error> {
-        let home = dirs::home_dir().ok_or(Error::NoneError)?;
-        let conf = home.join(".leetcode/leetcode.toml");
+        let conf = Self::config_dir().join("leetcode.toml");
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
 
         Ok(())
     }
+
+    pub fn home_dir() -> PathBuf {
+        etcetera::home_dir().expect("Unable to find the home directory!")
+    }
+
+    /// config_dir for `leetcode.toml`
+    pub fn config_dir() -> PathBuf {
+        let strategy = choose_base_strategy().expect("Unable to find the config directory!");
+        let mut path = strategy.config_dir();
+        path.push("leetcode");
+        path
+    }
+
+    /// create `config_dir` if not exists, and serialize default `Config` to it.
+    pub fn config_content() -> Result<Config, Error> {
+        let config_filepath = Self::config_dir();
+        if !config_filepath.exists() {
+            fs::create_dir_all(&config_filepath)?;
+        }
+        let config_filepath = config_filepath.join("leetcode.toml");
+        match fs::read_to_string(&config_filepath) {
+            Ok(s) => Ok(toml::from_str(&s)?),
+            Err(_) => {
+                // serialize default config
+                let def_config = Config::default();
+                fs::write(config_filepath, toml::ser::to_string_pretty(&def_config)?)?;
+                Ok(def_config)
+            }
+        }
+    }
+
+    pub fn script_dir_or_create() -> Result<String, Error> {
+        let script_dir = Self::config_dir().join("scripts");
+        if !script_dir.exists() {
+            fs::create_dir_all(&script_dir)?;
+        }
+        Ok(script_dir.to_string_lossy().to_string())
+    }
+
+    /// cache_dir for `code` and `problems`
+    pub fn cache_dir() -> PathBuf {
+        let strategy = choose_base_strategy().expect("Unable to find the cache directory!");
+        let mut path = strategy.cache_dir();
+        path.push("leetcode");
+        path
+    }
+
+    /// problems filepath
+    pub fn problems_filepath() -> Result<String, Error> {
+        let cache_dir = Self::cache_dir();
+        if !cache_dir.exists() {
+            fs::create_dir_all(&cache_dir)?;
+        }
+        Ok(cache_dir.join("problems").to_string_lossy().to_string())
+    }
+
+    /// cache `code` dir
+    pub fn code_dir_or_create() -> Result<String, Error> {
+        let code_dir = Self::cache_dir().join("code");
+        if !code_dir.exists() {
+            fs::create_dir_all(&code_dir)?;
+        }
+        Ok(code_dir.to_string_lossy().to_string())
+    }
 }
 
 /// Cookie settings
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize)]
 pub struct Cookies {
     pub csrf: String,
     pub session: String,
@@ -110,7 +115,40 @@ pub struct Cookies {
 pub struct Sys {
     pub categories: Vec<String>,
     pub langs: Vec<String>,
-    pub urls: HashMap<String, String>,
+    pub urls: Urls,
+}
+
+impl Default for Sys {
+    fn default() -> Self {
+        Self {
+            categories: vec!["algorithms", "concurrency", "database", "shell"]
+                .into_iter()
+                .map(|s| s.into())
+                .collect(),
+            langs: vec![
+                "bash",
+                "c",
+                "cpp",
+                "csharp",
+                "golang",
+                "java",
+                "javascript",
+                "kotlin",
+                "mysql",
+                "php",
+                "python",
+                "python3",
+                "ruby",
+                "rust",
+                "scala",
+                "swift",
+            ]
+            .into_iter()
+            .map(|s| s.into())
+            .collect(),
+            urls: Urls::default(),
+        }
+    }
 }
 
 /// Leetcode API
@@ -121,6 +159,7 @@ pub struct Urls {
     pub login: String,
     pub problems: String,
     pub problem: String,
+    pub tag: String,
     pub test: String,
     pub session: String,
     pub submit: String,
@@ -129,6 +168,27 @@ pub struct Urls {
     pub verify: String,
     pub favorites: String,
     pub favorite_delete: String,
+}
+
+impl Default for Urls {
+    fn default() -> Self {
+        Self {
+            base: "https://leetcode.com".into(),
+            graphql: "https://leetcode.com/graphql".into(),
+            login: "https://leetcode.com/accounts/login/".into(),
+            problems: "https://leetcode.com/api/problems/$category/".into(),
+            problem: "https://leetcode.com/problems/$slug/description/".into(),
+            tag: "https://leetcode.com/tag/$slug/".into(),
+            test: "https://leetcode.com/problems/$slug/interpret_solution/".into(),
+            session: "https://leetcode.com/session/".into(),
+            submit: "https://leetcode.com/problems/$slug/submit/".into(),
+            submissions: "https://leetcode.com/submissions/detail/$id/".into(),
+            submission: "https://leetcode.com/submissions/detail/$id/".into(),
+            verify: "https://leetcode.com/submissions/detail/$id/check/".into(),
+            favorites: "https://leetcode.com/list/api/questions".into(),
+            favorite_delete: "https://leetcode.com/list/api/questions/$hash/$id".into(),
+        }
+    }
 }
 
 /// default editor and langs
@@ -151,89 +211,20 @@ pub struct Code {
     pub submission: String,
 }
 
-/// Locate code files
-///
-/// + cache -> the path to cache
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Storage {
-    cache: String,
-    code: String,
-    root: String,
-    scripts: Option<String>,
-}
-
-impl Storage {
-    /// convert root path
-    pub fn root(&self) -> Result<String, Error> {
-        let home = dirs::home_dir()
-            .ok_or(Error::NoneError)?
-            .to_string_lossy()
-            .to_string();
-        let path = self.root.replace('~', &home);
-        Ok(path)
-    }
-
-    /// get cache path
-    pub fn cache(&self) -> Result<String, crate::Error> {
-        let home = dirs::home_dir()
-            .ok_or(Error::NoneError)?
-            .to_string_lossy()
-            .to_string();
-        let path = PathBuf::from(self.cache.replace('~', &home));
-        if !path.is_dir() {
-            info!("Generate cache dir at {:?}.", &path);
-            fs::DirBuilder::new().recursive(true).create(&path)?;
+impl Default for Code {
+    fn default() -> Self {
+        Self {
+            editor: "vim".into(),
+            editor_args: None,
+            edit_code_marker: false,
+            start_marker: "".into(),
+            end_marker: "".into(),
+            comment_problem_desc: false,
+            comment_leading: "///".into(),
+            test: true,
+            lang: "rust".into(),
+            pick: "${fid}.${slug}".into(),
+            submission: "${fid}.${slug}.${sid}.${ac}".into(),
         }
-
-        Ok(path.join("Problems").to_string_lossy().to_string())
     }
-
-    /// get code path
-    pub fn code(&self) -> Result<String, crate::Error> {
-        let root = &self.root()?;
-        let p = PathBuf::from(root).join(&self.code);
-        if !PathBuf::from(&p).exists() {
-            fs::create_dir(&p)?
-        }
-
-        Ok(p.to_string_lossy().to_string())
-    }
-
-    /// get scripts path
-    pub fn scripts(mut self) -> Result<String, crate::Error> {
-        let root = &self.root()?;
-        if self.scripts.is_none() {
-            let tmp = toml::from_str::<Config>(DEFAULT_CONFIG)?;
-            self.scripts = Some(tmp.storage.scripts.ok_or(Error::NoneError)?);
-        }
-
-        let p = PathBuf::from(root).join(&self.scripts.ok_or(Error::NoneError)?);
-        if !PathBuf::from(&p).exists() {
-            std::fs::create_dir(&p)?
-        }
-
-        Ok(p.to_string_lossy().to_string())
-    }
-}
-
-/// Locate lc's config file
-pub fn locate() -> Result<Config, crate::Error> {
-    let conf = root()?.join("leetcode.toml");
-    if !conf.is_file() {
-        fs::write(&conf, &DEFAULT_CONFIG[1..])?;
-    }
-
-    let s = fs::read_to_string(&conf)?;
-    Ok(toml::from_str::<Config>(&s)?)
-}
-
-/// Get root path of leetcode-cli
-pub fn root() -> Result<std::path::PathBuf, Error> {
-    let dir = dirs::home_dir().ok_or(Error::NoneError)?.join(".leetcode");
-    if !dir.is_dir() {
-        info!("Generate root dir at {:?}.", &dir);
-        fs::DirBuilder::new().recursive(true).create(&dir)?;
-    }
-
-    Ok(dir)
 }

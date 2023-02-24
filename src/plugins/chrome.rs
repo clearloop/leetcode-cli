@@ -1,4 +1,4 @@
-use crate::{cache, Error};
+use crate::{cache, Config, Error};
 use diesel::prelude::*;
 use keyring::Entry;
 use openssl::{hash, pkcs5, symm};
@@ -41,7 +41,7 @@ impl std::string::ToString for Ident {
 
 /// Get cookies from chrome storage
 pub fn cookies() -> Result<Ident, crate::Error> {
-    let ccfg = crate::cfg::locate()?.cookies;
+    let ccfg = Config::config_content()?.cookies;
     if !ccfg.csrf.is_empty() && !ccfg.session.is_empty() {
         return Ok(Ident {
             csrf: ccfg.csrf,
@@ -53,7 +53,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     use self::schema::cookies::dsl::*;
     trace!("Derive cookies from google chrome...");
 
-    let home = dirs::home_dir().ok_or(Error::NoneError)?;
+    let home = Config::home_dir();
     let p = match std::env::consts::OS {
         "macos" => home.join("Library/Application Support/Google/Chrome/Default/Cookies"),
         "linux" => home.join(".config/google-chrome/Default/Cookies"),

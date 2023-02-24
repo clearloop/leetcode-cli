@@ -186,12 +186,16 @@ mod file {
         }
     }
 
-    use crate::{cache::models::Problem, Error};
+    use crate::{cache::models::Problem, Config, Error};
 
     /// Generate test cases path by fid
     pub fn test_cases_path(problem: &Problem) -> Result<String, Error> {
-        let conf = crate::cfg::locate()?;
-        let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
+        let conf = Config::config_content()?;
+        let mut path = format!(
+            "{}/{}.tests.dat",
+            Config::code_dir_or_create()?,
+            conf.code.pick
+        );
 
         path = path.replace("${fid}", &problem.fid.to_string());
         path = path.replace("${slug}", &problem.slug.to_string());
@@ -200,7 +204,7 @@ mod file {
 
     /// Generate code path by fid
     pub fn code_path(problem: &Problem, l: Option<String>) -> Result<String, Error> {
-        let conf = crate::cfg::locate()?;
+        let conf = Config::config_content()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
             lang = l.ok_or(Error::NoneError)?;
@@ -208,7 +212,7 @@ mod file {
 
         let mut path = format!(
             "{}/{}.{}",
-            conf.storage.code()?,
+            Config::code_dir_or_create()?,
             conf.code.pick,
             suffix(&lang)?,
         );
@@ -223,9 +227,8 @@ mod file {
     pub fn load_script(module: &str) -> Result<String, crate::Error> {
         use std::fs::File;
         use std::io::Read;
-        let conf = crate::cfg::locate()?;
         let mut script = "".to_string();
-        File::open(format!("{}/{}.py", conf.storage.scripts()?, module))?
+        File::open(format!("{}/{}.py", Config::script_dir_or_create()?, module))?
             .read_to_string(&mut script)?;
 
         Ok(script)

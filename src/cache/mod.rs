@@ -7,7 +7,8 @@ use self::models::*;
 use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
 use crate::helper::test_cases_path;
-use crate::{cfg, err::Error, plugins::LeetCode};
+use crate::Config;
+use crate::{err::Error, plugins::LeetCode};
 use colored::Colorize;
 use diesel::prelude::*;
 use reqwest::Response;
@@ -40,12 +41,12 @@ pub struct Cache(pub LeetCode);
 impl Cache {
     /// Ref to sqlite connection
     fn conn(&self) -> Result<SqliteConnection, Error> {
-        Ok(conn(self.0.conf.storage.cache()?))
+        Ok(conn(Config::problems_filepath()?))
     }
 
     /// Clean cache
     pub fn clean(&self) -> Result<(), Error> {
-        Ok(std::fs::remove_file(&self.0.conf.storage.cache()?)?)
+        Ok(std::fs::remove_file(Config::problems_filepath()?)?)
     }
 
     /// ref to download probems
@@ -55,7 +56,7 @@ impl Cache {
     }
 
     pub fn update_after_ac(self, rid: i32) -> Result<(), Error> {
-        let c = conn(self.0.conf.storage.cache()?);
+        let c = conn(Config::problems_filepath()?);
         let target = problems.filter(id.eq(rid));
         diesel::update(target).set(status.eq("ac")).execute(&c)?;
         Ok(())
@@ -307,32 +308,16 @@ impl Cache {
         json.insert("data_input", test_case);
 
         let url = match run {
-            Run::Test => conf
-                .sys
-                .urls
-                .get("test")
-                .ok_or(Error::NoneError)?
-                .replace("$slug", &p.slug),
+            Run::Test => conf.sys.urls.test.replace("$slug", &p.slug),
             Run::Submit => {
                 json.insert("judge_type", "large".to_string());
-                conf.sys
-                    .urls
-                    .get("submit")
-                    .ok_or(Error::NoneError)?
-                    .replace("$slug", &p.slug)
+                conf.sys.urls.submit.replace("$slug", &p.slug)
             }
         };
 
         Ok((
             json,
-            [
-                url,
-                conf.sys
-                    .urls
-                    .get("problems")
-                    .ok_or(Error::NoneError)?
-                    .replace("$slug", &p.slug),
-            ],
+            [url, conf.sys.urls.problems.replace("$slug", &p.slug)],
         ))
     }
 
@@ -395,8 +380,7 @@ impl Cache {
 
     /// New cache
     pub fn new() -> Result<Self, Error> {
-        let conf = cfg::locate()?;
-        let c = conn(conf.storage.cache()?);
+        let c = conn(Config::problems_filepath()?);
         diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
         diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&c)?;
 
