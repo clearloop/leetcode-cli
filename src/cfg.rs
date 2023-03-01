@@ -138,7 +138,7 @@ pub struct Urls {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
     pub editor: String,
-    #[serde(rename(serialize = "editor-args", deserialize = "editor-args"))]
+    #[serde(rename(serialize = "editor_args", deserialize = "editor_args"))]
     pub editor_args: Option<Vec<String>>,
     pub edit_code_marker: bool,
     pub start_marker: String,
