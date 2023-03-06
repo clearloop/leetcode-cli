@@ -54,6 +54,8 @@ For example, given this config (can be found in `~/.leetcode/leetcode.toml`, it 
 [code]
 lang = "rust"
 editor = "emacs"
+# Optional parameter
+editor_args = ['-nw']
 ```
 
 #### 1. <kbd>pick</kbd>

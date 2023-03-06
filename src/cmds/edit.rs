@@ -140,7 +140,7 @@ impl Command for EditCommand {
         // ```toml
         // [code]
         // editor = "emacsclient"
-        // editor-args = [ "-n", "-s", "doom" ]
+        // editor_args = [ "-n", "-s", "doom" ]
         // ```
         //
         // ```rust
