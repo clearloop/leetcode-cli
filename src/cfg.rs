@@ -207,7 +207,7 @@ impl Storage {
             self.scripts = Some(tmp.storage.scripts.ok_or(Error::NoneError)?);
         }
 
-        let p = PathBuf::from(root).join(&self.scripts.ok_or(Error::NoneError)?);
+        let p = PathBuf::from(root).join(self.scripts.ok_or(Error::NoneError)?);
         if !PathBuf::from(&p).exists() {
             std::fs::create_dir(&p)?
         }

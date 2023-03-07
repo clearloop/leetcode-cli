@@ -1,6 +1,6 @@
 **/*target
 **/*.rs.bk
-Cargo.lock
+#Cargo.lock
 .DS_Store
 .idea
 .direnv/

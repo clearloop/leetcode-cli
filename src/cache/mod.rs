@@ -45,19 +45,21 @@ impl Cache {
 
     /// Clean cache
     pub fn clean(&self) -> Result<(), Error> {
-        Ok(std::fs::remove_file(&self.0.conf.storage.cache()?)?)
+        Ok(std::fs::remove_file(self.0.conf.storage.cache()?)?)
     }
 
-    /// ref to download probems
+    /// ref to download problems
     pub async fn update(self) -> Result<(), Error> {
         self.download_problems().await?;
         Ok(())
     }
 
     pub fn update_after_ac(self, rid: i32) -> Result<(), Error> {
-        let c = conn(self.0.conf.storage.cache()?);
+        let mut c = conn(self.0.conf.storage.cache()?);
         let target = problems.filter(id.eq(rid));
-        diesel::update(target).set(status.eq("ac")).execute(&c)?;
+        diesel::update(target)
+            .set(status.eq("ac"))
+            .execute(&mut c)?;
         Ok(())
     }
 
@@ -102,14 +104,14 @@ impl Cache {
 
         diesel::replace_into(problems)
             .values(&ps)
-            .execute(&self.conn()?)?;
+            .execute(&mut self.conn()?)?;
 
         Ok(ps)
     }
 
     /// Get problem
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
-        let p: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
+        let p: Problem = problems.filter(fid.eq(rfid)).first(&mut self.conn()?)?;
         if p.category != "algorithms" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
@@ -134,13 +136,13 @@ impl Cache {
 
     /// Get problems from cache
     pub fn get_problems(&self) -> Result<Vec<Problem>, Error> {
-        Ok(problems.load::<Problem>(&self.conn()?)?)
+        Ok(problems.load::<Problem>(&mut self.conn()?)?)
     }
 
     /// Get question
     #[allow(clippy::useless_let_if_seq)]
     pub async fn get_question(&self, rfid: i32) -> Result<Question, Error> {
-        let target: Problem = problems.filter(fid.eq(rfid)).first(&self.conn()?)?;
+        let target: Problem = problems.filter(fid.eq(rfid)).first(&mut self.conn()?)?;
 
         let ids = match target.level {
             1 => target.fid.to_string().green(),
@@ -190,7 +192,7 @@ impl Cache {
             let sdesc = serde_json::to_string(&rdesc)?;
             diesel::update(&target)
                 .set(desc.eq(sdesc))
-                .execute(&self.conn()?)?;
+                .execute(&mut self.conn()?)?;
         }
 
         Ok(rdesc)
@@ -201,7 +203,7 @@ impl Cache {
         let ids: Vec<String>;
         let rtag = tags
             .filter(tag.eq(rslug.to_string()))
-            .first::<Tag>(&self.conn()?);
+            .first::<Tag>(&mut self.conn()?);
         if let Ok(t) = rtag {
             trace!("Got {} questions from local cache...", &rslug);
             ids = serde_json::from_str(&t.refs)?;
@@ -222,14 +224,14 @@ impl Cache {
 
             diesel::insert_into(tags)
                 .values(&t)
-                .execute(&self.conn()?)?;
+                .execute(&mut self.conn()?)?;
         }
 
         Ok(ids)
     }
 
     pub fn get_tags(&self) -> Result<Vec<Tag>, Error> {
-        Ok(tags.load::<Tag>(&self.conn()?)?)
+        Ok(tags.load::<Tag>(&mut self.conn()?)?)
     }
 
     /// run_code data
@@ -396,9 +398,9 @@ impl Cache {
     /// New cache
     pub fn new() -> Result<Self, Error> {
         let conf = cfg::locate()?;
-        let c = conn(conf.storage.cache()?);
-        diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&c)?;
-        diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&c)?;
+        let mut c = conn(conf.storage.cache()?);
+        diesel::sql_query(CREATE_PROBLEMS_IF_NOT_EXISTS).execute(&mut c)?;
+        diesel::sql_query(CREATE_TAGS_IF_NOT_EXISTS).execute(&mut c)?;
 
         Ok(Cache(LeetCode::new()?))
     }

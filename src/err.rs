@@ -4,6 +4,7 @@ use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
 use std::fmt;
 
+// fixme: use this_error
 /// Error enum
 #[derive(Clone)]
 pub enum Error {
@@ -103,7 +104,7 @@ impl std::convert::From<serde_json::error::Error> for Error {
 impl std::convert::From<toml::de::Error> for Error {
     fn from(_err: toml::de::Error) -> Self {
         let conf = root().unwrap().join("leetcode_tmp.toml");
-        std::fs::write(&conf, &DEFAULT_CONFIG[1..]).unwrap();
+        std::fs::write(conf, &DEFAULT_CONFIG[1..]).unwrap();
         #[cfg(debug_assertions)]
         let err_msg = format!(
             "{}, {}{}{}{}{}{}",
