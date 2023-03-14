@@ -13,9 +13,9 @@
 //!     -V, --version    Prints version information
 //!
 //! OPTIONS:
-//!     -c, --category <category>    Fliter problems by category name
+//!     -c, --category <category>    Filter problems by category name
 //!                                  [algorithms, database, shell, concurrency]
-//!     -q, --query <query>          Fliter questions by conditions:
+//!     -q, --query <query>          Filter questions by conditions:
 //!                                  Uppercase means negative
 //!                                  e = easy     E = m+h
 //!                                  m = medium   M = e+h
@@ -42,15 +42,15 @@ use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 /// ## handler
 /// + try to request cache
 ///   + prints the list
-/// + if chache doesn't exist, download problems list
+/// + if cache doesn't exist, download problems list
 /// + ...
 pub struct ListCommand;
 
-static CATEGORY_HELP: &str = r#"Fliter problems by category name
+static CATEGORY_HELP: &str = r#"Filter problems by category name
 [algorithms, database, shell, concurrency]
 "#;
 
-static QUERY_HELP: &str = r#"Fliter questions by conditions:
+static QUERY_HELP: &str = r#"Filter questions by conditions:
 Uppercase means negative
 e = easy     E = m+h
 m = medium   M = e+h
@@ -61,7 +61,7 @@ s = starred  S = not starred"#;
 
 static LIST_AFTER_HELP: &str = r#"EXAMPLES:
     leetcode list                   List all questions
-    leetcode list array             List questions that has "array" in name
+    leetcode list array             List questions that has "array" in name, and this is letter non-sensitive
     leetcode list -c database       List questions that in database category
     leetcode list -q eD             List questions that with easy level and not done
     leetcode list -t linked-list    List questions that under tag "linked-list"
@@ -183,7 +183,7 @@ impl Command for ListCommand {
             let num_range: Vec<i32> = m
                 .get_many::<i32>("range")
                 .ok_or(Error::NoneError)?
-                .map(|id| *id)
+                .copied()
                 .into_iter()
                 .collect();
             ps.retain(|x| num_range[0] <= x.fid && x.fid <= num_range[1]);

@@ -61,10 +61,10 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     };
 
     debug!("Chrome Cookies path is {:?}", &p);
-    let conn = cache::conn(p.to_string_lossy().to_string());
+    let mut conn = cache::conn(p.to_string_lossy().to_string());
     let res = cookies
         .filter(host_key.like("%leetcode.com"))
-        .load::<Cookies>(&conn)
+        .load::<Cookies>(&mut conn)
         .expect("Loading cookies from google chrome failed.");
 
     debug!("res {:?}", &res);

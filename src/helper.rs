@@ -48,7 +48,7 @@ mod filter {
     /// Abstract query filter
     ///
     /// ```sh
-    ///     -q, --query <query>          Fliter questions by conditions:
+    ///     -q, --query <query>          Filter questions by conditions:
     ///                                  Uppercase means negative
     ///                                  e = easy     E = m+h
     ///                                  m = medium   M = e+h

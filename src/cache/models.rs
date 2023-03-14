@@ -7,7 +7,7 @@ use serde_json::Number;
 
 /// Tag model
 #[derive(Clone, Insertable, Queryable, Serialize, Debug)]
-#[table_name = "tags"]
+#[diesel(table_name = tags)]
 pub struct Tag {
     pub tag: String,
     pub refs: String,
@@ -15,7 +15,7 @@ pub struct Tag {
 
 /// Problem model
 #[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
-#[table_name = "problems"]
+#[diesel(table_name = problems)]
 pub struct Problem {
     pub category: String,
     pub fid: i32,
@@ -323,22 +323,26 @@ impl std::fmt::Display for VerifyResult {
                         .expect("update ac to cache failed");
 
                     // prints
-                    let (mut rp, mut mp) = (0, 0);
-                    if let Some(n) = &self.analyse.runtime_percentile {
+                    let rp = if let Some(n) = &self.analyse.runtime_percentile {
                         if n.is_f64() {
-                            rp = n.as_f64().unwrap_or(0.0) as i64;
+                            n.as_f64().unwrap_or(0.0) as i64
                         } else {
-                            rp = n.as_i64().unwrap_or(0);
+                            n.as_i64().unwrap_or(0)
                         }
-                    }
+                    } else {
+                        0
+                    };
 
-                    if let Some(n) = &self.analyse.memory_percentile {
+                    let mp = if let Some(n) = &self.analyse.memory_percentile {
                         if n.is_f64() {
-                            mp = n.as_f64().unwrap_or(0.0) as i64;
+                            n.as_f64().unwrap_or(0.0) as i64
                         } else {
-                            mp = n.as_i64().unwrap_or(0);
+                            n.as_i64().unwrap_or(0)
                         }
-                    }
+                    } else {
+                        0
+                    };
+
                     write!(
                         f,
                         "\n{}{}{}\

@@ -17,7 +17,7 @@ use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 ///     -V, --version    Prints version information
 ///
 /// OPTIONS:
-///     -q, --query <query>    Fliter questions by conditions:
+///     -q, --query <query>    Filter questions by conditions:
 ///                            Uppercase means negative
 ///                            e = easy     E = m+h
 ///                            m = medium   M = e+h
@@ -31,7 +31,7 @@ use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 /// ```
 pub struct PickCommand;
 
-static QUERY_HELP: &str = r#"Fliter questions by conditions:
+static QUERY_HELP: &str = r#"Filter questions by conditions:
 Uppercase means negative
 e = easy     E = m+h
 m = medium   M = e+h
@@ -129,7 +129,7 @@ impl Command for PickCommand {
 
         let fid = m
             .get_one::<i32>("id")
-            .map(|id| *id)
+            .copied()
             .or(daily_id)
             .unwrap_or_else(|| {
                 // Pick random without specify id
