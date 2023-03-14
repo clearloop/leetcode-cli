@@ -29,6 +29,6 @@ jobs:
               sudo apt-get install -y libsqlite3-dev libdbus-1-dev
           fi
       - name: Build
-        run: cargo build
+        run: cargo build --release --locked
       - name: Run tests
         run: cargo test
