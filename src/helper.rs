@@ -182,6 +182,7 @@ mod file {
             "rust" => Ok("rs"),
             "scala" => Ok("scala"),
             "swift" => Ok("swift"),
+            "typescript" => Ok("ts"),
             _ => Ok("c"),
         }
     }

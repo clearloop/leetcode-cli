@@ -35,7 +35,8 @@ langs = [
   "ruby",
   "rust",
   "scala",
-  "swift"
+  "swift",
+  "typescript"
 ]
 
 [sys.urls]
