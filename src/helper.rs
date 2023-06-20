@@ -170,6 +170,7 @@ mod file {
             "c" => Ok("c"),
             "cpp" => Ok("cpp"),
             "csharp" => Ok("cs"),
+            "elixir" => Ok("ex"),
             "golang" => Ok("go"),
             "java" => Ok("java"),
             "javascript" => Ok("js"),

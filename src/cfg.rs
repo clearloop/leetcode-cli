@@ -24,6 +24,7 @@ langs = [
   "c",
   "cpp",
   "csharp",
+  "elixir",
   "golang",
   "java",
   "javascript",
@@ -36,7 +37,7 @@ langs = [
   "rust",
   "scala",
   "swift",
-  "typescript"
+  "typescript",
 ]
 
 [sys.urls]
