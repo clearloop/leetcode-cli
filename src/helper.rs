@@ -48,7 +48,7 @@ mod filter {
     /// Abstract query filter
     ///
     /// ```sh
-    ///     -q, --query <query>          Fliter questions by conditions:
+    ///     -q, --query <query>          Filter questions by conditions:
     ///                                  Uppercase means negative
     ///                                  e = easy     E = m+h
     ///                                  m = medium   M = e+h
@@ -170,6 +170,7 @@ mod file {
             "c" => Ok("c"),
             "cpp" => Ok("cpp"),
             "csharp" => Ok("cs"),
+            "elixir" => Ok("ex"),
             "golang" => Ok("go"),
             "java" => Ok("java"),
             "javascript" => Ok("js"),
@@ -182,6 +183,7 @@ mod file {
             "rust" => Ok("rs"),
             "scala" => Ok("scala"),
             "swift" => Ok("swift"),
+            "typescript" => Ok("ts"),
             _ => Ok("c"),
         }
     }

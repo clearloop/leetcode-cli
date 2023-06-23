@@ -2,45 +2,40 @@
   description = "Leet your code in command-line.";
 
   inputs.nixpkgs.url      = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.rust-overlay.url = "github:oxalica/rust-overlay";
   inputs.utils.url        = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, rust-overlay, utils, ... }:
+  outputs = { self, nixpkgs, utils, ... }:
     utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; overlays = [ rust-overlay.overlay ]; };
+        pkgs = import nixpkgs { inherit system; };
 
-        platform = with pkgs; makeRustPlatform {
-          rustc = rust-bin.nightly.latest.minimal;
-          cargo = rust-bin.nightly.latest.minimal;
-        };
-        package = with pkgs; platform.buildRustPackage rec {
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+        ];
+
+        buildInputs = with pkgs; [
+          openssl
+          dbus
+          sqlite
+        ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
+
+
+        package = with pkgs; rustPlatform.buildRustPackage rec {
           pname = "leetcode-cli";
-          version = "0.3.10";
-
+          version = "0.3.11";
           src = fetchCrate {
             inherit pname version;
-            sha256 = "SkJLA49AXNTpiWZByII2saYLyN3bAAJTlCvhamlOEXA=";
+            sha256 = "sha256-DHtIhiRPRGuO6Rf1d9f8r0bMOHqAaJleUvYNyPiX6mc=";
           };
+          cargoSha256 = "sha256-Suk/nQ+JcoD9HO9x1lYp+p4qx0DZ9dt0p5jPz0ZQB+k=";
 
-          cargoSha256 = "xhKF4qYOTdt8iCSPY5yT8tH3l54HdkOAIS2SBGzqsdo=";
+          inherit buildInputs nativeBuildInputs;
 
           # a nightly compiler is required unless we use this cheat code.
           RUSTC_BOOTSTRAP = 0;
 
-          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-nightly";
-          CFG_RELEASE_CHANNEL = "ngihtly";
-
-          nativeBuildInputs = [
-            pkg-config
-            rust-bin.stable.latest.default
-          ];
-
-          buildInputs = [
-            openssl
-            dbus
-            sqlite
-          ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
+          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
+          CFG_RELEASE_CHANNEL = "stable";
 
           meta = with pkgs.lib; {
             description = "Leet your code in command-line.";
@@ -54,6 +49,28 @@
       {
         defaultPackage = package;
         overlay = final: prev: { leetcode-cli = package; };
+
+        devShell = with pkgs; mkShell {
+          name = "shell";
+          inherit nativeBuildInputs;
+
+          buildInputs = buildInputs ++ [
+            rustc
+            cargo
+            rustfmt
+            clippy
+            rust-analyzer
+            cargo-edit
+            cargo-bloat
+            cargo-audit
+            cargo-about
+            cargo-outdated
+          ];
+
+          PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+          RUST_BACKTRACE = "full";
+          LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
+        };
       }
     );
 }

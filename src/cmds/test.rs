@@ -25,19 +25,20 @@ pub struct TestCommand;
 #[async_trait]
 impl Command for TestCommand {
     /// `test` usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("test")
             .about("Test question by id")
             .visible_alias("t")
             .arg(
-                Arg::with_name("id")
-                    .takes_value(true)
+                Arg::new("id")
+                    .num_args(1)
                     .required(true)
+                    .value_parser(clap::value_parser!(i32))
                     .help("question id"),
             )
             .arg(
-                Arg::with_name("testcase")
-                    .takes_value(true)
+                Arg::new("testcase")
+                    .num_args(1)
                     .required(false)
                     .help("custom testcase"),
             )
@@ -46,8 +47,8 @@ impl Command for TestCommand {
     /// `test` handler
     async fn handler(m: &ArgMatches) -> Result<(), Error> {
         use crate::cache::{Cache, Run};
-        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
-        let testcase = m.value_of("testcase");
+        let id: i32 = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
+        let testcase = m.get_one::<String>("testcase");
         let case_str: Option<String> = match testcase {
             Some(case) => Option::from(case.replace("\\n", "\n")),
             _ => None,

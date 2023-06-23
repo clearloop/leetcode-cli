@@ -7,7 +7,7 @@ use serde_json::Number;
 
 /// Tag model
 #[derive(Clone, Insertable, Queryable, Serialize, Debug)]
-#[table_name = "tags"]
+#[diesel(table_name = tags)]
 pub struct Tag {
     pub tag: String,
     pub refs: String,
@@ -15,7 +15,7 @@ pub struct Tag {
 
 /// Problem model
 #[derive(AsChangeset, Clone, Identifiable, Insertable, Queryable, Serialize, Debug)]
-#[table_name = "problems"]
+#[diesel(table_name = problems)]
 pub struct Problem {
     pub category: String,
     pub fid: i32,
@@ -291,7 +291,7 @@ impl std::fmt::Display for VerifyResult {
 
         match &self.status.status_code {
             10 => {
-                if self.correct_answer {
+                if matches!(self.result_type, Run::Test) && self.correct_answer {
                     // Pass Tests
                     write!(
                         f,
@@ -306,9 +306,12 @@ impl std::fmt::Display for VerifyResult {
                         &"\nExpected:".after_spaces(6),
                         eca,
                     )?
-                } else if !self.submit.compare_result.is_empty() {
+                } else if matches!(self.result_type, Run::Submit)
+                    && !self.submit.compare_result.is_empty()
+                {
+                    // only Submit execute this branch
                     // Submit Successfully
-                    // TODO: result shoule be all 1;
+                    // TODO: result should be all 1;
                     // Lines below are sucks...
                     let cache = super::Cache::new().expect("cache gen failed");
                     cache
@@ -316,27 +319,31 @@ impl std::fmt::Display for VerifyResult {
                             self.submit
                                 .question_id
                                 .parse()
-                                .expect("submit succcessfully, parse question_id to i32 failed"),
+                                .expect("submit successfully, parse question_id to i32 failed"),
                         )
                         .expect("update ac to cache failed");
 
                     // prints
-                    let (mut rp, mut mp) = (0, 0);
-                    if let Some(n) = &self.analyse.runtime_percentile {
+                    let rp = if let Some(n) = &self.analyse.runtime_percentile {
                         if n.is_f64() {
-                            rp = n.as_f64().unwrap_or(0.0) as i64;
+                            n.as_f64().unwrap_or(0.0) as i64
                         } else {
-                            rp = n.as_i64().unwrap_or(0);
+                            n.as_i64().unwrap_or(0)
                         }
-                    }
+                    } else {
+                        0
+                    };
 
-                    if let Some(n) = &self.analyse.memory_percentile {
+                    let mp = if let Some(n) = &self.analyse.memory_percentile {
                         if n.is_f64() {
-                            mp = n.as_f64().unwrap_or(0.0) as i64;
+                            n.as_f64().unwrap_or(0.0) as i64
                         } else {
-                            mp = n.as_i64().unwrap_or(0);
+                            n.as_i64().unwrap_or(0)
                         }
-                    }
+                    } else {
+                        0
+                    };
+
                     write!(
                         f,
                         "\n{}{}{}\

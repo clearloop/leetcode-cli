@@ -25,21 +25,22 @@ pub struct EditCommand;
 #[async_trait]
 impl Command for EditCommand {
     /// `edit` usage
-    fn usage<'a>() -> ClapCommand<'a> {
+    fn usage() -> ClapCommand {
         ClapCommand::new("edit")
             .about("Edit question by id")
             .visible_alias("e")
             .arg(
-                Arg::with_name("lang")
+                Arg::new("lang")
                     .short('l')
                     .long("lang")
-                    .takes_value(true)
+                    .num_args(1)
                     .help("Edit with specific language"),
             )
             .arg(
-                Arg::with_name("id")
-                    .takes_value(true)
+                Arg::new("id")
+                    .num_args(1)
                     .required(true)
+                    .value_parser(clap::value_parser!(i32))
                     .help("question id"),
             )
     }
@@ -51,7 +52,7 @@ impl Command for EditCommand {
         use std::io::Write;
         use std::path::Path;
 
-        let id: i32 = m.value_of("id").ok_or(Error::NoneError)?.parse()?;
+        let id = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
         let cache = Cache::new()?;
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
@@ -61,7 +62,10 @@ impl Command for EditCommand {
         let p_desc_comment = problem.desc_comment(&conf);
         // condition language
         if m.contains_id("lang") {
-            conf.code.lang = m.value_of("lang").ok_or(Error::NoneError)?.to_string();
+            conf.code.lang = m
+                .get_one::<String>("lang")
+                .ok_or(Error::NoneError)?
+                .to_string();
             conf.sync()?;
         }
 
@@ -136,7 +140,7 @@ impl Command for EditCommand {
         // ```toml
         // [code]
         // editor = "emacsclient"
-        // editor-args = [ "-n", "-s", "doom" ]
+        // editor_args = [ "-n", "-s", "doom" ]
         // ```
         //
         // ```rust

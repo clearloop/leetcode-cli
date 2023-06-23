@@ -7,12 +7,12 @@
 //!     -V, --version    Prints version information
 //! ```
 use crate::err::Error;
-use clap::Arg;
+use clap::{Arg, ArgAction};
 use env_logger::Env;
 
 /// Abstract flag trait
 pub trait Flag {
-    fn usage<'a>() -> Arg<'a>;
+    fn usage() -> Arg;
     fn handler() -> Result<(), Error>;
 }
 
@@ -20,15 +20,16 @@ pub trait Flag {
 pub struct Debug;
 
 impl Flag for Debug {
-    fn usage<'a>() -> Arg<'a> {
-        Arg::with_name("debug")
+    fn usage() -> Arg {
+        Arg::new("debug")
             .short('d')
             .long("debug")
             .help("debug mode")
+            .action(ArgAction::SetTrue)
     }
 
     fn handler() -> Result<(), Error> {
-        env_logger::Builder::from_env(Env::default().default_filter_or("leetcode")).init();
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
 
         Ok(())
     }

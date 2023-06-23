@@ -18,7 +18,7 @@ use clap::{ArgMatches, Command as ClapCommand};
 #[async_trait]
 pub trait Command {
     /// Usage of the specific command
-    fn usage<'a>() -> ClapCommand<'a>;
+    fn usage() -> ClapCommand;
 
     /// The handler will deal [args, options,...] from the command-line
     async fn handler(m: &ArgMatches) -> Result<(), Error>;

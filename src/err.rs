@@ -3,6 +3,7 @@ use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
 use std::fmt;
 
+// fixme: use this_error
 /// Error enum
 #[derive(Clone)]
 pub enum Error {
@@ -18,6 +19,7 @@ pub enum Error {
     DecryptError,
     SilentError,
     NoneError,
+    ChromeNotLogin,
 }
 
 impl std::fmt::Debug for Error {
@@ -56,7 +58,8 @@ impl std::fmt::Debug for Error {
             Error::NoneError => write!(f,
                 "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
-            )
+            ),
+            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry.")
         }
     }
 }
@@ -120,7 +123,7 @@ impl std::convert::From<toml::de::Error> for Error {
             "~/.leetcode/leetcode.toml".yellow().bold().underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",
         );
-        Error::ParseError(err_msg)
+        Error::ParseError(err_msg.trim_start().into())
     }
 }
 
