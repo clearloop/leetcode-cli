@@ -1,16 +1,17 @@
 # leetcode-cli
-![Rust](https://github.com/clearloop/leetcode-cli/workflows/Rust/badge.svg)
+
+![Rust](https://github.com/clearloop/leetcode-cli/workflows/leetcode-cli/badge.svg)
 [![crate](https://img.shields.io/crates/v/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
 [![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/leetcode-cli/)
 [![downloads](https://img.shields.io/crates/d/leetcode-cli.svg)](https://crates.io/crates/leetcode-cli)
-[![gitter](https://img.shields.io/gitter/room/odditypark/leetcode-cli)](https://gitter.im/Odditypark/leetcode-cli)
+[![telegram](https://img.shields.io/badge/telegram-blue?logo=telegram)](https://t.me/+U_5si6PhWykxZTI1)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Installing
 
 ```sh
 # Required dependencies:
-# 
+#
 #  gcc
 #  libssl-dev
 #  libdbus-1-dev
@@ -48,14 +49,14 @@ SUBCOMMANDS:
 
 ## Example
 
-For example, given this config (can be found in `~/.leetcode/leetcode.toml`, it can be generated automatically with command: `leetcode list` if you are a new user):
+For example, given this config (could be found at `~/.leetcode/leetcode.toml`):
 
 ```toml
 [code]
 lang = "rust"
 editor = "emacs"
 # Optional parameter
-editor_args = ['-nw']
+editor-args = ['-nw']
 ```
 
 #### 1. <kbd>pick</kbd>
@@ -144,7 +145,8 @@ leetcode exec 1
 
 ## Cookies
 
-The cookie plugin of leetcode-cli can work on OSX and [Linux][#1]. **If you are on a different platform, there are problems with caching the cookies**, you can manually input your LeetCode Cookies to the configuration file.
+The cookie plugin of leetcode-cli can work on OSX and [Linux][#1]. **If you are on a different platform, there are problems with caching the cookies**,
+you can manually input your LeetCode Cookies to the configuration file.
 
 ```toml
 [cookies]
@@ -153,7 +155,6 @@ session = "..."
 ```
 
 For Example, using Chrome (after logging in to LeetCode):
-
 
 #### Step 1
 
@@ -166,6 +167,7 @@ chrome://settings/cookies/detail?site=leetcode.com
 #### Step 2
 
 Copy `Content` from `LEETCODE_SESSION` and `csrftoken` to `session` and `csrf` in your configuration file, respectively:
+
 ```toml
 [cookies]
 csrf = "${csrftoken}"
@@ -189,13 +191,13 @@ import json;
 
 def plan(sps, stags):
     ##
-    # `print` in python is supported, 
-    # if you want to know the data structures of these two args, 
+    # `print` in python is supported,
+    # if you want to know the data structures of these two args,
     # just print them
     ##
     problems = json.loads(sps)
     tags = json.loads(stags)
-	
+
     ret = []
     tm = {}
     for tag in tags:
@@ -215,17 +217,15 @@ Then run `list` with the filter that you just wrote:
 leetcode list -p plan1
 ```
 
-And that's it! Enjoy!
+That's it! Enjoy!
 
+## Contributions
 
-## PR
-
-[PRs][pr] are more than welcome!
+Feel free to add your names and emails in the `authors` field of `Cargo.toml` !
 
 ## LICENSE
 
 MIT
-
 
 [pr]: https://github.com/clearloop/leetcode-cli/pulls
 [#1]: https://github.com/clearloop/leetcode-cli/issues/1
