@@ -24,6 +24,7 @@ langs = [
   "c",
   "cpp",
   "csharp",
+  "elixir",
   "golang",
   "java",
   "javascript",
