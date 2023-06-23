@@ -38,17 +38,13 @@ impl Storage {
 
     /// get cache path
     pub fn cache(&self) -> Result<String, crate::Error> {
-        let home = dirs::home_dir()
-            .ok_or(Error::NoneError)?
-            .to_string_lossy()
-            .to_string();
-        let path = PathBuf::from(self.cache.replace('~', &home));
-        if !path.is_dir() {
-            info!("Generate cache dir at {:?}.", &path);
-            fs::DirBuilder::new().recursive(true).create(&path)?;
+        let root = PathBuf::from(self.root()?);
+        if !root.exists() {
+            info!("Generate cache dir at {:?}.", &root);
+            fs::DirBuilder::new().recursive(true).create(&root)?;
         }
 
-        Ok(path.join("Problems").to_string_lossy().to_string())
+        Ok(root.join("Problems").to_string_lossy().to_string())
     }
 
     /// get code path

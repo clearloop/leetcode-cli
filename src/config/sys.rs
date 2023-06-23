@@ -6,6 +6,11 @@ use serde::{Deserialize, Serialize};
 
 const CATEGORIES: [&str; 4] = ["algorithms", "concurrency", "database", "shell"];
 
+// TODO: find a better solution.
+fn categories() -> Vec<String> {
+    CATEGORIES.into_iter().map(|s| s.into()).collect()
+}
+
 /// Leetcode API
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Urls {
@@ -54,7 +59,7 @@ impl Urls {
 
     /// problems url with specific `$category`
     pub fn problems(&self, category: &str) -> String {
-        self.problem.replace("$category", category)
+        self.problems.replace("$category", category)
     }
 
     /// submit url with specific `$slug`
@@ -81,7 +86,9 @@ impl Urls {
 /// System settings, for leetcode api mainly
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Sys {
+    #[serde(default = "categories")]
     pub categories: Vec<String>,
+    #[serde(default)]
     pub urls: Urls,
 }
 
