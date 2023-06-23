@@ -232,18 +232,18 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.3.6"
+version = "4.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6320c6d1c98b6981da7bb2dcecbd0be9dc98d42165fa8326b21000f7dbfde6d0"
+checksum = "d9394150f5b4273a1763355bd1c2ec54cc5a2593f790587bcd6b2c947cfa9211"
 dependencies = [
  "clap_builder",
 ]
 
 [[package]]
 name = "clap_builder"
-version = "4.3.5"
+version = "4.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e53afce1efce6ed1f633cf0e57612fe51db54a1ee4fd8f8503d078fe02d69ae"
+checksum = "9a78fbdd3cc2914ddf37ba444114bc7765bbdcb55ec9cbe6fa054f0137400717"
 dependencies = [
  "anstream",
  "anstyle",
@@ -1025,7 +1025,7 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "leetcode-cli"
-version = "0.3.13"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "cargo-husky",
