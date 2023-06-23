@@ -10,17 +10,17 @@ use crate::{
     Error,
 };
 use serde::{Deserialize, Serialize};
-use std::fs;
+use std::{fs, path::Path};
 
 mod code;
 mod cookies;
 mod storage;
 mod sys;
 
-/// Sync with `~/.leetcode/config.toml`
+/// Sync with `~/.leetcode/leetcode.toml`
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Config {
-    #[serde(skip)]
+    #[serde(default, skip_serializing)]
     pub sys: Sys,
     pub code: Code,
     pub cookies: Cookies,
@@ -28,15 +28,29 @@ pub struct Config {
 }
 
 impl Config {
+    fn write_default(p: impl AsRef<Path>) -> Result<(), crate::Error> {
+        fs::write(p.as_ref(), toml::ser::to_string_pretty(&Self::default())?)?;
+
+        Ok(())
+    }
+
     /// Locate lc's config file
     pub fn locate() -> Result<Config, crate::Error> {
         let conf = Self::root()?.join("leetcode.toml");
+
         if !conf.is_file() {
-            fs::write(&conf, toml::ser::to_string_pretty(&Self::default())?)?;
+            Self::write_default(&conf)?;
         }
 
         let s = fs::read_to_string(&conf)?;
-        Ok(toml::from_str::<Config>(&s)?)
+        match toml::from_str::<Config>(&s) {
+            Ok(config) => Ok(config),
+            Err(e) => {
+                let tmp = Self::root()?.join("leetcode.tmp.toml");
+                Self::write_default(tmp)?;
+                Err(e.into())
+            }
+        }
     }
 
     /// Get root path of leetcode-cli

@@ -108,7 +108,7 @@ impl std::convert::From<toml::de::Error> for Error {
             _err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
-            "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
+            "~/.leetcode/leetcode.tmp.toml,".green().bold().underline(),
             " the current one at ",
             "~/.leetcode/leetcode.toml".yellow().bold().underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",

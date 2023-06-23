@@ -2,10 +2,12 @@
 //!
 //! This section is a set of constants after #88
 
+use serde::{Deserialize, Serialize};
+
 const CATEGORIES: [&str; 4] = ["algorithms", "concurrency", "database", "shell"];
 
 /// Leetcode API
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Urls {
     pub base: String,
     pub graphql: String,
@@ -77,7 +79,7 @@ impl Urls {
 }
 
 /// System settings, for leetcode api mainly
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Sys {
     pub categories: Vec<String>,
     pub urls: Urls,
