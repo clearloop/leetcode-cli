@@ -53,10 +53,22 @@ For example, given this config (could be found at `~/.leetcode/leetcode.toml`):
 
 ```toml
 [code]
-lang = "rust"
-editor = "emacs"
+editor = emacs
 # Optional parameter
 editor-args = ['-nw']
+lang = 'rust'
+pick = '${fid}.${slug}'
+submission = '${fid}.${slug}.${sid}.${ac}'
+
+[cookies]
+csrf = '<your-leetcode-csrf-token>'
+session = '<your-leetcode-session-key>'
+
+[storage]
+cache = 'Problems'
+code = 'code'
+root = '~/.leetcode'
+scripts = 'scripts'
 ```
 
 #### 1. <kbd>pick</kbd>
