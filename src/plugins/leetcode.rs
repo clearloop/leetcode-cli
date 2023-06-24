@@ -2,7 +2,7 @@ use self::req::{Json, Mode, Req};
 use crate::{
     config::{self, Config},
     err::Error,
-    plugins::chrome,
+    // plugins::chrome,
 };
 use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue},
@@ -37,7 +37,7 @@ impl LeetCode {
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
         let conf = config::Config::locate()?;
-        let cookies = chrome::cookies()?;
+        let cookies = conf.cookies.clone();
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
             vec![
@@ -52,11 +52,6 @@ impl LeetCode {
             .gzip(true)
             .connect_timeout(Duration::from_secs(30))
             .build()?;
-
-        // Sync conf
-        if conf.cookies.csrf != cookies.csrf {
-            conf.sync()?;
-        }
 
         Ok(LeetCode {
             conf,

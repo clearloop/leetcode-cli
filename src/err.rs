@@ -5,7 +5,6 @@ use std::fmt;
 
 // fixme: use this_error
 /// Error enum
-#[derive(Clone)]
 pub enum Error {
     MatchError,
     DownloadError(String),
@@ -20,6 +19,7 @@ pub enum Error {
     SilentError,
     NoneError,
     ChromeNotLogin,
+    Anyhow(anyhow::Error),
 }
 
 impl std::fmt::Debug for Error {
@@ -59,7 +59,8 @@ impl std::fmt::Debug for Error {
                 "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
             ),
-            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry.")
+            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry."),
+            Error::Anyhow(e) => write!(f, "{} {}", e, e),
         }
     }
 }
@@ -144,6 +145,12 @@ impl std::convert::From<std::io::Error> for Error {
 impl std::convert::From<openssl::error::ErrorStack> for Error {
     fn from(_: openssl::error::ErrorStack) -> Self {
         Error::DecryptError
+    }
+}
+
+impl From<anyhow::Error> for Error {
+    fn from(err: anyhow::Error) -> Self {
+        Error::Anyhow(err)
     }
 }
 

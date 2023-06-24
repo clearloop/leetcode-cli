@@ -8,6 +8,7 @@ use self::schemas::{problems::dsl::*, tags::dsl::*};
 use self::sql::*;
 use crate::helper::test_cases_path;
 use crate::{config::Config, err::Error, plugins::LeetCode};
+use anyhow::anyhow;
 use colored::Colorize;
 use diesel::prelude::*;
 use reqwest::Response;
@@ -342,15 +343,20 @@ impl Cache {
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
         let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case).await?;
-        trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
+        trace!("Pre run code result {:#?}, {}, {}", json, url, refer);
 
-        let run_res: RunCode = self
+        let text = self
             .0
             .clone()
             .run_code(json.clone(), url.clone(), refer.clone())
             .await?
-            .json() // does not require LEETCODE_SESSION (very oddly)
+            .text()
             .await?;
+
+        let run_res: RunCode = serde_json::from_str(&text).map_err(|e| {
+            anyhow!("json error: {e}, plz double check your session and csrf config.")
+        })?;
+
         trace!("Run code result {:#?}", run_res);
 
         // Check if leetcode accepted the Run request
