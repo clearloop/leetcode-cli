@@ -1,12 +1,10 @@
 //! Errors in leetcode-cli
-use crate::cfg::{root, DEFAULT_CONFIG};
 use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
 use std::fmt;
 
 // fixme: use this_error
 /// Error enum
-#[derive(Clone)]
 pub enum Error {
     MatchError,
     DownloadError(String),
@@ -21,6 +19,7 @@ pub enum Error {
     SilentError,
     NoneError,
     ChromeNotLogin,
+    Anyhow(anyhow::Error),
 }
 
 impl std::fmt::Debug for Error {
@@ -60,7 +59,8 @@ impl std::fmt::Debug for Error {
                 "json from response parse failed, please open a new issue at: {}.",
                 "https://github.com/clearloop/leetcode-cli/".underline(),
             ),
-            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry.")
+            Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry."),
+            Error::Anyhow(e) => write!(f, "{} {}", e, e),
         }
     }
 }
@@ -103,15 +103,13 @@ impl std::convert::From<serde_json::error::Error> for Error {
 // toml
 impl std::convert::From<toml::de::Error> for Error {
     fn from(_err: toml::de::Error) -> Self {
-        let conf = root().unwrap().join("leetcode_tmp.toml");
-        std::fs::write(conf, &DEFAULT_CONFIG[1..]).unwrap();
         #[cfg(debug_assertions)]
         let err_msg = format!(
             "{}, {}{}{}{}{}{}",
             _err,
             "Parse config file failed, ",
             "leetcode-cli has just generated a new leetcode.toml at ",
-            "~/.leetcode/leetcode_tmp.toml,".green().bold().underline(),
+            "~/.leetcode/leetcode.tmp.toml,".green().bold().underline(),
             " the current one at ",
             "~/.leetcode/leetcode.toml".yellow().bold().underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",
@@ -126,7 +124,7 @@ impl std::convert::From<toml::de::Error> for Error {
             "~/.leetcode/leetcode.toml".yellow().bold().underline(),
             " seems missing some keys, Please compare the new file and add the missing keys.\n",
         );
-        Error::ParseError(err_msg)
+        Error::ParseError(err_msg.trim_start().into())
     }
 }
 
@@ -147,6 +145,12 @@ impl std::convert::From<std::io::Error> for Error {
 impl std::convert::From<openssl::error::ErrorStack> for Error {
     fn from(_: openssl::error::ErrorStack) -> Self {
         Error::DecryptError
+    }
+}
+
+impl From<anyhow::Error> for Error {
+    fn from(err: anyhow::Error) -> Self {
+        Error::Anyhow(err)
     }
 }
 

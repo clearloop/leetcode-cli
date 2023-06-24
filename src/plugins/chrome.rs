@@ -41,7 +41,7 @@ impl std::string::ToString for Ident {
 
 /// Get cookies from chrome storage
 pub fn cookies() -> Result<Ident, crate::Error> {
-    let ccfg = crate::cfg::locate()?.cookies;
+    let ccfg = crate::config::Config::locate()?.cookies;
     if !ccfg.csrf.is_empty() && !ccfg.session.is_empty() {
         return Ok(Ident {
             csrf: ccfg.csrf,
