@@ -57,8 +57,6 @@ editor = emacs
 # Optional parameter
 editor-args = ['-nw']
 lang = 'rust'
-pick = '${fid}.${slug}'
-submission = '${fid}.${slug}.${sid}.${ac}'
 
 [cookies]
 csrf = '<your-leetcode-csrf-token>'

@@ -1,6 +1,14 @@
 //! Code in config
 use serde::{Deserialize, Serialize};
 
+fn default_pick() -> String {
+    "${fid}.${slug}".into()
+}
+
+fn default_submission() -> String {
+    "${fid}.${slug}.${sid}.${ac}".into()
+}
+
 /// Code config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
@@ -21,7 +29,9 @@ pub struct Code {
     #[serde(default, skip_serializing)]
     pub test: bool,
     pub lang: String,
+    #[serde(default = "default_pick", skip_serializing)]
     pub pick: String,
+    #[serde(default = "default_submission", skip_serializing)]
     pub submission: String,
 }
 
