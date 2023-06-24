@@ -42,11 +42,6 @@ features = ["sqlite"]
 version = "0.11.11"
 features = ["gzip", "json"]
 
-[dev-dependencies.cargo-husky]
-version = "1.5.0"
-default-features = false
-features = ["precommit-hook", "user-hooks"]
-
 [features]
 pym = ["pyo3"]
 
