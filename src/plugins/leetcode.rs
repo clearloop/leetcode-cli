@@ -37,12 +37,20 @@ impl LeetCode {
     /// New LeetCode client
     pub fn new() -> Result<LeetCode, crate::Error> {
         let conf = config::Config::locate()?;
-        let cookies = conf.cookies.clone();
+        let (cookie, csrf) = if conf.cookies.csrf.is_empty() || conf.cookies.session.is_empty() {
+            let cookies = super::chrome::cookies()?;
+            (cookies.to_string(), cookies.csrf)
+        } else {
+            (
+                conf.cookies.clone().to_string(),
+                conf.cookies.clone().csrf,
+            )
+        };
         let default_headers = LeetCode::headers(
             HeaderMap::new(),
             vec![
-                ("Cookie", cookies.to_string().as_str()),
-                ("x-csrftoken", &cookies.csrf),
+                ("Cookie", &cookie),
+                ("x-csrftoken", &csrf),
                 ("x-requested-with", "XMLHttpRequest"),
                 ("Origin", &conf.sys.urls.base),
             ],
