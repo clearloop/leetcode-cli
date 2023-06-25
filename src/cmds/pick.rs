@@ -48,6 +48,14 @@ impl Command for PickCommand {
             .about("Pick a problem")
             .visible_alias("p")
             .arg(
+                Arg::new("name")
+                    .short('n')
+                    .long("name")
+                    .value_parser(clap::value_parser!(String))
+                    .help("Problem name")
+                    .num_args(1),
+            )
+            .arg(
                 Arg::new("id")
                     .value_parser(clap::value_parser!(i32))
                     .help("Problem id")
@@ -127,15 +135,32 @@ impl Command for PickCommand {
             None
         };
 
-        let fid = m
-            .get_one::<i32>("id")
-            .copied()
-            .or(daily_id)
-            .unwrap_or_else(|| {
-                // Pick random without specify id
-                let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
-                problem.fid
-            });
+        let fid = match m.contains_id("name") {
+            //check for name specified
+            true => {
+                match m.get_one::<String>("name").map(|name| name) {
+                    Some(quesname) => match cache.get_problem_id_from_name(quesname) {
+                        Ok(p) => p,
+                        Err(_) => 1,
+                    },
+                    None => {
+                        // Pick random without specify id
+                        let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
+                        problem.fid
+                    }
+                }
+            }
+            false => {
+                m.get_one::<i32>("id")
+                    .copied()
+                    .or(daily_id)
+                    .unwrap_or_else(|| {
+                        // Pick random without specify id
+                        let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
+                        problem.fid
+                    })
+            }
+        };
 
         let r = cache.get_question(fid).await;
 
