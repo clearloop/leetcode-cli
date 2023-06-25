@@ -139,8 +139,8 @@ impl Command for PickCommand {
             //check for name specified
             true => {
                 match m.get_one::<String>("name").map(|name| name) {
-                    Some(quesname) => match cache.get_problem_from_name(quesname) {
-                        Ok(p) => p.fid,
+                    Some(quesname) => match cache.get_problem_id_from_name(quesname) {
+                        Ok(p) => p,
                         Err(_) => 1,
                     },
                     None => {
@@ -158,18 +158,11 @@ impl Command for PickCommand {
                         // Pick random without specify id
                         let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
                         problem.fid
-                    });
-
-        let id = match fid {
-            Ok(id) => id,
-            Err(_) => {
-                // Pick random without specify id
-                let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
-                problem.fid
+                    })
             }
         };
 
-        let r = cache.get_question(id).await;
+        let r = cache.get_question(fid).await;
 
         match r {
             Ok(q) => println!("{}", q.desc()),
