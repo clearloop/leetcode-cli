@@ -8,6 +8,6 @@
 //!
 
 // FIXME: Read cookies from local storage. (issue #122)
-// mod chrome;
+mod chrome;
 mod leetcode;
 pub use leetcode::LeetCode;
