@@ -126,7 +126,7 @@ impl Cache {
     pub fn get_problem_id_from_name(&self, problem_name: &String) -> Result<i32, Error> {
         let p: Problem = problems
             .filter(name.eq(problem_name))
-            .first(&self.conn()?)?;
+            .first(&mut self.conn()?)?;
         if p.category != "algorithms" {
             return Err(Error::FeatureError(
                 "Not support database and shell questions for now".to_string(),
