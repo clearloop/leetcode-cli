@@ -22,7 +22,7 @@ cargo install leetcode-cli
 
 ## Usage
 
-**Make sure you have logged in to `leetcode.com` with `Chrome`**. See [Cookies](#cookies) for why you need to do this first.
+**Make sure you have logged in to `leetcode.com` with `Firefox`**. See [Cookies](#cookies) for why you need to do this first.
 
 ```sh
 leetcode 0.4.0
@@ -168,19 +168,20 @@ csrf = "..."
 session = "..."
 ```
 
-For Example, using Chrome (after logging in to LeetCode):
+For Example, using Firefox (after logging in to LeetCode):
 
 #### Step 1
 
-Open Chrome and navigate to the link below:
-
-```sh
-chrome://settings/cookies/detail?site=leetcode.com
-```
+Open Firefox, press F12, and click `Storage` tab.
 
 #### Step 2
 
-Copy `Content` from `LEETCODE_SESSION` and `csrftoken` to `session` and `csrf` in your configuration file, respectively:
+Expand `Cookies` tab on the left and select https://leetcode.com.
+
+
+#### Step 2
+
+Copy `Value` from `LEETCODE_SESSION` and `csrftoken` to `session` and `csrf` in your configuration file, respectively:
 
 ```toml
 [cookies]
