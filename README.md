@@ -20,6 +20,23 @@
 cargo install leetcode-cli
 ```
 
+<details>
+<summary>Shell completions</summary>
+
+For Bash and Zsh (by default picks up `$SHELL` from environment)
+```sh
+eval "$(leetcode completions)"
+```
+Copy the line above to `.bash_profile` or `.zshrc`
+
+You may also obtain specific shell configuration using.
+
+```sh
+leetcode completions fish
+```
+
+</details>
+
 ## Usage
 
 **Make sure you have logged in to `leetcode.com` with `Firefox`**. See [Cookies](#cookies) for why you need to do this first.

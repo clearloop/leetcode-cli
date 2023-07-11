@@ -24,6 +24,7 @@ pub trait Command {
     async fn handler(m: &ArgMatches) -> Result<(), Error>;
 }
 
+mod completions;
 mod data;
 mod edit;
 mod exec;
@@ -31,6 +32,7 @@ mod list;
 mod pick;
 mod stat;
 mod test;
+pub use completions::{completion_handler, CompletionCommand};
 pub use data::DataCommand;
 pub use edit::EditCommand;
 pub use exec::ExecCommand;
