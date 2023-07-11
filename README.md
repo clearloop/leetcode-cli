@@ -20,7 +20,8 @@
 cargo install leetcode-cli
 ```
 
-### For shell completions:
+<details>
+<summary>Shell completions</summary>
 
 For Bash and Zsh (by default picks up `$SHELL` from environment)
 ```sh
@@ -28,11 +29,13 @@ eval "$(leetcode completions)"
 ```
 Copy the line above to `.bash_profile` or `.zshrc`
 
-You can obtain specific shell configuration using.
+You may also obtain specific shell configuration using.
 
 ```sh
 leetcode completions fish
 ```
+
+</details>
 
 ## Usage
 
