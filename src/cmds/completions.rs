@@ -3,7 +3,6 @@
 use super::Command;
 use crate::err::Error;
 use async_trait::async_trait;
-use clap::crate_name;
 use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
 use clap_complete::{generate, Generator, Shell};
 
@@ -44,7 +43,8 @@ impl Command for CompletionCommand {
 
 fn get_completions_string<G: Generator>(gen: G, cmd: &mut ClapCommand) -> Result<String, Error> {
     let mut v: Vec<u8> = Vec::new();
-    generate(gen, cmd, crate_name!(), &mut v);
+    let name = cmd.get_name().to_string();
+    generate(gen, cmd, name, &mut v);
     Ok(String::from_utf8(v)?)
 }
 

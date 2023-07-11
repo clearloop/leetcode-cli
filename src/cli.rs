@@ -7,7 +7,7 @@ use crate::{
     err::Error,
     flag::{Debug, Flag},
 };
-use clap::{crate_name, crate_version};
+use clap::crate_version;
 use log::LevelFilter;
 
 /// This should be called before calling any cli method or printing any output.
@@ -26,7 +26,8 @@ pub fn reset_signal_pipe_handler() {
 /// Get matches
 pub async fn main() -> Result<(), Error> {
     reset_signal_pipe_handler();
-    let mut cmd = clap::Command::new(crate_name!())
+
+    let mut cmd = clap::Command::new("leetcode")
         .version(crate_version!())
         .about("May the Code be with You 👻")
         .subcommands(vec![
