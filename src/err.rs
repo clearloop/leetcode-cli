@@ -1,7 +1,7 @@
 //! Errors in leetcode-cli
 use crate::cmds::{Command, DataCommand};
 use colored::Colorize;
-use std::fmt;
+use std::{fmt, string::FromUtf8Error};
 
 // fixme: use this_error
 /// Error enum
@@ -17,6 +17,7 @@ pub enum Error {
     PremiumError,
     DecryptError,
     SilentError,
+    Utf8ParseError,
     NoneError,
     ChromeNotLogin,
     Anyhow(anyhow::Error),
@@ -61,6 +62,7 @@ impl std::fmt::Debug for Error {
             ),
             Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry."),
             Error::Anyhow(e) => write!(f, "{} {}", e, e),
+            Error::Utf8ParseError => write!(f, "cannot parse utf8 from buff {}", e),
         }
     }
 }
@@ -69,6 +71,13 @@ impl std::fmt::Debug for Error {
 impl std::convert::From<reqwest::Error> for Error {
     fn from(err: reqwest::Error) -> Self {
         Error::NetworkError(err.to_string())
+    }
+}
+
+// utf8 parse
+impl std::convert::From<FromUtf8Error> for Error {
+    fn from(_err: FromUtf8Error) -> Self {
+        Error::Utf8ParseError
     }
 }
 

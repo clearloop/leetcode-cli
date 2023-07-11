@@ -1,8 +1,8 @@
 //! Clap Commanders
 use crate::{
     cmds::{
-        Command, DataCommand, EditCommand, ExecCommand, ListCommand, PickCommand, StatCommand,
-        TestCommand,
+        completion_handler, Command, CompletionCommand, DataCommand, EditCommand, ExecCommand,
+        ListCommand, PickCommand, StatCommand, TestCommand,
     },
     err::Error,
     flag::{Debug, Flag},
@@ -26,7 +26,7 @@ pub fn reset_signal_pipe_handler() {
 /// Get matches
 pub async fn main() -> Result<(), Error> {
     reset_signal_pipe_handler();
-    let m = clap::Command::new(crate_name!())
+    let mut cmd = clap::Command::new(crate_name!())
         .version(crate_version!())
         .about("May the Code be with You 👻")
         .subcommands(vec![
@@ -37,10 +37,12 @@ pub async fn main() -> Result<(), Error> {
             PickCommand::usage().display_order(5),
             StatCommand::usage().display_order(6),
             TestCommand::usage().display_order(7),
+            CompletionCommand::usage().display_order(8),
         ])
         .arg(Debug::usage())
-        .arg_required_else_help(true)
-        .get_matches();
+        .arg_required_else_help(true);
+
+    let m = cmd.clone().get_matches();
 
     if m.get_flag("debug") {
         Debug::handler()?;
@@ -59,6 +61,7 @@ pub async fn main() -> Result<(), Error> {
         Some(("pick", sub_m)) => Ok(PickCommand::handler(sub_m).await?),
         Some(("stat", sub_m)) => Ok(StatCommand::handler(sub_m).await?),
         Some(("test", sub_m)) => Ok(TestCommand::handler(sub_m).await?),
+        Some(("completions", sub_m)) => Ok(completion_handler(sub_m, &mut cmd)?),
         _ => Err(Error::MatchError),
     }
 }

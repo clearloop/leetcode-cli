@@ -33,6 +33,7 @@ toml = "0.5.9"
 regex = "1.6.0"
 scraper = "0.13.0"
 anyhow = "1.0.71"
+clap_complete = "4.3.2"
 
 [dependencies.diesel]
 version = "2.0.3"
