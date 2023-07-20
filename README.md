@@ -24,9 +24,11 @@ cargo install leetcode-cli
 <summary>Shell completions</summary>
 
 For Bash and Zsh (by default picks up `$SHELL` from environment)
+
 ```sh
 eval "$(leetcode completions)"
 ```
+
 Copy the line above to `.bash_profile` or `.zshrc`
 
 You may also obtain specific shell configuration using.
@@ -72,8 +74,14 @@ For example, given this config (could be found at `~/.leetcode/leetcode.toml`):
 [code]
 editor = 'emacs'
 # Optional parameter
-editor-args = ['-nw']
+editor_args = ['-nw']
 lang = 'rust'
+edit_code_marker = false
+start_marker = ""
+end_marker = ""
+comment_problem_desc = false
+comment_leading = ""
+test = true
 
 [cookies]
 csrf = '<your-leetcode-csrf-token>'
@@ -194,7 +202,6 @@ Open Firefox, press F12, and click `Storage` tab.
 #### Step 2
 
 Expand `Cookies` tab on the left and select https://leetcode.com.
-
 
 #### Step 2
 
