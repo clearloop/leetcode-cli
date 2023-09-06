@@ -37,6 +37,8 @@ You may also obtain specific shell configuration using.
 leetcode completions fish
 ```
 
+If no argument is provided, the shell is inferred from the `SHELL` environment variable.
+
 </details>
 
 ## Usage
