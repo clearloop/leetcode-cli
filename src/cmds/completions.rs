@@ -49,14 +49,17 @@ fn get_completions_string<G: Generator>(gen: G, cmd: &mut ClapCommand) -> Result
 }
 
 pub fn completion_handler(m: &ArgMatches, cmd: &mut ClapCommand) -> Result<(), Error> {
-    let shell = *m.get_one::<Shell>("shell").unwrap_or(
-        // if shell value is not provided try to get from the environment
-        {
-            println!("# Since shell arg value is not provided trying to get the default shell from the environment.");
-            &Shell::from_env().ok_or(Error::MatchError)?
-        }
-    );
-    let completions = get_completions_string(shell, cmd)?;
-    println!("{}", completions);
+    let shell_result = m.get_one::<Shell>("shell");
+    if let Some(shell) = shell_result {
+        // Shell argument is provided, use it directly
+        let completions = get_completions_string(*shell, cmd)?;
+        println!("{}", completions);
+    } else {
+        // Shell argument is not provided, fall back to the default shell from the environment
+        let shell = Shell::from_env().ok_or(Error::MatchError)?;
+        let completions = get_completions_string(shell, cmd)?;
+        println!("{}", completions);
+        println!("# Since shell arg value is not provided trying to get the default shell from the environment.");
+    }
     Ok(())
 }
