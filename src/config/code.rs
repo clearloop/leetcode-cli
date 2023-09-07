@@ -16,6 +16,8 @@ pub struct Code {
     pub editor: String,
     #[serde(rename(serialize = "editor-args"), alias = "editor-args", default)]
     pub editor_args: Option<Vec<String>>,
+    #[serde(rename(serialize = "template"), alias = "template", default)]
+    pub template: Option<Vec<String>>,
     #[serde(default, skip_serializing)]
     pub edit_code_marker: bool,
     #[serde(default, skip_serializing)]
@@ -40,6 +42,7 @@ impl Default for Code {
         Self {
             editor: "vim".into(),
             editor_args: None,
+            template: None,
             edit_code_marker: false,
             start_marker: "".into(),
             end_marker: "".into(),
