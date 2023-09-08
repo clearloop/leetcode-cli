@@ -115,7 +115,7 @@ impl Cache {
         let p: Problem = problems.filter(fid.eq(rfid)).first(&mut self.conn()?)?;
         if p.category != "algorithms" {
             return Err(Error::FeatureError(
-                "Not support database and shell questions for now".to_string(),
+                "No support for database and shell questions yet".to_string(),
             ));
         }
 
@@ -129,7 +129,7 @@ impl Cache {
             .first(&mut self.conn()?)?;
         if p.category != "algorithms" {
             return Err(Error::FeatureError(
-                "Not support database and shell questions for now".to_string(),
+                "No support for database and shell questions yet".to_string(),
             ));
         }
         Ok(p.fid)
@@ -174,7 +174,7 @@ impl Cache {
 
         if target.category != "algorithms" {
             return Err(Error::FeatureError(
-                "Not support database and shell questions for now".to_string(),
+                "No support for database and shell questions yet".to_string(),
             ));
         }
 
@@ -255,7 +255,7 @@ impl Cache {
         rfid: i32,
         test_case: Option<String>,
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
-        trace!("pre run code...");
+        trace!("pre-run code...");
         use crate::helper::code_path;
         use std::fs::File;
         use std::io::Read;
