@@ -16,14 +16,16 @@ pub struct Code {
     pub editor: String,
     #[serde(rename(serialize = "editor-args"), alias = "editor-args", default)]
     pub editor_args: Option<Vec<String>>,
-    #[serde(rename(serialize = "template"), alias = "template", default)]
-    pub template: Option<Vec<String>>,
     #[serde(default, skip_serializing)]
     pub edit_code_marker: bool,
     #[serde(default, skip_serializing)]
     pub start_marker: String,
     #[serde(default, skip_serializing)]
     pub end_marker: String,
+    #[serde(rename(serialize = "inject_before"), alias = "inject_before", default)]
+    pub inject_before: Option<Vec<String>>,
+    #[serde(rename(serialize = "inject_after"), alias = "inject_after", default)]
+    pub inject_after: Option<Vec<String>>,
     #[serde(default, skip_serializing)]
     pub comment_problem_desc: bool,
     #[serde(default, skip_serializing)]
@@ -42,10 +44,11 @@ impl Default for Code {
         Self {
             editor: "vim".into(),
             editor_args: None,
-            template: None,
             edit_code_marker: false,
             start_marker: "".into(),
             end_marker: "".into(),
+            inject_before: None,
+            inject_after: None,
             comment_problem_desc: false,
             comment_leading: "".into(),
             test: true,
