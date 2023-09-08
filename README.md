@@ -194,7 +194,7 @@ Some linting tools/lsps will throw errors unless the necessary libraries are imp
 
 ```toml
 [code]
-inject_before = ["#include<bits/stdc++.h", "using namespace std;"]
+inject_before = ["#include<bits/stdc++.h>", "using namespace std;"]
 inject_after = ["int main() {\n    Solution solution;\n\n}"]
 ```
 
