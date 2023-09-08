@@ -93,6 +93,11 @@ impl Command for EditCommand {
                         file_code.write_all(p_desc_comment.as_bytes())?;
                         file_code.write_all(question_desc.as_bytes())?;
                     }
+                    if let Some(inject_before) = &conf.code.inject_before {
+                        for line in inject_before {
+                            file_code.write_all((line.to_string() + "\n").as_bytes())?;
+                        }
+                    }
                     if conf.code.edit_code_marker {
                         file_code.write_all(
                             (conf.code.comment_leading.clone()
@@ -111,6 +116,11 @@ impl Command for EditCommand {
                                 + "\n")
                                 .as_bytes(),
                         )?;
+                    }
+                    if let Some(inject_after) = &conf.code.inject_after {
+                        for line in inject_after {
+                            file_code.write_all((line.to_string() + "\n").as_bytes())?;
+                        }
                     }
 
                     if test_flag {

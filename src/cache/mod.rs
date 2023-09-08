@@ -356,7 +356,7 @@ impl Cache {
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
         let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case).await?;
-        trace!("Pre run code result {:#?}, {}, {}", json, url, refer);
+        trace!("Pre-run code result {:#?}, {}, {}", json, url, refer);
 
         let text = self
             .0
@@ -367,7 +367,7 @@ impl Cache {
             .await?;
 
         let run_res: RunCode = serde_json::from_str(&text).map_err(|e| {
-            anyhow!("json error: {e}, plz double check your session and csrf config.")
+            anyhow!("JSON error: {e}, please double check your session and csrf config.")
         })?;
 
         trace!("Run code result {:#?}", run_res);
