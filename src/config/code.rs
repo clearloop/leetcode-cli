@@ -17,6 +17,8 @@ pub struct Code {
     #[serde(rename(serialize = "editor-args"), alias = "editor-args", default)]
     pub editor_args: Option<Vec<String>>,
     #[serde(default, skip_serializing)]
+    pub editor_env: String,
+    #[serde(default, skip_serializing)]
     pub edit_code_marker: bool,
     #[serde(default, skip_serializing)]
     pub start_marker: String,
@@ -44,6 +46,7 @@ impl Default for Code {
         Self {
             editor: "vim".into(),
             editor_args: None,
+            editor_env: "".into(),
             edit_code_marker: false,
             start_marker: "".into(),
             end_marker: "".into(),

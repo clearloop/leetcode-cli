@@ -161,8 +161,21 @@ impl Command for EditCommand {
             args.extend_from_slice(&editor_args);
         }
 
+        let editor_env = &conf.code.editor_env;
+        let mut env: Vec<&str> = vec!["", ""];
+        if !editor_env.is_empty() {
+            env = editor_env.splitn(2, '=').collect();
+            if env.len() != 2 {
+                return Err(crate::Error::FeatureError(
+                    "Invalid environment variable, please check your configuration for errors"
+                        .into(),
+                ));
+            }
+        }
+
         args.push(path);
         std::process::Command::new(conf.code.editor)
+            .env(env[0], env[1])
             .args(args)
             .status()?;
         Ok(())
