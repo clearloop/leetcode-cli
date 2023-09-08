@@ -68,7 +68,7 @@ SUBCOMMANDS:
 
 ## Example
 
-For example, given this config (could be found at `~/.leetcode/leetcode.toml`):
+To configure leetcode-cli, create a file at `~/.leetcode/leetcode.toml`):
 
 ```toml
 [code]
@@ -185,6 +185,14 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
 </details>
 
 <br>
+
+Some linting tools/lsps will throw errors unless the necessary libraries are imported. leetcode-cli can generate this boilerplate automatically if the `inject_before` key is set. Similarly, if you want to test out your code locally, you can automate that with `inject_after`. For c++ this might look something like:
+
+```toml
+[code]
+inject_before = ["#include<bits/stdc++.h", "using namespace std;"]
+inject_after = ["int main() {\n    Solution solution;\n\n}"]
+```
 
 #### 1. <kbd>pick</kbd>
 
