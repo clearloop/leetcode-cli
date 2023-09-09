@@ -75,6 +75,8 @@ To configure leetcode-cli, create a file at `~/.leetcode/leetcode.toml`):
 editor = 'emacs'
 # Optional parameter
 editor_args = ['-nw']
+# Optional environment variables (ex. [ "XDG_DATA_HOME=...", "XDG_CONFIG_HOME=...", "XDG_STATE_HOME=..." ])
+editor_envs = []
 lang = 'rust'
 edit_code_marker = false
 start_marker = ""
@@ -104,6 +106,8 @@ scripts = 'scripts'
 editor = 'emacs'
 # Optional parameter
 editor_args = ['-nw']
+# Optional environment variables (ex. [ "XDG_DATA_HOME=...", "XDG_CONFIG_HOME=...", "XDG_STATE_HOME=..." ])
+editor_envs = []
 lang = 'rust'
 edit_code_marker = true
 start_marker = "start_marker"
@@ -190,7 +194,7 @@ Some linting tools/lsps will throw errors unless the necessary libraries are imp
 
 ```toml
 [code]
-inject_before = ["#include<bits/stdc++.h", "using namespace std;"]
+inject_before = ["#include<bits/stdc++.h>", "using namespace std;"]
 inject_after = ["int main() {\n    Solution solution;\n\n}"]
 ```
 

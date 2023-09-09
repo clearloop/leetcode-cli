@@ -3,6 +3,7 @@ use super::Command;
 use crate::Error;
 use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command as ClapCommand};
+use std::collections::HashMap;
 
 /// Abstract `edit` command
 ///
@@ -161,8 +162,39 @@ impl Command for EditCommand {
             args.extend_from_slice(&editor_args);
         }
 
+        // Set environment variables for editor
+        //
+        // for example:
+        //
+        // ```toml
+        // [code]
+        // editor = "nvim"
+        // editor_envs = [ "XDG_DATA_HOME=...", "XDG_CONFIG_HOME=...", "XDG_STATE_HOME=..." ]
+        // ```
+        //
+        // ```rust
+        // Command::new("nvim").envs(&[ ("XDG_DATA_HOME", "..."), ("XDG_CONFIG_HOME", "..."), ("XDG_STATE_HOME", "..."), ]);
+        // ```
+        let mut envs: HashMap<String, String> = Default::default();
+        if let Some(editor_envs) = &conf.code.editor_envs {
+            for env in editor_envs.iter() {
+                let parts: Vec<&str> = env.split('=').collect();
+                if parts.len() == 2 {
+                    let name = parts[0].trim();
+                    let value = parts[1].trim();
+                    envs.insert(name.to_string(), value.to_string());
+                } else {
+                    return Err(crate::Error::FeatureError(format!(
+                        "Invalid editor environment variable: {}",
+                        &env
+                    )));
+                }
+            }
+        }
+
         args.push(path);
         std::process::Command::new(conf.code.editor)
+            .envs(envs)
             .args(args)
             .status()?;
         Ok(())
