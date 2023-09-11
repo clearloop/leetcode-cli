@@ -7,6 +7,7 @@ use pyo3::prelude::*;
 
 /// Exec python scripts as filter
 pub fn exec(module: &str) -> Result<Vec<String>, crate::Error> {
+    pyo3::prepare_freethreaded_python();
     let script = load_script(&module)?;
     let cache = Cache::new()?;
 
@@ -20,7 +21,7 @@ pub fn exec(module: &str) -> Result<Vec<String>, crate::Error> {
     let stags = serde_json::to_string(&cache.get_tags()?)?;
 
     // ret
-    let res: Vec<String> = pym.call1("plan", (sps, stags))?.extract()?;
+    let res: Vec<String> = pym.getattr("plan")?.call1((sps, stags))?.extract()?;
 
     Ok(res)
 }
