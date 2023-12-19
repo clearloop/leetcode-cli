@@ -1,4 +1,5 @@
 use crate::{cache, Error};
+use anyhow::anyhow;
 use diesel::prelude::*;
 use keyring::Entry;
 use openssl::{hash, pkcs5, symm};
@@ -117,11 +118,7 @@ fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
             )
             .expect("pbkdf2 hmac went error.");
         }
-        _ => {
-            return Err(crate::Error::FeatureError(
-                "only supports OSX or Linux for now".to_string(),
-            ))
-        }
+        _ => return Err(anyhow!("only supports OSX or Linux for now").into()),
     }
 
     chrome_decrypt(v, key)

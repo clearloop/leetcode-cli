@@ -114,9 +114,7 @@ impl Cache {
     pub fn get_problem(&self, rfid: i32) -> Result<Problem, Error> {
         let p: Problem = problems.filter(fid.eq(rfid)).first(&mut self.conn()?)?;
         if p.category != "algorithms" {
-            return Err(Error::FeatureError(
-                "No support for database and shell questions yet".to_string(),
-            ));
+            return Err(anyhow!("No support for database and shell questions yet").into());
         }
 
         Ok(p)
@@ -128,9 +126,7 @@ impl Cache {
             .filter(name.eq(problem_name))
             .first(&mut self.conn()?)?;
         if p.category != "algorithms" {
-            return Err(Error::FeatureError(
-                "No support for database and shell questions yet".to_string(),
-            ));
+            return Err(anyhow!("No support for database and shell questions yet").into());
         }
         Ok(p.fid)
     }
@@ -173,9 +169,7 @@ impl Cache {
         );
 
         if target.category != "algorithms" {
-            return Err(Error::FeatureError(
-                "No support for database and shell questions yet".to_string(),
-            ));
+            return Err(anyhow!("No support for database and shell questions yet").into());
         }
 
         let mut rdesc = Question::default();

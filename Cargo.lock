@@ -1239,6 +1239,7 @@ dependencies = [
  "scraper",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio",
  "toml",
 ]

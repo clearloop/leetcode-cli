@@ -22,13 +22,9 @@ impl LeetCode {
     /// Parse reqwest headers
     fn headers(mut headers: HeaderMap, ts: Vec<(&str, &str)>) -> Result<HeaderMap, Error> {
         for (k, v) in ts.into_iter() {
-            let name = HeaderName::from_str(k);
-            let value = HeaderValue::from_str(v);
-            if name.is_err() || value.is_err() {
-                return Err(Error::ParseError("http header parse failed".to_string()));
-            }
-
-            headers.insert(name.unwrap(), value.unwrap());
+            let name = HeaderName::from_str(k)?;
+            let value = HeaderValue::from_str(v)?;
+            headers.insert(name, value);
         }
 
         Ok(headers)
@@ -41,10 +37,7 @@ impl LeetCode {
             let cookies = super::chrome::cookies()?;
             (cookies.to_string(), cookies.csrf)
         } else {
-            (
-                conf.cookies.clone().to_string(),
-                conf.cookies.clone().csrf,
-            )
+            (conf.cookies.clone().to_string(), conf.cookies.clone().csrf)
         };
         let default_headers = LeetCode::headers(
             HeaderMap::new(),

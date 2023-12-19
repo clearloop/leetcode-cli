@@ -34,6 +34,7 @@ regex = "1.10.2"
 scraper = "0.18.1"
 anyhow = "1.0.75"
 clap_complete = "4.4.4"
+thiserror = "1.0.51"
 
 [dependencies.diesel]
 version = "2.1.4"

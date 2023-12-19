@@ -1,6 +1,7 @@
 //! Edit command
 use super::Command;
 use crate::Error;
+use anyhow::anyhow;
 use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use std::collections::HashMap;
@@ -134,13 +135,14 @@ impl Command for EditCommand {
             // if language is not found in the list of supported languges clean up files
             if !flag {
                 std::fs::remove_file(&path)?;
+
                 if test_flag {
                     std::fs::remove_file(&test_path)?;
                 }
-                return Err(crate::Error::FeatureError(format!(
-                    "This question doesn't support {}, please try another",
-                    &lang
-                )));
+
+                return Err(
+                    anyhow!("This question doesn't support {lang}, please try another").into(),
+                );
             }
         }
 
@@ -184,10 +186,7 @@ impl Command for EditCommand {
                     let value = parts[1].trim();
                     envs.insert(name.to_string(), value.to_string());
                 } else {
-                    return Err(crate::Error::FeatureError(format!(
-                        "Invalid editor environment variable: {}",
-                        &env
-                    )));
+                    return Err(anyhow!("Invalid editor environment variable: {env}").into());
                 }
             }
         }
