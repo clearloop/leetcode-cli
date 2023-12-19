@@ -2,9 +2,9 @@ name: leetcode-cli
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -29,6 +29,6 @@ jobs:
               sudo apt-get install -y libsqlite3-dev libdbus-1-dev
           fi
       - name: Build
-        run: cargo build --release --locked
+        run: cargo build --release --all-features
       - name: Run tests
-        run: cargo test
+        run: cargo test --release --all-features
