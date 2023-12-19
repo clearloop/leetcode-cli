@@ -1,8 +1,10 @@
 //! A set of helper traits
-pub use self::digit::Digit;
-pub use self::file::{code_path, load_script, test_cases_path};
-pub use self::filter::{filter, squash};
-pub use self::html::HTML;
+pub use self::{
+    digit::Digit,
+    file::{code_path, load_script, test_cases_path},
+    filter::{filter, squash},
+    html::HTML,
+};
 
 /// Convert i32 to specific digits string.
 mod digit {
@@ -78,7 +80,7 @@ mod filter {
     }
 
     /// Squash questions and ids
-    pub fn squash(ps: &mut Vec<Problem>, ids: Vec<String>) -> Result<(), crate::Error> {
+    pub fn squash(ps: &mut Vec<Problem>, ids: Vec<String>) -> crate::Result<()> {
         use std::collections::HashMap;
 
         let mut map: HashMap<String, bool> = HashMap::new();
@@ -164,7 +166,7 @@ mod html {
 
 mod file {
     /// Convert file suffix from language type
-    pub fn suffix(l: &str) -> Result<&'static str, crate::Error> {
+    pub fn suffix(l: &str) -> crate::Result<&'static str> {
         match l {
             "bash" => Ok("sh"),
             "c" => Ok("c"),
@@ -191,7 +193,7 @@ mod file {
     use crate::{cache::models::Problem, Error};
 
     /// Generate test cases path by fid
-    pub fn test_cases_path(problem: &Problem) -> Result<String, Error> {
+    pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
         let conf = crate::config::Config::locate()?;
         let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
 
@@ -201,7 +203,7 @@ mod file {
     }
 
     /// Generate code path by fid
-    pub fn code_path(problem: &Problem, l: Option<String>) -> Result<String, Error> {
+    pub fn code_path(problem: &Problem, l: Option<String>) -> crate::Result<String> {
         let conf = crate::config::Config::locate()?;
         let mut lang = conf.code.lang;
         if l.is_some() {
@@ -222,7 +224,7 @@ mod file {
     }
 
     /// Load python scripts
-    pub fn load_script(module: &str) -> Result<String, crate::Error> {
+    pub fn load_script(module: &str) -> crate::Result<String> {
         use std::fs::File;
         use std::io::Read;
         let conf = crate::config::Config::locate()?;

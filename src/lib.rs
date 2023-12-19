@@ -248,4 +248,4 @@ pub mod pym;
 // re-exports
 pub use cache::Cache;
 pub use config::Config;
-pub use err::Error;
+pub use err::{Error, Result};

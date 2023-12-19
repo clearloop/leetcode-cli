@@ -1,4 +1,4 @@
-use crate::{cache, Error};
+use crate::{cache, Error, Result};
 use anyhow::anyhow;
 use diesel::prelude::*;
 use keyring::Entry;
@@ -41,7 +41,7 @@ impl std::string::ToString for Ident {
 }
 
 /// Get cookies from chrome storage
-pub fn cookies() -> Result<Ident, crate::Error> {
+pub fn cookies() -> Result<Ident> {
     let ccfg = crate::config::Config::locate()?.cookies;
     if !ccfg.csrf.is_empty() && !ccfg.session.is_empty() {
         return Ok(Ident {
@@ -70,7 +70,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 
     debug!("res {:?}", &res);
     if res.is_empty() {
-        return Err(crate::Error::CookieError);
+        return Err(Error::CookieError);
     }
 
     // Get system password
@@ -95,7 +95,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
 }
 
 /// Decode cookies from chrome
-fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
+fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String> {
     let mut key = [0_u8; 16];
     match std::env::consts::OS {
         "macos" => {
@@ -125,7 +125,7 @@ fn decode_cookies(pass: &str, v: Vec<u8>) -> Result<String, crate::Error> {
 }
 
 /// Decrypt chrome cookie value with aes-128-cbc
-fn chrome_decrypt(v: Vec<u8>, key: [u8; 16]) -> Result<String, crate::Error> {
+fn chrome_decrypt(v: Vec<u8>, key: [u8; 16]) -> Result<String> {
     // <space>: \u16
     let iv = vec![32_u8; 16];
     let mut decrypter = symm::Crypter::new(

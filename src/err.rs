@@ -8,6 +8,9 @@ const CONFIG: &str = "~/.leetcode/leetcode.tmp.toml";
 #[cfg(not(debug_assertions))]
 const CONFIG: &str = "~/.leetcode/leetcode_tmp.toml";
 
+/// Leetcode result.
+pub type Result<T> = std::result::Result<T, Error>;
+
 /// Leetcode cli errors
 #[derive(thiserror::Error, Debug)]
 pub enum Error {

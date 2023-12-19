@@ -1,5 +1,5 @@
 //! Storage in config.
-use crate::Error;
+use crate::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
 
@@ -27,7 +27,7 @@ impl Default for Storage {
 
 impl Storage {
     /// convert root path
-    pub fn root(&self) -> Result<String, Error> {
+    pub fn root(&self) -> Result<String> {
         let home = dirs::home_dir()
             .ok_or(Error::NoneError)?
             .to_string_lossy()
@@ -37,7 +37,7 @@ impl Storage {
     }
 
     /// get cache path
-    pub fn cache(&self) -> Result<String, crate::Error> {
+    pub fn cache(&self) -> Result<String> {
         let root = PathBuf::from(self.root()?);
         if !root.exists() {
             info!("Generate cache dir at {:?}.", &root);
@@ -48,7 +48,7 @@ impl Storage {
     }
 
     /// get code path
-    pub fn code(&self) -> Result<String, crate::Error> {
+    pub fn code(&self) -> Result<String> {
         let root = &self.root()?;
         let p = PathBuf::from(root).join(&self.code);
         if !PathBuf::from(&p).exists() {
@@ -59,7 +59,7 @@ impl Storage {
     }
 
     /// get scripts path
-    pub fn scripts(mut self) -> Result<String, crate::Error> {
+    pub fn scripts(mut self) -> Result<String> {
         let root = &self.root()?;
         if self.scripts.is_none() {
             self.scripts = Some("scripts".into());

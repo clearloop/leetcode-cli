@@ -1,6 +1,6 @@
 //! Edit command
 use super::Command;
-use crate::Error;
+use crate::{Error, Result};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command as ClapCommand};
@@ -48,7 +48,7 @@ impl Command for EditCommand {
     }
 
     /// `edit` handler
-    async fn handler(m: &ArgMatches) -> Result<(), crate::Error> {
+    async fn handler(m: &ArgMatches) -> Result<()> {
         use crate::{cache::models::Question, Cache};
         use std::fs::File;
         use std::io::Write;
