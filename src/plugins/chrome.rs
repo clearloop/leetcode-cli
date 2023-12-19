@@ -73,7 +73,7 @@ pub fn cookies() -> Result<Ident, crate::Error> {
     }
 
     // Get system password
-    let ring = Entry::new("Chrome Safe Storage", "Chrome");
+    let ring = Entry::new("Chrome Safe Storage", "Chrome")?;
     let pass = ring.get_password().expect("Get Password failed");
 
     // Decode cookies

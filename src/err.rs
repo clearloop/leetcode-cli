@@ -21,6 +21,7 @@ pub enum Error {
     NoneError,
     ChromeNotLogin,
     Anyhow(anyhow::Error),
+    Keyring(keyring::Error),
 }
 
 impl std::fmt::Debug for Error {
@@ -63,6 +64,7 @@ impl std::fmt::Debug for Error {
             Error::ChromeNotLogin => write!(f, "maybe you not login on the Chrome, you can login and retry."),
             Error::Anyhow(e) => write!(f, "{} {}", e, e),
             Error::Utf8ParseError => write!(f, "cannot parse utf8 from buff {}", e),
+            Error::Keyring(e) => write!(f, " {e:?}"),
         }
     }
 }
@@ -160,6 +162,12 @@ impl std::convert::From<openssl::error::ErrorStack> for Error {
 impl From<anyhow::Error> for Error {
     fn from(err: anyhow::Error) -> Self {
         Error::Anyhow(err)
+    }
+}
+
+impl From<keyring::Error> for Error {
+    fn from(err: keyring::Error) -> Self {
+        Error::Keyring(err)
     }
 }
 

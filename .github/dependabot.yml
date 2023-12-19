@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "sunday"
+    commit-message:
+      prefix: "chore(dep): "
+    groups:
+      deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "sunday"
+    commit-message:
+      prefix: "chore(dep): "
+    groups:
+      deps:
+        patterns:
+          - "*"
