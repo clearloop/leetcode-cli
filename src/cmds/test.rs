@@ -1,6 +1,6 @@
 //! Test command
 use super::Command;
-use crate::Error;
+use crate::{Error, Result};
 use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 
@@ -45,7 +45,7 @@ impl Command for TestCommand {
     }
 
     /// `test` handler
-    async fn handler(m: &ArgMatches) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<()> {
         use crate::cache::{Cache, Run};
         let id: i32 = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
         let testcase = m.get_one::<String>("testcase");

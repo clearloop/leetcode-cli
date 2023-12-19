@@ -7,7 +7,7 @@
 //! + Use `leetcode config` to update it
 use crate::{
     config::{code::Code, cookies::Cookies, storage::Storage, sys::Sys},
-    Error,
+    Error, Result,
 };
 use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};
@@ -28,14 +28,14 @@ pub struct Config {
 }
 
 impl Config {
-    fn write_default(p: impl AsRef<Path>) -> Result<(), crate::Error> {
+    fn write_default(p: impl AsRef<Path>) -> Result<()> {
         fs::write(p.as_ref(), toml::ser::to_string_pretty(&Self::default())?)?;
 
         Ok(())
     }
 
     /// Locate lc's config file
-    pub fn locate() -> Result<Config, crate::Error> {
+    pub fn locate() -> Result<Config> {
         let conf = Self::root()?.join("leetcode.toml");
 
         if !conf.is_file() {
@@ -54,7 +54,7 @@ impl Config {
     }
 
     /// Get root path of leetcode-cli
-    pub fn root() -> Result<std::path::PathBuf, Error> {
+    pub fn root() -> Result<std::path::PathBuf> {
         let dir = dirs::home_dir().ok_or(Error::NoneError)?.join(".leetcode");
         if !dir.is_dir() {
             info!("Generate root dir at {:?}.", &dir);
@@ -65,7 +65,7 @@ impl Config {
     }
 
     /// Sync new config to config.toml
-    pub fn sync(&self) -> Result<(), Error> {
+    pub fn sync(&self) -> Result<()> {
         let home = dirs::home_dir().ok_or(Error::NoneError)?;
         let conf = home.join(".leetcode/leetcode.toml");
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;

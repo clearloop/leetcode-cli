@@ -169,7 +169,7 @@ impl Command for PickCommand {
             Ok(q) => println!("{}", q.desc()),
             Err(e) => {
                 eprintln!("{:?}", e);
-                if let Error::NetworkError(_) = e {
+                if let Error::Reqwest(_) = e {
                     Self::handler(m).await?;
                 }
             }
