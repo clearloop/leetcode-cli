@@ -315,8 +315,8 @@ Copy `Value` from `LEETCODE_SESSION` and `csrftoken` to `session` and `csrf` in 
 
 ```toml
 [cookies]
-csrf = "${csrftoken}"
-session = "${LEETCODE_SESSION}"
+csrf = '<your-leetcode-csrf-token>'
+session = '<your-leetcode-session-key>'
 ```
 
 ## Programmable
