@@ -361,7 +361,7 @@ impl Cache {
             .await?;
 
         let run_res: RunCode = serde_json::from_str(&text).map_err(|e| {
-            anyhow!("JSON error: {e}, please double check your session and csrf config.")
+            anyhow!("Error JSON error: {e}, original response: {text}, please double check your session and csrf config.")
         })?;
 
         trace!("Run code result {:#?}", run_res);
