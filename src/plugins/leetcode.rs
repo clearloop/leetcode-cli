@@ -145,21 +145,42 @@ impl LeetCode {
         trace!("Requesting daily problem...");
         let url = &self.conf.sys.urls.graphql;
         let mut json: Json = HashMap::new();
-        json.insert("operationName", "questionOfToday".to_string());
-        json.insert(
-            "query",
-            vec![
-                "query questionOfToday {",
-                "  todayRecord {",
-                "    question {",
-                "      questionFrontendId",
-                "    }",
-                "  }",
-                "}",
-            ]
-            .join("\n"),
-        );
-    
+
+        match self.conf.cookies.site {
+            config::LeetcodeSite::LeetcodeCom => {
+                json.insert("operationName", "daily".to_string());
+                json.insert(
+                    "query",
+                    vec![
+                        "query daily {",
+                        "  activeDailyCodingChallengeQuestion {",
+                        "    question {",
+                        "      questionFrontendId",
+                        "    }",
+                        "  }",
+                        "}",
+                    ]
+                    .join("\n"),
+                );
+            }
+            config::LeetcodeSite::LeetcodeCn => {
+                json.insert("operationName", "questionOfToday".to_string());
+                json.insert(
+                    "query",
+                    vec![
+                        "query questionOfToday {",
+                        "  todayRecord {",
+                        "    question {",
+                        "      questionFrontendId",
+                        "    }",
+                        "  }",
+                        "}",
+                    ]
+                    .join("\n"),
+                );
+            }
+        }
+
         Req {
             default_headers: self.default_headers,
             refer: None,

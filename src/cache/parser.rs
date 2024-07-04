@@ -10,15 +10,17 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
         let total_acs = stat.get("total_acs")?.as_f64()? as f32;
         let total_submitted = stat.get("total_submitted")?.as_f64()? as f32;
 
+        let fid_obj = stat.get("frontend_question_id")?;
+        let fid = match fid_obj.as_i64() {
+            // Handle on leetcode-com
+            Some(s) => s as i32,
+            // Handle on leetcode-cn
+            None => fid_obj.as_str()?.split(" ").last()?.parse::<i32>().ok()?,
+        };
+
         problems.push(Problem {
             category: v.get("category_slug")?.as_str()?.to_string(),
-            fid: stat
-                .get("frontend_question_id")?
-                .as_str()?
-                .split(" ")
-                .last()?
-                .parse::<i32>()
-                .ok()?,
+            fid: fid,
             id: stat.get("question_id")?.as_i64()? as i32,
             level: p.get("difficulty")?.as_object()?.get("level")?.as_i64()? as i32,
             locked: p.get("paid_only")?.as_bool()?,
@@ -95,18 +97,20 @@ pub fn tags(v: Value) -> Option<Vec<String>> {
 /// daily parser
 pub fn daily(v: Value) -> Option<i32> {
     trace!("Parse daily...");
-    v.as_object()?
-        .get("data")?
-        .as_object()?
-        .get("todayRecord")?
-        .as_array()?[0]
-        .as_object()?
-        .get("question")?
-        .as_object()?
-        .get("questionFrontendId")?
-        .as_str()?
-        .parse()
-        .ok()
+    let v_obj = v.as_object()?.get("data")?.as_object()?;
+    match v_obj.get("dailyQuestionRecord") {
+        // Handle on leetcode-com
+        Some(v) => v,
+        // Handle on leetcode-cn
+        None => v_obj.get("todayRecord")?.as_array()?.get(0)?,
+    }
+    .as_object()?
+    .get("question")?
+    .as_object()?
+    .get("questionFrontendId")?
+    .as_str()?
+    .parse()
+    .ok()
 }
 
 /// user parser

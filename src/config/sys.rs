@@ -33,6 +33,27 @@ pub struct Urls {
 impl Default for Urls {
     fn default() -> Self {
         Self {
+            base: "https://leetcode.com".into(),
+            graphql: "https://leetcode.com/graphql".into(),
+            login: "https://leetcode.com/accounts/login/".into(),
+            problems: "https://leetcode.com/api/problems/$category/".into(),
+            problem: "https://leetcode.com/problems/$slug/description/".into(),
+            tag: "https://leetcode.com/tag/$slug/".into(),
+            test: "https://leetcode.com/problems/$slug/interpret_solution/".into(),
+            session: "https://leetcode.com/session/".into(),
+            submit: "https://leetcode.com/problems/$slug/submit/".into(),
+            submissions: "https://leetcode.com/submissions/detail/$id/".into(),
+            submission: "https://leetcode.com/submissions/detail/$id/".into(),
+            verify: "https://leetcode.com/submissions/detail/$id/check/".into(),
+            favorites: "https://leetcode.com/list/api/questions".into(),
+            favorite_delete: "https://leetcode.com/list/api/questions/$hash/$id".into(),
+        }
+    }
+}
+
+impl Urls {
+    pub fn new_with_leetcode_cn() -> Self {
+        Self {
             base: "https://leetcode.cn".into(),
             graphql: "https://leetcode.cn/graphql".into(),
             login: "https://leetcode.cn/accounts/login/".into(),
@@ -49,9 +70,7 @@ impl Default for Urls {
             favorite_delete: "https://leetcode.cn/list/api/questions/$hash/$id".into(),
         }
     }
-}
 
-impl Urls {
     /// problem url with specific `$slug`
     pub fn problem(&self, slug: &str) -> String {
         self.problem.replace("$slug", slug)
