@@ -12,7 +12,13 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
 
         problems.push(Problem {
             category: v.get("category_slug")?.as_str()?.to_string(),
-            fid: stat.get("frontend_question_id")?.as_i64()? as i32,
+            fid: stat
+                .get("frontend_question_id")?
+                .as_str()?
+                .split(" ")
+                .last()?
+                .parse::<i32>()
+                .ok()?,
             id: stat.get("question_id")?.as_i64()? as i32,
             level: p.get("difficulty")?.as_object()?.get("level")?.as_i64()? as i32,
             locked: p.get("paid_only")?.as_bool()?,
@@ -92,7 +98,8 @@ pub fn daily(v: Value) -> Option<i32> {
     v.as_object()?
         .get("data")?
         .as_object()?
-        .get("activeDailyCodingChallengeQuestion")?
+        .get("todayRecord")?
+        .as_array()?[0]
         .as_object()?
         .get("question")?
         .as_object()?

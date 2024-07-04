@@ -12,7 +12,7 @@
 //!
 //! ## Usage
 //!
-//! **Please make sure you have logined in `leetcode.com` with `chrome`**, more info plz checkout [this](#cookies)
+//! **Please make sure you have logined in `leetcode.cn` with `chrome`**, more info plz checkout [this](#cookies)
 //!
 //! ```sh
 //! leetcode 0.3.10
@@ -142,7 +142,7 @@
 //! session = "..."
 //! ```
 //!
-//! For Example, if you're using chrome to login to leetcode.com.
+//! For Example, if you're using chrome to login to leetcode.cn.
 //!
 //!
 //! #### Step 1
@@ -150,7 +150,7 @@
 //! Open chrome and paste the link below to the `chrome linkbar`.
 //!
 //! ```sh
-//! chrome://settings/cookies/detail?site=leetcode.com
+//! chrome://settings/cookies/detail?site=leetcode.cn
 //! ```
 //!
 //! #### Step 2
