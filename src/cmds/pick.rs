@@ -210,7 +210,7 @@ fn closest_named_problem(problems: &Vec<Problem>, lookup_name: &str) -> Option<i
 
 // Longest commong subsequence DP approach O(nm) space and time. Table must be at least
 // (text1.len() + 1) * (text2.len() + 1) length or greater and is mutated every call
-fn longest_common_subsequence(table: &mut Vec<usize>, text1: &str, text2: &str) -> usize {
+fn longest_common_subsequence(table: &mut [usize], text1: &str, text2: &str) -> usize {
     assert!(table.len() >= (text1.len() + 1) * (text2.len() + 1));
     let height: usize = text1.len() + 1;
     let width: usize = text2.len() + 1;
