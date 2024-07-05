@@ -151,10 +151,10 @@ impl Question {
     }
 
     pub fn desc_comment(&self, conf: &Config) -> String {
-        let desc = self.content.render();
+        let desc = self.t_content.render();
 
         let mut res = desc.lines().fold("\n".to_string(), |acc, e| {
-            acc + " " + conf.code.comment_leading.as_str() + " " + e + "\n"
+            acc + "" + conf.code.comment_leading.as_str() + " " + e + "\n"
         });
         res += " \n";
 
