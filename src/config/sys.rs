@@ -52,6 +52,25 @@ impl Default for Urls {
 }
 
 impl Urls {
+    pub fn new_with_leetcode_cn() -> Self {
+        Self {
+            base: "https://leetcode.cn".into(),
+            graphql: "https://leetcode.cn/graphql".into(),
+            login: "https://leetcode.cn/accounts/login/".into(),
+            problems: "https://leetcode.cn/api/problems/$category/".into(),
+            problem: "https://leetcode.cn/problems/$slug/description/".into(),
+            tag: "https://leetcode.cn/tag/$slug/".into(),
+            test: "https://leetcode.cn/problems/$slug/interpret_solution/".into(),
+            session: "https://leetcode.cn/session/".into(),
+            submit: "https://leetcode.cn/problems/$slug/submit/".into(),
+            submissions: "https://leetcode.cn/submissions/detail/$id/".into(),
+            submission: "https://leetcode.cn/submissions/detail/$id/".into(),
+            verify: "https://leetcode.cn/submissions/detail/$id/check/".into(),
+            favorites: "https://leetcode.cn/list/api/questions".into(),
+            favorite_delete: "https://leetcode.cn/list/api/questions/$hash/$id".into(),
+        }
+    }
+
     /// problem url with specific `$slug`
     pub fn problem(&self, slug: &str) -> String {
         self.problem.replace("$slug", slug)

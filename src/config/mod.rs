@@ -17,6 +17,8 @@ mod cookies;
 mod storage;
 mod sys;
 
+pub use cookies::LeetcodeSite;
+
 /// Sync with `~/.leetcode/leetcode.toml`
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Config {
@@ -44,7 +46,14 @@ impl Config {
 
         let s = fs::read_to_string(&conf)?;
         match toml::from_str::<Config>(&s) {
-            Ok(config) => Ok(config),
+            Ok(config) => match config.cookies.site {
+                cookies::LeetcodeSite::LeetcodeCom => Ok(config),
+                cookies::LeetcodeSite::LeetcodeCn => {
+                    let mut config = config;
+                    config.sys.urls = sys::Urls::new_with_leetcode_cn();
+                    Ok(config)
+                }
+            },
             Err(e) => {
                 let tmp = Self::root()?.join("leetcode.tmp.toml");
                 Self::write_default(tmp)?;
