@@ -23,16 +23,13 @@ pub fn conn(p: String) -> SqliteConnection {
 
 /// Condition submit or test
 #[derive(Clone, Debug)]
+#[derive(Default)]
 pub enum Run {
     Test,
+    #[default]
     Submit,
 }
 
-impl Default for Run {
-    fn default() -> Self {
-        Run::Submit
-    }
-}
 
 /// Requests if data not download
 #[derive(Clone)]

@@ -16,7 +16,7 @@ pub fn exec(module: &str) -> Result<Vec<String>> {
 
     // pygil
     Python::with_gil(|py| {
-        let pym = PyModule::from_code(py, &script, "plan.py", "plan")?;
+        let pym = PyModule::from_code_bound(py, &script, "plan.py", "plan")?;
         pym.getattr("plan")?.call1((sps, stags))?.extract()
     })
     .map_err(Into::into)

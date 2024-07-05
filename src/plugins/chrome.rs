@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use diesel::prelude::*;
 use keyring::Entry;
 use openssl::{hash, pkcs5, symm};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 /// LeetCode Cookies Schema
 mod schema {
@@ -34,9 +34,13 @@ pub struct Ident {
     session: String,
 }
 
-impl std::string::ToString for Ident {
-    fn to_string(&self) -> String {
-        format!("LEETCODE_SESSION={};csrftoken={};", self.session, self.csrf)
+impl Display for Ident {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "LEETCODE_SESSION={};csrftoken={};",
+            self.session, self.csrf
+        )
     }
 }
 
@@ -64,7 +68,7 @@ pub fn cookies() -> Result<Ident> {
     debug!("Chrome Cookies path is {:?}", &p);
     let mut conn = cache::conn(p.to_string_lossy().to_string());
     let res = cookies
-        .filter(host_key.like(format!("#{}", ccfg.site.to_string())))
+        .filter(host_key.like(format!("#{}", ccfg.site)))
         .load::<Cookies>(&mut conn)
         .expect("Loading cookies from google chrome failed.");
 

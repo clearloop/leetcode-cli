@@ -1,7 +1,9 @@
 //! Cookies in config
-use std::str::FromStr;
-
 use serde::{Deserialize, Serialize};
+use std::{
+    fmt::{self, Display},
+    str::FromStr,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum LeetcodeSite {
@@ -22,12 +24,14 @@ impl FromStr for LeetcodeSite {
     }
 }
 
-impl ToString for LeetcodeSite {
-    fn to_string(&self) -> String {
-        match self {
-            LeetcodeSite::LeetcodeCom => "leetcode.com".to_string(),
-            LeetcodeSite::LeetcodeCn => "leetcode.cn".to_string(),
-        }
+impl Display for LeetcodeSite {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            LeetcodeSite::LeetcodeCom => "leetcode.com",
+            LeetcodeSite::LeetcodeCn => "leetcode.cn",
+        };
+
+        write!(f, "{s}")
     }
 }
 
@@ -49,8 +53,12 @@ impl Default for Cookies {
     }
 }
 
-impl std::string::ToString for Cookies {
-    fn to_string(&self) -> String {
-        format!("LEETCODE_SESSION={};csrftoken={};", self.session, self.csrf)
+impl Display for Cookies {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "LEETCODE_SESSION={};csrftoken={};",
+            self.session, self.csrf
+        )
     }
 }

@@ -87,7 +87,8 @@ mod filter {
         ids.iter().for_each(|x| {
             map.insert(x.to_string(), true).unwrap_or_default();
         });
-        ps.retain(|x| map.get(&x.id.to_string()).is_some());
+
+        ps.retain(|x| map.contains_key(&x.id.to_string()));
         Ok(())
     }
 }
