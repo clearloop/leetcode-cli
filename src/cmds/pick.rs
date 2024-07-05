@@ -139,11 +139,8 @@ impl Command for PickCommand {
         let fid = match m.contains_id("name") {
             // check for name specified, or closest name
             true => {
-                match m.get_one::<String>("name").map(|name| name) {
-                    Some(quesname) => match closest_named_problem(&problems, quesname) {
-                        Some(p) => p,
-                        None => 1,
-                    },
+                match m.get_one::<String>("name") {
+                    Some(quesname) => closest_named_problem(&problems, quesname).unwrap_or(1),
                     None => {
                         // Pick random without specify id
                         let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
@@ -190,7 +187,7 @@ fn closest_named_problem(problems: &Vec<Problem>, lookup_name: &str) -> Option<i
     let mut table: Vec<usize> = vec![0; (max_name_size + 1) * (lookup_name.len() + 1)];
 
     // this is guaranteed because of the earlier max None propegation
-    assert!(problems.len() > 0);
+    assert!(!problems.is_empty());
     let mut max_score = 0;
     let mut current_problem = &problems[0];
     for problem in problems {
@@ -204,7 +201,7 @@ fn closest_named_problem(problems: &Vec<Problem>, lookup_name: &str) -> Option<i
 
         if this_score > max_score {
             max_score = this_score;
-            current_problem = &problem;
+            current_problem = problem;
         }
     }
 

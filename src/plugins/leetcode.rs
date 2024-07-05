@@ -86,15 +86,13 @@ impl LeetCode {
         json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
         json.insert(
             "query",
-            vec![
-                "query getTopicTag($slug: String!) {",
+            ["query getTopicTag($slug: String!) {",
                 "  topicTag(slug: $slug) {",
                 "    questions {",
                 "      questionId",
                 "    }",
                 "  }",
-                "}",
-            ]
+                "}"]
             .join("\n"),
         );
 
@@ -151,15 +149,13 @@ impl LeetCode {
                 json.insert("operationName", "daily".to_string());
                 json.insert(
                     "query",
-                    vec![
-                        "query daily {",
+                    ["query daily {",
                         "  activeDailyCodingChallengeQuestion {",
                         "    question {",
                         "      questionFrontendId",
                         "    }",
                         "  }",
-                        "}",
-                    ]
+                        "}"]
                     .join("\n"),
                 );
             }
@@ -167,15 +163,13 @@ impl LeetCode {
                 json.insert("operationName", "questionOfToday".to_string());
                 json.insert(
                     "query",
-                    vec![
-                        "query questionOfToday {",
+                    ["query questionOfToday {",
                         "  todayRecord {",
                         "    question {",
                         "      questionFrontendId",
                         "    }",
                         "  }",
-                        "}",
-                    ]
+                        "}"]
                     .join("\n"),
                 );
             }
@@ -201,8 +195,7 @@ impl LeetCode {
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
-            vec![
-                "query getQuestionDetail($titleSlug: String!) {",
+            ["query getQuestionDetail($titleSlug: String!) {",
                 "  question(titleSlug: $titleSlug) {",
                 "    content",
                 "    stats",
@@ -213,8 +206,7 @@ impl LeetCode {
                 "    metaData",
                 "    translatedContent",
                 "  }",
-                "}",
-            ]
+                "}"]
             .join("\n"),
         );
 
@@ -232,7 +224,7 @@ impl LeetCode {
             json: Some(json),
             mode: Mode::Post,
             name: "get_problem_detail",
-            url: self.conf.sys.urls.graphql.into(),
+            url: self.conf.sys.urls.graphql,
         }
         .send(&self.client)
         .await

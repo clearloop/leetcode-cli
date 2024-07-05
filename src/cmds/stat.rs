@@ -81,7 +81,7 @@ impl Command for StatCommand {
         );
 
         // lines
-        for (i, l) in vec![(easy, easy_ac), (medium, medium_ac), (hard, hard_ac)]
+        for (i, l) in [(easy, easy_ac), (medium, medium_ac), (hard, hard_ac)]
             .iter()
             .enumerate()
         {

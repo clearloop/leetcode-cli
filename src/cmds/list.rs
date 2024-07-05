@@ -184,7 +184,6 @@ impl Command for ListCommand {
                 .get_many::<i32>("range")
                 .ok_or(Error::NoneError)?
                 .copied()
-                .into_iter()
                 .collect();
             ps.retain(|x| num_range[0] <= x.fid && x.fid <= num_range[1]);
         }
