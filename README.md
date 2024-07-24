@@ -92,6 +92,8 @@ test = true
 [cookies]
 csrf = '<your-leetcode-csrf-token>'
 session = '<your-leetcode-session-key>'
+# leetcode.com or leetcode.cn
+site = "leetcode.com"
 
 [storage]
 cache = 'Problems'
