@@ -98,7 +98,7 @@ pub fn tags(v: Value) -> Option<Vec<String>> {
 pub fn daily(v: Value) -> Option<i32> {
     trace!("Parse daily...");
     let v_obj = v.as_object()?.get("data")?.as_object()?;
-    match v_obj.get("dailyQuestionRecord") {
+    match v_obj.get("activeDailyCodingChallengeQuestion") {
         // Handle on leetcode-com
         Some(v) => v,
         // Handle on leetcode-cn
