@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.4.4"
+version = "0.4.5"
 authors = ["clearloop <tianyi.gc@gmail.com>"]
 edition = "2021"
 description = "Leetcode command-line interface in rust."
