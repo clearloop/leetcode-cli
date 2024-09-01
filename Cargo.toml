@@ -17,12 +17,12 @@ readme = './README.md'
 
 [dependencies]
 async-trait = "0.1.81"
-tokio = { version = "1.39.3", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 clap = { version = "4.5.13", features = ["cargo"] }
 colored = "2.1.0"
 dirs = "5.0.1"
 env_logger = "0.11.5"
-keyring = "3.2.0"
+keyring = "3.2.1"
 log = "0.4.22"
 openssl = "0.10.66"
 pyo3 = { version = "0.22.2", optional = true }
@@ -33,7 +33,7 @@ toml = "0.8.19"
 regex = "1.10.6"
 scraper = "0.20.0"
 anyhow = "1.0.86"
-clap_complete = "4.5.13"
+clap_complete = "4.5.24"
 thiserror = "1.0.63"
 
 [dependencies.diesel]
