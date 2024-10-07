@@ -1,8 +1,10 @@
 {
   description = "Leet your code in command-line.";
 
-  inputs.nixpkgs.url      = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.utils.url        = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    utils.url = "github:numtide/flake-utils";
+  };
 
   outputs = { self, nixpkgs, utils, ... }:
     utils.lib.eachDefaultSystem (system:
@@ -22,12 +24,8 @@
 
         package = with pkgs; rustPlatform.buildRustPackage rec {
           pname = "leetcode-cli";
-          version = "0.4.3";
-          src = fetchCrate {
-            inherit pname version;
-            sha256 = "sha256-y5zh93WPWSMDXqYangqrxav+sC0b0zpFIp6ZIew6KMo=";
-          };
-          cargoSha256 = "sha256-VktDiLsU+GOsa6ba9JJZGEPTavSKp+aSZm2dfhPEqMs=";
+          version = "git";
+          src = ./.;
 
           inherit buildInputs nativeBuildInputs;
 
@@ -46,7 +44,7 @@
           };
         };
       in
-      {
+        {
         defaultPackage = package;
         overlay = final: prev: { leetcode-cli = package; };
 
