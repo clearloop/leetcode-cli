@@ -17,7 +17,7 @@
           openssl
           dbus
           sqlite
-        ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
+        ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ Security SystemConfiguration ]);
 
 
         package = with pkgs; rustPlatform.buildRustPackage rec {
