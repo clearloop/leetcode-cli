@@ -18,33 +18,57 @@
     };
   };
 
+  outputs = {
+    self,
+    nixpkgs,
+    utils,
+    naersk,
+    rust-overlay,
+    ...
+    }:
     utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        overlays = [ (import rust-overlay) ];
+
+        pkgs = (import nixpkgs) {
+          inherit system overlays;
+        };
+
+        toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
+        naersk' = pkgs.callPackage naersk {
+          cargo = toolchain;
+          rustc = toolchain;
+          clippy = toolchain;
+        };
 
         nativeBuildInputs = with pkgs; [
           pkg-config
+        ];
+
+        darwinBuildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [
+          pkgs.darwin.apple_sdk.frameworks.Security
+          pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
         ];
 
         buildInputs = with pkgs; [
           openssl
           dbus
           sqlite
-        ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ Security SystemConfiguration ]);
+        ] ++ darwinBuildInputs;
 
-
-        package = with pkgs; rustPlatform.buildRustPackage rec {
+        package = naersk'.buildPackage rec {
           pname = "leetcode-cli";
           version = "git";
+
           src = ./.;
+          doCheck = true; # run `cargo test` on build
 
           inherit buildInputs nativeBuildInputs;
 
-          # a nightly compiler is required unless we use this cheat code.
-          RUSTC_BOOTSTRAP = 0;
+          buildNoDefaultFeatures = true;
 
-          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
-          CFG_RELEASE_CHANNEL = "stable";
+          buildFeatures = "git";
 
           meta = with pkgs.lib; {
             description = "Leet your code in command-line.";
@@ -53,6 +77,13 @@
             maintainers = with maintainers; [ congee ];
             mainProgram = "leetcode";
           };
+
+          # Env vars
+          # a nightly compiler is required unless we use this cheat code.
+          RUSTC_BOOTSTRAP = 0;
+
+          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
+          CFG_RELEASE_CHANNEL = "stable";
         };
       in
         {
@@ -64,11 +95,7 @@
           inherit nativeBuildInputs;
 
           buildInputs = buildInputs ++ [
-            rustc
-            cargo
-            rustfmt
-            clippy
-            rust-analyzer
+            toolchain
             cargo-edit
             cargo-bloat
             cargo-audit
