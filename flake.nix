@@ -1,41 +1,72 @@
 {
   description = "Leet your code in command-line.";
 
-  inputs.nixpkgs.url      = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.utils.url        = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, utils, ... }:
+    naersk = {
+      url = "github:nix-community/naersk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+    utils,
+    naersk,
+    rust-overlay,
+    ...
+    }:
     utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        overlays = [ (import rust-overlay) ];
+
+        pkgs = (import nixpkgs) {
+          inherit system overlays;
+        };
+
+        toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
+        naersk' = pkgs.callPackage naersk {
+          cargo = toolchain;
+          rustc = toolchain;
+          clippy = toolchain;
+        };
 
         nativeBuildInputs = with pkgs; [
           pkg-config
+        ];
+
+        darwinBuildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [
+          pkgs.darwin.apple_sdk.frameworks.Security
+          pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
         ];
 
         buildInputs = with pkgs; [
           openssl
           dbus
           sqlite
-        ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
+        ] ++ darwinBuildInputs;
 
-
-        package = with pkgs; rustPlatform.buildRustPackage rec {
+        package = naersk'.buildPackage rec {
           pname = "leetcode-cli";
-          version = "0.4.3";
-          src = fetchCrate {
-            inherit pname version;
-            sha256 = "sha256-y5zh93WPWSMDXqYangqrxav+sC0b0zpFIp6ZIew6KMo=";
-          };
-          cargoSha256 = "sha256-VktDiLsU+GOsa6ba9JJZGEPTavSKp+aSZm2dfhPEqMs=";
+          version = "git";
+
+          src = ./.;
+          doCheck = true; # run `cargo test` on build
 
           inherit buildInputs nativeBuildInputs;
 
-          # a nightly compiler is required unless we use this cheat code.
-          RUSTC_BOOTSTRAP = 0;
+          buildNoDefaultFeatures = true;
 
-          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
-          CFG_RELEASE_CHANNEL = "stable";
+          buildFeatures = "git";
 
           meta = with pkgs.lib; {
             description = "Leet your code in command-line.";
@@ -44,9 +75,16 @@
             maintainers = with maintainers; [ congee ];
             mainProgram = "leetcode";
           };
+
+          # Env vars
+          # a nightly compiler is required unless we use this cheat code.
+          RUSTC_BOOTSTRAP = 0;
+
+          # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
+          CFG_RELEASE_CHANNEL = "stable";
         };
       in
-      {
+        {
         defaultPackage = package;
         overlay = final: prev: { leetcode-cli = package; };
 
@@ -55,11 +93,7 @@
           inherit nativeBuildInputs;
 
           buildInputs = buildInputs ++ [
-            rustc
-            cargo
-            rustfmt
-            clippy
-            rust-analyzer
+            toolchain
             cargo-edit
             cargo-bloat
             cargo-audit
