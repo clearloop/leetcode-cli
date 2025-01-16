@@ -40,7 +40,7 @@ impl Command for ExecCommand {
                 Arg::new("daily")
                     .short('d')
                     .long("daily")
-                    .help("Edit today's daily challenge")
+                    .help("Exec today's daily challenge")
                     .action(ArgAction::SetTrue),
             )
             .group(
