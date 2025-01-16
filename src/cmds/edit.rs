@@ -3,7 +3,7 @@ use super::Command;
 use crate::{Error, Result};
 use anyhow::anyhow;
 use async_trait::async_trait;
-use clap::{Arg, ArgMatches, Command as ClapCommand};
+use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command as ClapCommand};
 use std::collections::HashMap;
 
 /// Abstract `edit` command
@@ -29,7 +29,7 @@ impl Command for EditCommand {
     /// `edit` usage
     fn usage() -> ClapCommand {
         ClapCommand::new("edit")
-            .about("Edit question by id")
+            .about("Edit question")
             .visible_alias("e")
             .arg(
                 Arg::new("lang")
@@ -41,9 +41,21 @@ impl Command for EditCommand {
             .arg(
                 Arg::new("id")
                     .num_args(1)
-                    .required(true)
                     .value_parser(clap::value_parser!(i32))
                     .help("question id"),
+            )
+            .arg(
+                Arg::new("daily")
+                    .short('d')
+                    .long("daily")
+                    .help("Edit today's daily challenge")
+                    .action(ArgAction::SetTrue),
+            )
+            .group(
+                ArgGroup::new("question-id")
+                    .args(["id", "daily"])
+                    .multiple(false)
+                    .required(true),
             )
     }
 
@@ -54,8 +66,21 @@ impl Command for EditCommand {
         use std::io::Write;
         use std::path::Path;
 
-        let id = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
         let cache = Cache::new()?;
+
+        let daily = m.get_one::<bool>("daily").unwrap_or(&false);
+        let daily_id = if *daily {
+            Some(cache.get_daily_problem_id().await?)
+        } else {
+            None
+        };
+
+        let id = m
+            .get_one::<i32>("id")
+            .copied()
+            .or(daily_id)
+            .ok_or(Error::NoneError)?;
+
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
 
