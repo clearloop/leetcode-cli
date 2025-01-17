@@ -16,32 +16,32 @@ keywords = ["cli", "games", "leetcode"]
 readme = './README.md'
 
 [dependencies]
-async-trait = "0.1.83"
-tokio = { version = "1.41.1", features = ["full"] }
-clap = { version = "4.5.21", features = ["cargo"] }
-colored = "2.1.0"
-dirs = "5.0.1"
-env_logger = "0.11.5"
+async-trait = "0.1.85"
+tokio = { version = "1.43.0", features = ["full"] }
+clap = { version = "4.5.26", features = ["cargo"] }
+colored = "3.0.0"
+dirs = "6.0.0"
+env_logger = "0.11.6"
 keyring = "3.6.1"
-log = "0.4.22"
+log = "0.4.25"
 openssl = "0.10.68"
-pyo3 = { version = "0.23.2", optional = true }
+pyo3 = { version = "0.23.4", optional = true }
 rand = "0.8.5"
-serde = { version = "1.0.215", features = ["derive"] }
-serde_json = "1.0.133"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.135"
 toml = "0.8.19"
 regex = "1.11.1"
-scraper = "0.21.0"
-anyhow = "1.0.93"
-clap_complete = "4.5.38"
-thiserror = "2.0.3"
+scraper = "0.22.0"
+anyhow = "1.0.95"
+clap_complete = "4.5.42"
+thiserror = "2.0.11"
 
 [dependencies.diesel]
-version = "2.2.5"
+version = "2.2.6"
 features = ["sqlite"]
 
 [dependencies.reqwest]
-version = "0.12.9"
+version = "0.12.12"
 features = ["gzip", "json"]
 
 [features]
