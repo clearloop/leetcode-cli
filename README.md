@@ -64,7 +64,7 @@ SUBCOMMANDS:
     list    List problems [aliases: l]
     pick    Pick a problem [aliases: p]
     stat    Show simple chart about submissions [aliases: s]
-    test    Edit question by id [aliases: t]
+    test    Test question by id [aliases: t]
     help    Prints this message or the help of the given subcommand(s)
 ```
 
