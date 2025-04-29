@@ -1,4 +1,6 @@
 //! Leetcode data models
+use unicode_width::UnicodeWidthStr;
+use unicode_width::UnicodeWidthChar;
 use super::schemas::{problems, tags};
 use crate::helper::HTML;
 use colored::Colorize;
@@ -54,7 +56,7 @@ impl Problem {
 static DONE: &str = " ✔";
 static ETC: &str = "...";
 static LOCK: &str = "🔒";
-static NDONE: &str = "✘";
+static NDONE: &str = " ✘";
 static SPACE: &str = " ";
 impl std::fmt::Display for Problem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -98,14 +100,27 @@ impl std::fmt::Display for Problem {
             }
         }
 
-        if self.name.len() < 60_usize {
+        let name_width = UnicodeWidthStr::width(self.name.as_str());
+        let target_width = 60;
+        if name_width <= target_width {
             name.push_str(&self.name);
-            name.push_str(&SPACE.repeat(60 - &self.name.len()));
+            name.push_str(&SPACE.repeat(target_width - name_width));
         } else {
-            name.push_str(&self.name[..49]);
-            name = name.trim_end().to_string();
-            name.push_str(ETC);
-            name.push_str(&SPACE.repeat(60 - name.len()));
+            // truncate carefully to target width - 3 (because "..." will take some width)
+            let mut truncated = String::new();
+            let mut current_width = 0;
+            for c in self.name.chars() {
+                let char_width = UnicodeWidthChar::width(c).unwrap_or(0);
+                if current_width + char_width > target_width - 3 {
+                    break;
+                }
+                truncated.push(c);
+                current_width += char_width;
+            }
+            truncated.push_str(ETC); // add "..."
+            let truncated_width = UnicodeWidthStr::width(truncated.as_str());
+            truncated.push_str(&SPACE.repeat(target_width - truncated_width));
+            name = truncated;
         }
 
         level = match self.level {
