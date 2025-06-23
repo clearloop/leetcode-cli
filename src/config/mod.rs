@@ -46,14 +46,19 @@ impl Config {
 
         let s = fs::read_to_string(&conf)?;
         match toml::from_str::<Config>(&s) {
-            Ok(config) => match config.cookies.site {
-                cookies::LeetcodeSite::LeetcodeCom => Ok(config),
-                cookies::LeetcodeSite::LeetcodeCn => {
-                    let mut config = config;
-                    config.sys.urls = sys::Urls::new_with_leetcode_cn();
-                    Ok(config)
+            Ok(mut config) => {
+                // Override config.cookies with environment variables
+                config.cookies = config.cookies.with_env_override();
+
+                match config.cookies.site {
+                    cookies::LeetcodeSite::LeetcodeCom => Ok(config),
+                    cookies::LeetcodeSite::LeetcodeCn => {
+                        let mut config = config;
+                        config.sys.urls = sys::Urls::new_with_leetcode_cn();
+                        Ok(config)
+                    }
                 }
-            },
+            }
             Err(e) => {
                 let tmp = Self::root()?.join("leetcode.tmp.toml");
                 Self::write_default(tmp)?;
