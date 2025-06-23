@@ -3,6 +3,7 @@
 //! Seems like some error exists now, welocome pr to fix this : )
 use crate::{cache::Cache, helper::load_script, Result};
 use pyo3::prelude::*;
+use std::ffi::CString;
 
 /// Exec python scripts as filter
 pub fn exec(module: &str) -> Result<Vec<String>> {
@@ -16,7 +17,10 @@ pub fn exec(module: &str) -> Result<Vec<String>> {
 
     // pygil
     Python::with_gil(|py| {
-        let pym = PyModule::from_code_bound(py, &script, "plan.py", "plan")?;
+        let script_cstr = CString::new(script.as_str())?;
+        let filename_cstr = CString::new("plan.py")?;
+        let module_name_cstr = CString::new("plan")?;
+        let pym = PyModule::from_code(py, &script_cstr, &filename_cstr, &module_name_cstr)?;
         pym.getattr("plan")?.call1((sps, stags))?.extract()
     })
     .map_err(Into::into)

@@ -144,7 +144,7 @@ impl Command for PickCommand {
                     Some(quesname) => closest_named_problem(&problems, quesname).unwrap_or(1),
                     None => {
                         // Pick random without specify id
-                        let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
+                        let problem = &problems[rand::rng().random_range(0..problems.len())];
                         problem.fid
                     }
                 }
@@ -155,7 +155,7 @@ impl Command for PickCommand {
                     .or(daily_id)
                     .unwrap_or_else(|| {
                         // Pick random without specify id
-                        let problem = &problems[rand::thread_rng().gen_range(0..problems.len())];
+                        let problem = &problems[rand::rng().random_range(0..problems.len())];
                         problem.fid
                     })
             }
