@@ -62,3 +62,27 @@ impl Display for Cookies {
         )
     }
 }
+
+/// Override cookies from environment variables
+pub const LEETCODE_CSRF_ENV: &str = "LEETCODE_CSRF";
+pub const LEETCODE_SESSION_ENV: &str = "LEETCODE_SESSION";
+pub const LEETCODE_SITE_ENV: &str = "LEETCODE_SITE";
+
+impl Cookies {
+    /// Load cookies from environment variables, overriding any existing values
+    /// if the environment variables are set.
+    pub fn with_env_override(mut self) -> Self {
+        if let Ok(csrf) = std::env::var(LEETCODE_CSRF_ENV) {
+            self.csrf = csrf;
+        }
+        if let Ok(session) = std::env::var(LEETCODE_SESSION_ENV) {
+            self.session = session;
+        }
+        if let Ok(site) = std::env::var(LEETCODE_SITE_ENV) {
+            if let Ok(leetcode_site) = LeetcodeSite::from_str(&site) {
+                self.site = leetcode_site;
+            }
+        }
+        self
+    }
+}

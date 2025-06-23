@@ -321,6 +321,27 @@ csrf = '<your-leetcode-csrf-token>'
 session = '<your-leetcode-session-key>'
 ```
 
+#### Environment variables
+
+The cookies can also be overridden by environment variables, which might be useful to exclude the sensitive information from the configuration file `leetcode.toml`. To do this, you can leave the `csrf` and `session` fields empty in the configuration file and override cookies settings via the environment variables `LEETCODE_CSRF`, `LEETCODE_SESSION`, and `LEETCODE_SITE`:
+
+```toml
+[cookies]
+csrf = ''
+session = ''
+site = 'leetcode.com'
+```
+
+Then set the environment variables:
+
+```bash
+export LEETCODE_CSRF='<your-leetcode-csrf-token>'
+export LEETCODE_SESSION='<your-leetcode-session-key>'
+export LEETCODE_SITE='leetcode.cn' # or 'leetcode.com'
+```
+
+Note that `cookies.site` in still required in the `leetcode.toml` to avoid exception during configuration file parsing, but can be overridden using environment variables.
+
 ## Programmable
 
 If you want to filter LeetCode questions using custom Python scripts, add the following to your the configuration file:
