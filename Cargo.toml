@@ -17,28 +17,28 @@ readme = './README.md'
 
 [dependencies]
 async-trait = "0.1.88"
-tokio = { version = "1.45.1", features = ["full"] }
-clap = { version = "4.5.40", features = ["cargo"] }
+tokio = { version = "1.47.1", features = ["full"] }
+clap = { version = "4.5.42", features = ["cargo"] }
 colored = "3.0.0"
 dirs = "6.0.0"
 env_logger = "0.11.6"
-keyring = "3.6.2"
+keyring = "3.6.3"
 log = "0.4.27"
 openssl = "0.10.73"
 pyo3 = { version = "0.25.1", optional = true }
-rand = "0.9.1"
+rand = "0.9.2"
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
-toml = "0.8.23"
+serde_json = "1.0.142"
+toml = "0.9.4"
 regex = "1.11.1"
 scraper = "0.23.1"
 anyhow = "1.0.98"
-clap_complete = "4.5.54"
+clap_complete = "4.5.55"
 thiserror = "2.0.12"
 unicode-width = "0.2"
 
 [dependencies.diesel]
-version = "2.2.11"
+version = "2.2.12"
 features = ["sqlite"]
 
 [dependencies.reqwest]
