@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions-rs/toolchain@v1
         with:
             components: clippy
