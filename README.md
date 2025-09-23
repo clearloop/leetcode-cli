@@ -206,7 +206,7 @@ For `lang = 'rust'`, leetcode-cli generates per-problem crate structures to enab
 
 This keeps submissions unchanged (sends code snippet to LeetCode API) while improving local editing.
 
-For other languages, files remain flat. Future support for similar setups (e.g., Python virtualenvs) can be added via config.
+For other languages, files remain flat. Please contribute if needed!
 
 <br>
 
