@@ -194,35 +194,53 @@ mod file {
     use crate::{cache::models::Problem, Error};
 
     /// Generate test cases path by fid
-    pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
-        let conf = crate::config::Config::locate()?;
-        let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
+pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
+    let conf = crate::config::Config::locate()?;
+    let lang = conf.code.lang.clone();
+    let code_base = conf.storage.code()?;
 
+    let path = if lang == "rust" {
+        let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+        let subdir = format!("{}-{}/tests.dat", problem.fid, sanitized_slug);
+        format!("{}/{}", code_base, subdir)
+    } else {
+        let mut path = format!("{}/{}.tests.dat", code_base, conf.code.pick);
         path = path.replace("${fid}", &problem.fid.to_string());
         path = path.replace("${slug}", &problem.slug.to_string());
-        Ok(path)
-    }
+        path
+    };
+
+    Ok(path)
+}
 
     /// Generate code path by fid
-    pub fn code_path(problem: &Problem, l: Option<String>) -> crate::Result<String> {
-        let conf = crate::config::Config::locate()?;
-        let mut lang = conf.code.lang;
-        if l.is_some() {
-            lang = l.ok_or(Error::NoneError)?;
-        }
+pub fn code_path(problem: &Problem, l: Option<String>) -> crate::Result<String> {
+    let conf = crate::config::Config::locate()?;
+    let mut lang = conf.code.lang.clone();
+    if let Some(lang_opt) = l {
+        lang = lang_opt;
+    }
 
+    let code_base = conf.storage.code()?;
+
+    let path = if lang == "rust" {
+        let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+        let subdir = format!("{}-{}/src/lib.rs", problem.fid, sanitized_slug);
+        format!("{}/{}", code_base, subdir)
+    } else {
         let mut path = format!(
             "{}/{}.{}",
-            conf.storage.code()?,
+            code_base,
             conf.code.pick,
             suffix(&lang)?,
         );
-
         path = path.replace("${fid}", &problem.fid.to_string());
         path = path.replace("${slug}", &problem.slug.to_string());
+        path
+    };
 
-        Ok(path)
-    }
+    Ok(path)
+}
 
     /// Load python scripts
     pub fn load_script(module: &str) -> crate::Result<String> {

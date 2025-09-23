@@ -62,9 +62,9 @@ impl Command for EditCommand {
     /// `edit` handler
     async fn handler(m: &ArgMatches) -> Result<()> {
         use crate::{cache::models::Question, Cache};
-        use std::fs::File;
-        use std::io::Write;
-        use std::path::Path;
+use std::fs::{self, File};
+use std::io::Write;
+use std::path::Path;
 
         let cache = Cache::new()?;
 
@@ -105,9 +105,41 @@ impl Command for EditCommand {
                 qr = Ok(cache.get_question(id).await?);
             }
 
-            let question: Question = qr?;
+let question: Question = qr?;
 
-            let mut file_code = File::create(&path)?;
+if *lang == "rust" {
+    let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+    let code_dir_str = format!("{}/{}-{}", conf.storage.code()?, problem.fid, sanitized_slug);
+    let code_dir = Path::new(&code_dir_str);
+    fs::create_dir_all(code_dir)?;
+
+    let src_dir_str = format!("{}/src", code_dir_str);
+    let src_dir = Path::new(&src_dir_str);
+    fs::create_dir_all(src_dir)?;
+
+    let cargo_path_str = format!("{}/Cargo.toml", code_dir_str);
+    let cargo_path = Path::new(&cargo_path_str);
+    if !cargo_path.exists() {
+        let package_name = format!("leetcode-{}-{}", problem.fid, sanitized_slug);
+        let cargo_content = format!(
+r#"[package]
+name = "{}"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+"#,
+            package_name
+        );
+        let mut cargo_file = File::create(&cargo_path_str)?;
+        cargo_file.write_all(cargo_content.as_bytes())?;
+    }
+}
+
+let mut file_code = File::create(&path)?;
             let question_desc = question.desc_comment(&conf) + "\n";
 
             let test_path = crate::helper::test_cases_path(&problem)?;
