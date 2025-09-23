@@ -121,7 +121,7 @@ if *lang == "rust" {
     let cargo_path = Path::new(&cargo_path_str);
     if !cargo_path.exists() {
         let package_name = format!("prob-{}-{}", problem.fid, sanitized_slug);
-        let cargo_content = format!(
+let cargo_content = format!(
 r#"[package]
 name = "{}"
 version = "0.1.0"
@@ -131,9 +131,12 @@ edition = "2021"
 path = "src/lib.rs"
 
 [dependencies]
+# Uncomment and add crates as needed for LeetCode problems, e.g.:
+# itertools = "0.12"
+# regex = "1"
 "#,
-            package_name
-        );
+    package_name
+);
         let mut cargo_file = File::create(&cargo_path_str)?;
         cargo_file.write_all(cargo_content.as_bytes())?;
     }
