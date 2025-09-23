@@ -1,7 +1,7 @@
 //! A set of helper traits
 pub use self::{
     digit::Digit,
-    file::{code_path, load_script, test_cases_path},
+    file::{code_path, load_script, suffix, test_cases_path},
     filter::{filter, squash},
     html::HTML,
 };
