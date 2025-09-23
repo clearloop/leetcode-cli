@@ -192,6 +192,22 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
 
 </details>
 
+## Language-Specific Configuration
+
+### Rust
+For `lang = 'rust'`, leetcode-cli generates per-problem crate structures to enable full LSP support (e.g., rust-analyzer in editors like Helix or VS Code).
+
+- **Structure**: `code/{fid}-{slug}/src/lib.rs` (code), `tests.dat` (test cases), and `Cargo.toml` (basic crate config with commented dependencies for common crates like `itertools` or `regex`).
+- **Example**: For problem 1 ("Two Sum"), creates `code/1-two_sum/` with `prob-1-two_sum` as package name.
+- **Config Option**: Set `enable_rust_crates = false` in `[code]` to fall back to flat files (e.g., `1.two-sum.rs`).
+- **Usage**: Run `leetcode edit 1`, then open the dir: `hx code/1-two_sum/` for LSP features (autocomplete, diagnostics, etc.).
+- **Migration**: If flat files exist, the tool notes them—manually move content to `lib.rs` if needed.
+- **Local Testing**: Edit `Cargo.toml` to add deps, then `cargo check` or `cargo test` (tests.dat can be adapted for unit tests).
+
+This keeps submissions unchanged (sends code snippet to LeetCode API) while improving local editing.
+
+For other languages, files remain flat. Future support for similar setups (e.g., Python virtualenvs) can be added via config.
+
 <br>
 
 Some linting tools/lsps will throw errors unless the necessary libraries are imported. leetcode-cli can generate this boilerplate automatically if the `inject_before` key is set. Similarly, if you want to test out your code locally, you can automate that with `inject_after`. For c++ this might look something like:
