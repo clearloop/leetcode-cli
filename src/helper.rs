@@ -191,7 +191,7 @@ mod file {
         }
     }
 
-    use crate::{cache::models::Problem, Error};
+    use crate::cache::models::Problem;
 
     /// Generate test cases path by fid
 pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
