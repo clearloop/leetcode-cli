@@ -38,7 +38,8 @@ pub struct Code {
     pub comment_leading: String,
     #[serde(default, skip_serializing)]
     pub test: bool,
-    pub enable_rust_crates: bool,
+    #[serde(default = "default_enable_rust_crates")]
+pub enable_rust_crates: bool,
     pub lang: String,
     #[serde(default = "default_pick", skip_serializing)]
     pub pick: String,
