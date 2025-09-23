@@ -62,6 +62,7 @@ impl Command for EditCommand {
     /// `edit` handler
     async fn handler(m: &ArgMatches) -> Result<()> {
         use crate::{cache::models::Question, Cache};
+use crate::helper::suffix;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
@@ -108,6 +109,13 @@ use std::path::Path;
 let question: Question = qr?;
 
 if *lang == "rust" {
+    let flat_suffix = suffix(&lang).map_err(anyhow::Error::msg)?;  // Since suffix returns Result<&str>
+    let pick_replaced = conf.code.pick.replace("${fid}", &problem.fid.to_string()).replace("${slug}", &problem.slug.to_string());
+    let flat_path_str = format!("{}/{}.{}", conf.storage.code()?, pick_replaced, flat_suffix);
+    if Path::new(&flat_path_str).exists() {
+        println!("Note: Existing flat file at {}. Consider migrating content to new subdir structure.", flat_path_str);
+    }
+
     let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
     let code_dir_str = format!("{}/{}-{}", conf.storage.code()?, problem.fid, sanitized_slug);
     let code_dir = Path::new(&code_dir_str);
