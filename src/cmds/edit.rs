@@ -108,7 +108,7 @@ use std::path::Path;
 let question: Question = qr?;
 
 if *lang == "rust" {
-    let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+    let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
     let code_dir_str = format!("{}/{}-{}", conf.storage.code()?, problem.fid, sanitized_slug);
     let code_dir = Path::new(&code_dir_str);
     fs::create_dir_all(code_dir)?;
@@ -120,7 +120,7 @@ if *lang == "rust" {
     let cargo_path_str = format!("{}/Cargo.toml", code_dir_str);
     let cargo_path = Path::new(&cargo_path_str);
     if !cargo_path.exists() {
-        let package_name = format!("leetcode-{}-{}", problem.fid, sanitized_slug);
+        let package_name = format!("prob-{}-{}", problem.fid, sanitized_slug);
         let cargo_content = format!(
 r#"[package]
 name = "{}"

@@ -200,7 +200,7 @@ pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
     let code_base = conf.storage.code()?;
 
     let path = if lang == "rust" {
-        let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+        let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
         let subdir = format!("{}-{}/tests.dat", problem.fid, sanitized_slug);
         format!("{}/{}", code_base, subdir)
     } else {
@@ -224,7 +224,7 @@ pub fn code_path(problem: &Problem, l: Option<String>) -> crate::Result<String> 
     let code_base = conf.storage.code()?;
 
     let path = if lang == "rust" {
-        let sanitized_slug = problem.slug.replace(|c: char| !c.is_alphanumeric(), "_");
+        let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
         let subdir = format!("{}-{}/src/lib.rs", problem.fid, sanitized_slug);
         format!("{}/{}", code_base, subdir)
     } else {
