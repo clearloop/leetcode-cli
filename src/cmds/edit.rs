@@ -108,7 +108,7 @@ use std::path::Path;
 
 let question: Question = qr?;
 
-if *lang == "rust" {
+if *lang == "rust" && conf.code.enable_rust_crates {
     let flat_suffix = suffix(&lang).map_err(anyhow::Error::msg)?;  // Since suffix returns Result<&str>
     let pick_replaced = conf.code.pick.replace("${fid}", &problem.fid.to_string()).replace("${slug}", &problem.slug.to_string());
     let flat_path_str = format!("{}/{}.{}", conf.storage.code()?, pick_replaced, flat_suffix);

@@ -197,9 +197,10 @@ mod file {
 pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {
     let conf = crate::config::Config::locate()?;
     let lang = conf.code.lang.clone();
+    let use_crates = conf.code.enable_rust_crates;
     let code_base = conf.storage.code()?;
 
-    let path = if lang == "rust" {
+    let path = if lang == "rust" && use_crates {
         let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
         let subdir = format!("{}-{}/tests.dat", problem.fid, sanitized_slug);
         format!("{}/{}", code_base, subdir)
@@ -221,9 +222,10 @@ pub fn code_path(problem: &Problem, l: Option<String>) -> crate::Result<String> 
         lang = lang_opt;
     }
 
+    let use_crates = conf.code.enable_rust_crates;
     let code_base = conf.storage.code()?;
 
-    let path = if lang == "rust" {
+    let path = if lang == "rust" && use_crates {
         let sanitized_slug = problem.slug.to_lowercase().replace(|c: char| !c.is_alphanumeric(), "_");
         let subdir = format!("{}-{}/src/lib.rs", problem.fid, sanitized_slug);
         format!("{}/{}", code_base, subdir)
