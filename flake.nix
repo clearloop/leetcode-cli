@@ -78,7 +78,7 @@
 
           # Env vars
           # a nightly compiler is required unless we use this cheat code.
-          RUSTC_BOOTSTRAP = 0;
+          RUSTC_BOOTSTRAP = 1;
 
           # CFG_RELEASE = "${rustPlatform.rust.rustc.version}-stable";
           CFG_RELEASE_CHANNEL = "stable";
@@ -104,6 +104,8 @@
           PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
           RUST_BACKTRACE = "full";
           LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
+          RUSTC_BOOTSTRAP = 1;
+          CFG_RELEASE_CHANNEL = "stable";
         };
       }
     );
