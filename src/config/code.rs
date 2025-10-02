@@ -1,12 +1,29 @@
 //! Code in config
 use serde::{Deserialize, Serialize};
 
+const PICK_DEFAULT: &str = "${fid}.${slug}";
 fn default_pick() -> String {
-    "${fid}.${slug}".into()
+    PICK_DEFAULT.into()
 }
 
+const SUBMISSION_DEFAULT: &str = "${fid}.${slug}.${sid}.${ac}";
 fn default_submission() -> String {
-    "${fid}.${slug}.${sid}.${ac}".into()
+    SUBMISSION_DEFAULT.into()
+}
+
+fn is_default_pick(t: &String) -> bool {
+    t == PICK_DEFAULT
+}
+
+fn is_default_submission(t: &String) -> bool {
+    t == SUBMISSION_DEFAULT
+}
+
+fn is_default_string(t: &String) -> bool {
+    t.is_empty()
+}
+fn is_default_bool(t: &bool) -> bool {
+    !t
 }
 
 /// Code config
@@ -18,26 +35,29 @@ pub struct Code {
     pub editor_args: Option<Vec<String>>,
     #[serde(rename(serialize = "editor-envs"), alias = "editor-envs", default)]
     pub editor_envs: Option<Vec<String>>,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_bool")]
     pub edit_code_marker: bool,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_string")]
     pub start_marker: String,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_string")]
     pub end_marker: String,
     #[serde(rename(serialize = "inject_before"), alias = "inject_before", default)]
     pub inject_before: Option<Vec<String>>,
     #[serde(rename(serialize = "inject_after"), alias = "inject_after", default)]
     pub inject_after: Option<Vec<String>>,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_bool")]
     pub comment_problem_desc: bool,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_string")]
     pub comment_leading: String,
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_serializing_if = "is_default_bool")]
     pub test: bool,
     pub lang: String,
-    #[serde(default = "default_pick", skip_serializing)]
+    #[serde(default = "default_pick", skip_serializing_if = "is_default_pick")]
     pub pick: String,
-    #[serde(default = "default_submission", skip_serializing)]
+    #[serde(
+        default = "default_submission",
+        skip_serializing_if = "is_default_submission"
+    )]
     pub submission: String,
 }
 
