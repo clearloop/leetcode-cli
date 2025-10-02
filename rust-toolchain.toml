@@ -6,5 +6,6 @@ components = [
   "rustfmt",
   "clippy",
   "rust-analyzer",
+  "rust-src"
 ]
 profile = "minimal"
