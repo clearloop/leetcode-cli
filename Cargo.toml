@@ -36,6 +36,7 @@ anyhow = "1.0.100"
 clap_complete = "4.5.60"
 thiserror = "2.0.17"
 unicode-width = "0.2"
+notify = "6.1.1"
 
 [dependencies.diesel]
 version = "2.2.12"
