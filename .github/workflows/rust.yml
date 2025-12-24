@@ -15,19 +15,20 @@ jobs:
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v5
-      - name: Set nightly toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - name: Environment
-        run: |
-          if [[ "$(uname)" == 'Darwin' ]]; then
-              brew install sqlite3
-          else
-              sudo apt-get update -y
-              sudo apt-get install -y libsqlite3-dev libdbus-1-dev
-          fi
-      - name: Build
-        run: cargo build --release --all-features
+      - name: Install Toolchain
+        run: rustup update stable && rustup default stable
+      - uses: actions/setup-sqlite@v1
       - name: Run tests
-        run: cargo test --release --all-features
+        run: cargo nextest run --release --all-features
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v5
+      - name: Install Toolchain
+        run: rustup update stable && rustup default stable
+      - uses: actions/setup-sqlite@v1
+      - name: Run format check
+        run: cargo fmt --check
+      - name: Run clippy
+        run: cargo clippy --all-features -- -D warnings
