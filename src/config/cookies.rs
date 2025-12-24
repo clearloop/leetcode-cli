@@ -78,10 +78,10 @@ impl Cookies {
         if let Ok(session) = std::env::var(LEETCODE_SESSION_ENV) {
             self.session = session;
         }
-        if let Ok(site) = std::env::var(LEETCODE_SITE_ENV) {
-            if let Ok(leetcode_site) = LeetcodeSite::from_str(&site) {
-                self.site = leetcode_site;
-            }
+        if let Ok(site) = std::env::var(LEETCODE_SITE_ENV)
+            && let Ok(leetcode_site) = LeetcodeSite::from_str(&site)
+        {
+            self.site = leetcode_site;
         }
         self
     }

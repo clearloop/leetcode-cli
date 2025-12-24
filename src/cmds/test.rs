@@ -67,13 +67,12 @@ impl Command for TestCommand {
     async fn handler(m: &ArgMatches) -> Result<()> {
         use crate::cache::{Cache, Run};
         use crate::helper::code_path;
-        use notify::{Config as NotifyConfig, Event, RecommendedWatcher, RecursiveMode, Watcher};
+        use notify::{Config as NotifyConfig, RecommendedWatcher, RecursiveMode, Watcher};
         use std::path::Path;
         use std::sync::mpsc::channel;
         use std::time::{Duration, Instant};
 
         let cache = Cache::new()?;
-
         let daily = m.get_one::<bool>("daily").unwrap_or(&false);
         let daily_id = if *daily {
             Some(cache.get_daily_problem_id().await?)

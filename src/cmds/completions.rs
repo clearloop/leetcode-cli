@@ -4,16 +4,16 @@ use super::Command;
 use crate::err::Error;
 use async_trait::async_trait;
 use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
-use clap_complete::{generate, Generator, Shell};
+use clap_complete::{Generator, Shell, generate};
 
 /// Abstract shell completions command
 ///
 /// ```sh
 /// Generate shell Completions
-
+///
 /// USAGE:
 ///     leetcode completions <shell>
-
+///
 /// ARGUMENTS:
 ///     <shell>  [possible values: bash, elvish, fish, powershell, zsh]
 /// ```
@@ -36,15 +36,20 @@ impl Command for CompletionCommand {
     async fn handler(_m: &ArgMatches) -> Result<(), Error> {
         // defining custom handler to print the completions. Handler method signature limits taking
         // other params. We need &ArgMatches and &mut ClapCommand to generate completions.
-        println!("Don't use this handler. Does not implement the functionality to print completions. Use completions_handler() below.");
+        println!(
+            "Don't use this handler. Does not implement the functionality to print completions. Use completions_handler() below."
+        );
         Ok(())
     }
 }
 
-fn get_completions_string<G: Generator>(gen: G, cmd: &mut ClapCommand) -> Result<String, Error> {
+fn get_completions_string<G: Generator>(
+    generator: G,
+    cmd: &mut ClapCommand,
+) -> Result<String, Error> {
     let mut v: Vec<u8> = Vec::new();
     let name = cmd.get_name().to_string();
-    generate(gen, cmd, name, &mut v);
+    generate(generator, cmd, name, &mut v);
     Ok(String::from_utf8(v)?)
 }
 

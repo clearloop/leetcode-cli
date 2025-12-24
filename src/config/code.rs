@@ -11,7 +11,7 @@ fn default_submission() -> String {
     SUBMISSION_DEFAULT.into()
 }
 
-fn is_default_pick(t: &String) -> bool {
+fn is_default_pick(t: &str) -> bool {
     t == PICK_DEFAULT
 }
 
@@ -19,7 +19,7 @@ fn is_default_submission(t: &String) -> bool {
     t == SUBMISSION_DEFAULT
 }
 
-fn is_default_string(t: &String) -> bool {
+fn is_default_string(t: &str) -> bool {
     t.is_empty()
 }
 fn is_default_bool(t: &bool) -> bool {
