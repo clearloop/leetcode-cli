@@ -1,7 +1,7 @@
 //! This module is for python scripts.
 //!
 //! Seems like some error exists now, welocome pr to fix this : )
-use crate::{cache::Cache, helper::load_script, Result};
+use crate::{Result, cache::Cache, helper::load_script};
 use pyo3::prelude::*;
 use std::ffi::CString;
 

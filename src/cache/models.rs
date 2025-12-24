@@ -1,11 +1,11 @@
 //! Leetcode data models
-use unicode_width::UnicodeWidthStr;
-use unicode_width::UnicodeWidthChar;
 use super::schemas::{problems, tags};
 use crate::helper::HTML;
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
+use unicode_width::UnicodeWidthChar;
+use unicode_width::UnicodeWidthStr;
 
 /// Tag model
 #[derive(Clone, Insertable, Queryable, Serialize, Debug)]

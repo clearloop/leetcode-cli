@@ -22,14 +22,12 @@ pub fn conn(p: String) -> SqliteConnection {
 }
 
 /// Condition submit or test
-#[derive(Clone, Debug)]
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub enum Run {
     Test,
     #[default]
     Submit,
 }
-
 
 /// Requests if data not download
 #[derive(Clone)]
@@ -188,7 +186,7 @@ impl Cache {
                         Err(Error::CookieError)
                     } else {
                         Err(Error::PremiumError)
-                    }
+                    };
                 }
                 Some(true) => (),
             }
@@ -358,7 +356,11 @@ impl Cache {
             .await?;
 
         let run_res: RunCode = serde_json::from_str(&text).map_err(|e| {
-            anyhow!("JSON error: {e}, please double check your session and csrf config.")
+            anyhow!(
+                "Failed to decode run code result, could be caused by cookie expiration, \
+                 csrf token mismatch, or network issue:\n {e}, raw response:\n {text}\n, \
+                 please report this issue at https://github.com/clearloop/leetcode-cli/issues/new"
+            )
         })?;
 
         trace!("Run code result {:#?}", run_res);

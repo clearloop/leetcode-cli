@@ -41,10 +41,7 @@ impl TestArgs {
 
         let id = self.id.or(daily_id).ok_or(Error::NoneError)?;
 
-        let case_str: Option<String> = self
-            .testcase
-            .as_ref()
-            .map(|case| case.replace("\\n", "\n"));
+        let case_str: Option<String> = self.testcase.as_ref().map(|case| case.replace("\\n", "\n"));
 
         if self.watch {
             let problem = cache.get_problem(id)?;

@@ -1,8 +1,6 @@
 //! Clap Commanders
 use crate::{
-    cmd::{
-        CompletionsArgs, DataArgs, EditArgs, ExecArgs, ListArgs, PickArgs, StatArgs, TestArgs,
-    },
+    cmd::{CompletionsArgs, DataArgs, EditArgs, ExecArgs, ListArgs, PickArgs, StatArgs, TestArgs},
     err::Error,
 };
 use clap::{CommandFactory, Parser, Subcommand};

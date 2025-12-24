@@ -1,5 +1,5 @@
 //! Cache manager
-use crate::{cache::Cache, helper::Digit, Error};
+use crate::{Error, cache::Cache, helper::Digit};
 use clap::Args;
 use colored::Colorize;
 

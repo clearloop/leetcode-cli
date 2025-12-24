@@ -6,8 +6,8 @@
 //! + Edit leetcode.toml at `~/.leetcode/leetcode.toml` directly
 //! + Use `leetcode config` to update it
 use crate::{
-    config::{code::Code, cookies::Cookies, storage::Storage, sys::Sys},
     Error, Result,
+    config::{code::Code, cookies::Cookies, storage::Storage, sys::Sys},
 };
 use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};

@@ -24,7 +24,7 @@ pub struct EditArgs {
 impl EditArgs {
     /// `edit` handler
     pub async fn run(&self) -> Result<()> {
-        use crate::{cache::models::Question, Cache};
+        use crate::{Cache, cache::models::Question};
         use std::fs::File;
         use std::io::Write;
         use std::path::Path;

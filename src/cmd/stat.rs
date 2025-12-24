@@ -9,7 +9,7 @@ pub struct StatArgs {}
 impl StatArgs {
     /// `stat` handler
     pub async fn run(&self) -> Result<(), crate::err::Error> {
-        use crate::{helper::Digit, Cache};
+        use crate::{Cache, helper::Digit};
 
         let cache = Cache::new()?;
         let res = cache.get_problems()?;
