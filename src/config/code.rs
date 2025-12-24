@@ -26,6 +26,10 @@ fn is_default_bool(t: &bool) -> bool {
     !t
 }
 
+fn default_enable_rust_crates() -> bool {
+    true
+}
+
 /// Code config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
@@ -51,6 +55,8 @@ pub struct Code {
     pub comment_leading: String,
     #[serde(default, skip_serializing_if = "is_default_bool")]
     pub test: bool,
+    #[serde(default = "default_enable_rust_crates")]
+pub enable_rust_crates: bool,
     pub lang: String,
     #[serde(default = "default_pick", skip_serializing_if = "is_default_pick")]
     pub pick: String,
@@ -75,6 +81,7 @@ impl Default for Code {
             comment_problem_desc: false,
             comment_leading: "".into(),
             test: true,
+            enable_rust_crates: default_enable_rust_crates(),
             lang: "rust".into(),
             pick: "${fid}.${slug}".into(),
             submission: "${fid}.${slug}.${sid}.${ac}".into(),
