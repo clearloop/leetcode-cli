@@ -14,7 +14,7 @@ jobs:
         os: [macOS-latest, ubuntu-latest]
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install Toolchain
         run: rustup update stable && rustup default stable
       - uses: actions/setup-sqlite@v1
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install Toolchain
         run: rustup update stable && rustup default stable
       - uses: actions/setup-sqlite@v1
