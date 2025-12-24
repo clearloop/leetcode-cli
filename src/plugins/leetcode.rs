@@ -1,11 +1,11 @@
 use self::req::{Json, Mode, Req};
 use crate::{
-    config::{self, Config},
     Result,
+    config::{self, Config},
 };
 use reqwest::{
-    header::{HeaderMap, HeaderName, HeaderValue},
     Client, ClientBuilder, Response,
+    header::{HeaderMap, HeaderName, HeaderValue},
 };
 use std::{collections::HashMap, str::FromStr, time::Duration};
 
@@ -86,13 +86,15 @@ impl LeetCode {
         json.insert("variables", r#"{"slug": "$slug"}"#.replace("$slug", slug));
         json.insert(
             "query",
-            ["query getTopicTag($slug: String!) {",
+            [
+                "query getTopicTag($slug: String!) {",
                 "  topicTag(slug: $slug) {",
                 "    questions {",
                 "      questionId",
                 "    }",
                 "  }",
-                "}"]
+                "}",
+            ]
             .join("\n"),
         );
 
@@ -149,13 +151,15 @@ impl LeetCode {
                 json.insert("operationName", "daily".to_string());
                 json.insert(
                     "query",
-                    ["query daily {",
+                    [
+                        "query daily {",
                         "  activeDailyCodingChallengeQuestion {",
                         "    question {",
                         "      questionFrontendId",
                         "    }",
                         "  }",
-                        "}"]
+                        "}",
+                    ]
                     .join("\n"),
                 );
             }
@@ -163,13 +167,15 @@ impl LeetCode {
                 json.insert("operationName", "questionOfToday".to_string());
                 json.insert(
                     "query",
-                    ["query questionOfToday {",
+                    [
+                        "query questionOfToday {",
                         "  todayRecord {",
                         "    question {",
                         "      questionFrontendId",
                         "    }",
                         "  }",
-                        "}"]
+                        "}",
+                    ]
                     .join("\n"),
                 );
             }
@@ -195,7 +201,8 @@ impl LeetCode {
         let mut json: Json = HashMap::new();
         json.insert(
             "query",
-            ["query getQuestionDetail($titleSlug: String!) {",
+            [
+                "query getQuestionDetail($titleSlug: String!) {",
                 "  question(titleSlug: $titleSlug) {",
                 "    content",
                 "    stats",
@@ -206,7 +213,8 @@ impl LeetCode {
                 "    metaData",
                 "    translatedContent",
                 "  }",
-                "}"]
+                "}",
+            ]
             .join("\n"),
         );
 
@@ -269,7 +277,7 @@ impl LeetCode {
 mod req {
     use super::LeetCode;
     use crate::err::Error;
-    use reqwest::{header::HeaderMap, Client, Response};
+    use reqwest::{Client, Response, header::HeaderMap};
     use std::collections::HashMap;
 
     /// Standardize json format

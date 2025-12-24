@@ -1,85 +1,43 @@
 //! Edit command
-use super::Command;
 use crate::{Error, Result};
 use anyhow::anyhow;
-use async_trait::async_trait;
-use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command as ClapCommand};
+use clap::Args;
 use std::collections::HashMap;
 
-/// Abstract `edit` command
-///
-/// ```sh
-/// leetcode-edit
-/// Edit question by id
-///
-/// USAGE:
-///     leetcode edit <id>
-///
-/// FLAGS:
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-///
-/// ARGS:
-///     <id>    question id
-/// ```
-pub struct EditCommand;
+/// Edit command arguments
+#[derive(Args)]
+#[command(group = clap::ArgGroup::new("question-id").args(&["id", "daily"]).required(true))]
+pub struct EditArgs {
+    /// Question id
+    #[arg(value_parser = clap::value_parser!(i32))]
+    pub id: Option<i32>,
 
-#[async_trait]
-impl Command for EditCommand {
-    /// `edit` usage
-    fn usage() -> ClapCommand {
-        ClapCommand::new("edit")
-            .about("Edit question")
-            .visible_alias("e")
-            .arg(
-                Arg::new("lang")
-                    .short('l')
-                    .long("lang")
-                    .num_args(1)
-                    .help("Edit with specific language"),
-            )
-            .arg(
-                Arg::new("id")
-                    .num_args(1)
-                    .value_parser(clap::value_parser!(i32))
-                    .help("question id"),
-            )
-            .arg(
-                Arg::new("daily")
-                    .short('d')
-                    .long("daily")
-                    .help("Edit today's daily challenge")
-                    .action(ArgAction::SetTrue),
-            )
-            .group(
-                ArgGroup::new("question-id")
-                    .args(["id", "daily"])
-                    .multiple(false)
-                    .required(true),
-            )
-    }
+    /// Edit today's daily challenge
+    #[arg(short = 'd', long)]
+    pub daily: bool,
 
+    /// Edit with specific language
+    #[arg(short, long)]
+    pub lang: Option<String>,
+}
+
+impl EditArgs {
     /// `edit` handler
-    async fn handler(m: &ArgMatches) -> Result<()> {
-        use crate::{cache::models::Question, Cache};
+    pub async fn run(&self) -> Result<()> {
+        use crate::{Cache, cache::models::Question};
         use std::fs::File;
         use std::io::Write;
         use std::path::Path;
 
         let cache = Cache::new()?;
 
-        let daily = m.get_one::<bool>("daily").unwrap_or(&false);
-        let daily_id = if *daily {
+        let daily_id = if self.daily {
             Some(cache.get_daily_problem_id().await?)
         } else {
             None
         };
 
-        let id = m
-            .get_one::<i32>("id")
-            .copied()
-            .or(daily_id)
-            .ok_or(Error::NoneError)?;
+        let id = self.id.or(daily_id).ok_or(Error::NoneError)?;
 
         let problem = cache.get_problem(id)?;
         let mut conf = cache.to_owned().0.conf;
@@ -88,11 +46,8 @@ impl Command for EditCommand {
 
         let p_desc_comment = problem.desc_comment(&conf);
         // condition language
-        if m.contains_id("lang") {
-            conf.code.lang = m
-                .get_one::<String>("lang")
-                .ok_or(Error::NoneError)?
-                .to_string();
+        if let Some(ref lang) = self.lang {
+            conf.code.lang = lang.clone();
             conf.sync()?;
         }
 

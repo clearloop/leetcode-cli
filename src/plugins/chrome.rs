@@ -1,4 +1,4 @@
-use crate::{cache, Error, Result};
+use crate::{Error, Result, cache};
 use anyhow::anyhow;
 use diesel::prelude::*;
 use keyring::Entry;

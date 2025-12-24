@@ -1,14 +1,14 @@
 //! This module is for python scripts.
 //!
 //! Seems like some error exists now, welocome pr to fix this : )
-use crate::{cache::Cache, helper::load_script, Result};
+use crate::{Result, cache::Cache, helper::load_script};
 use pyo3::prelude::*;
 use std::ffi::CString;
 
 /// Exec python scripts as filter
 pub fn exec(module: &str) -> Result<Vec<String>> {
-    pyo3::prepare_freethreaded_python();
-    let script = load_script(&module)?;
+    Python::initialize();
+    let script = load_script(module)?;
     let cache = Cache::new()?;
 
     // args
@@ -16,7 +16,7 @@ pub fn exec(module: &str) -> Result<Vec<String>> {
     let stags = serde_json::to_string(&cache.get_tags()?)?;
 
     // pygil
-    Python::with_gil(|py| {
+    Python::attach(|py| {
         let script_cstr = CString::new(script.as_str())?;
         let filename_cstr = CString::new("plan.py")?;
         let module_name_cstr = CString::new("plan")?;

@@ -1,13 +1,10 @@
 //! Clap Commanders
 use crate::{
-    cmds::{
-        completion_handler, Command, CompletionCommand, DataCommand, EditCommand, ExecCommand,
-        ListCommand, PickCommand, StatCommand, TestCommand,
-    },
+    cmd::{CompletionsArgs, DataArgs, EditArgs, ExecArgs, ListArgs, PickArgs, StatArgs, TestArgs},
     err::Error,
-    flag::{Debug, Flag},
 };
-use clap::crate_version;
+use clap::{CommandFactory, Parser, Subcommand};
+use env_logger::Env;
 use log::LevelFilter;
 
 /// This should be called before calling any cli method or printing any output.
@@ -23,30 +20,62 @@ pub fn reset_signal_pipe_handler() {
     }
 }
 
+/// May the Code be with You
+#[derive(Parser)]
+#[command(name = "leetcode", version, about = "May the Code be with You 👻")]
+#[command(arg_required_else_help = true)]
+pub struct Cli {
+    /// Debug mode
+    #[arg(short, long)]
+    pub debug: bool,
+
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+}
+
+#[derive(Subcommand)]
+pub enum Commands {
+    /// Manage Cache
+    #[command(visible_alias = "d", display_order = 1)]
+    Data(DataArgs),
+
+    /// Edit question
+    #[command(visible_alias = "e", display_order = 2)]
+    Edit(EditArgs),
+
+    /// Submit solution
+    #[command(visible_alias = "x", display_order = 3)]
+    Exec(ExecArgs),
+
+    /// List problems
+    #[command(visible_alias = "l", display_order = 4)]
+    List(ListArgs),
+
+    /// Pick a problem
+    #[command(visible_alias = "p", display_order = 5)]
+    Pick(PickArgs),
+
+    /// Show simple chart about submissions
+    #[command(visible_alias = "s", display_order = 6)]
+    Stat(StatArgs),
+
+    /// Test a question
+    #[command(visible_alias = "t", display_order = 7)]
+    Test(TestArgs),
+
+    /// Generate shell Completions
+    #[command(visible_alias = "c", display_order = 8)]
+    Completions(CompletionsArgs),
+}
+
 /// Get matches
 pub async fn main() -> Result<(), Error> {
     reset_signal_pipe_handler();
 
-    let mut cmd = clap::Command::new("leetcode")
-        .version(crate_version!())
-        .about("May the Code be with You 👻")
-        .subcommands(vec![
-            DataCommand::usage().display_order(1),
-            EditCommand::usage().display_order(2),
-            ExecCommand::usage().display_order(3),
-            ListCommand::usage().display_order(4),
-            PickCommand::usage().display_order(5),
-            StatCommand::usage().display_order(6),
-            TestCommand::usage().display_order(7),
-            CompletionCommand::usage().display_order(8),
-        ])
-        .arg(Debug::usage())
-        .arg_required_else_help(true);
+    let cli = Cli::parse();
 
-    let m = cmd.clone().get_matches();
-
-    if m.get_flag("debug") {
-        Debug::handler()?;
+    if cli.debug {
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
     } else {
         env_logger::Builder::new()
             .filter_level(LevelFilter::Info)
@@ -54,15 +83,18 @@ pub async fn main() -> Result<(), Error> {
             .init();
     }
 
-    match m.subcommand() {
-        Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
-        Some(("edit", sub_m)) => Ok(EditCommand::handler(sub_m).await?),
-        Some(("exec", sub_m)) => Ok(ExecCommand::handler(sub_m).await?),
-        Some(("list", sub_m)) => Ok(ListCommand::handler(sub_m).await?),
-        Some(("pick", sub_m)) => Ok(PickCommand::handler(sub_m).await?),
-        Some(("stat", sub_m)) => Ok(StatCommand::handler(sub_m).await?),
-        Some(("test", sub_m)) => Ok(TestCommand::handler(sub_m).await?),
-        Some(("completions", sub_m)) => Ok(completion_handler(sub_m, &mut cmd)?),
-        _ => Err(Error::MatchError),
+    match cli.command {
+        Some(Commands::Data(args)) => args.run().await,
+        Some(Commands::Edit(args)) => args.run().await,
+        Some(Commands::Exec(args)) => args.run().await,
+        Some(Commands::List(args)) => args.run().await,
+        Some(Commands::Pick(args)) => args.run().await,
+        Some(Commands::Stat(args)) => args.run().await,
+        Some(Commands::Test(args)) => args.run().await,
+        Some(Commands::Completions(args)) => {
+            let mut cmd = Cli::command();
+            args.run(&mut cmd)
+        }
+        None => Err(Error::MatchError),
     }
 }

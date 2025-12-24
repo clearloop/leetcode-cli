@@ -15,7 +15,12 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
             // Handle on leetcode-com
             Some(s) => s as i32,
             // Handle on leetcode-cn
-            None => fid_obj.as_str()?.split(' ').last()?.parse::<i32>().ok()?,
+            None => fid_obj
+                .as_str()?
+                .split(' ')
+                .next_back()?
+                .parse::<i32>()
+                .ok()?,
         };
 
         problems.push(Problem {
@@ -132,7 +137,7 @@ pub fn user(v: Value) -> Option<Option<(String, bool)>> {
 pub use ss::ssr;
 /// string or squence
 mod ss {
-    use serde::{de, Deserialize, Deserializer};
+    use serde::{Deserialize, Deserializer, de};
     use std::fmt;
     use std::marker::PhantomData;
 

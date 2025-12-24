@@ -154,13 +154,9 @@ mod html {
             });
 
             let frag = Html::parse_fragment(&res);
-
-            let res = frag
-                .root_element()
+            frag.root_element()
                 .text()
-                .fold(String::new(), |acc, e| acc + e);
-
-            res
+                .fold(String::new(), |acc, e| acc + e)
         }
     }
 }
@@ -191,7 +187,7 @@ mod file {
         }
     }
 
-    use crate::{cache::models::Problem, Error};
+    use crate::{Error, cache::models::Problem};
 
     /// Generate test cases path by fid
     pub fn test_cases_path(problem: &Problem) -> crate::Result<String> {

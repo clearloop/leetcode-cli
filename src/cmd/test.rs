@@ -1,99 +1,49 @@
 //! Test command
-use super::Command;
 use crate::{Error, Result};
-use async_trait::async_trait;
-use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command as ClapCommand};
+use clap::Args;
 
-/// Abstract Test Command
-///
-/// ```sh
-/// leetcode-test
-/// Edit question by id
-///
-/// USAGE:
-///     leetcode test <id>
-///
-/// FLAGS:
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-///
-/// ARGS:
-///     <id>    question id
-/// ```
-pub struct TestCommand;
+/// Test command arguments
+#[derive(Args)]
+#[command(group = clap::ArgGroup::new("question-id").args(&["id", "daily"]).required(true))]
+pub struct TestArgs {
+    /// Question id
+    #[arg(value_parser = clap::value_parser!(i32))]
+    pub id: Option<i32>,
 
-#[async_trait]
-impl Command for TestCommand {
-    /// `test` usage
-    fn usage() -> ClapCommand {
-        ClapCommand::new("test")
-            .about("Test a question")
-            .visible_alias("t")
-            .arg(
-                Arg::new("id")
-                    .num_args(1)
-                    .value_parser(clap::value_parser!(i32))
-                    .help("question id"),
-            )
-            .arg(
-                Arg::new("testcase")
-                    .num_args(1)
-                    .required(false)
-                    .help("custom testcase"),
-            )
-            .arg(
-                Arg::new("daily")
-                    .short('d')
-                    .long("daily")
-                    .help("Test today's daily challenge")
-                    .action(ArgAction::SetTrue),
-            )
-            .arg(
-                Arg::new("watch")
-                    .short('w')
-                    .long("watch")
-                    .help("Watch for file changes and test automatically")
-                    .action(ArgAction::SetTrue),
-            )
-            .group(
-                ArgGroup::new("question-id")
-                    .args(["id", "daily"])
-                    .multiple(false)
-                    .required(true),
-            )
-    }
+    /// Custom testcase
+    pub testcase: Option<String>,
 
+    /// Test today's daily challenge
+    #[arg(short = 'd', long)]
+    pub daily: bool,
+
+    /// Watch for file changes and test automatically
+    #[arg(short, long)]
+    pub watch: bool,
+}
+
+impl TestArgs {
     /// `test` handler
-    async fn handler(m: &ArgMatches) -> Result<()> {
+    pub async fn run(&self) -> Result<()> {
         use crate::cache::{Cache, Run};
         use crate::helper::code_path;
-        use notify::{Config as NotifyConfig, Event, RecommendedWatcher, RecursiveMode, Watcher};
+        use notify::{Config as NotifyConfig, RecommendedWatcher, RecursiveMode, Watcher};
         use std::path::Path;
         use std::sync::mpsc::channel;
         use std::time::{Duration, Instant};
 
         let cache = Cache::new()?;
-
-        let daily = m.get_one::<bool>("daily").unwrap_or(&false);
-        let daily_id = if *daily {
+        let daily_id = if self.daily {
             Some(cache.get_daily_problem_id().await?)
         } else {
             None
         };
 
-        let id = m
-            .get_one::<i32>("id")
-            .copied()
-            .or(daily_id)
-            .ok_or(Error::NoneError)?;
+        let id = self.id.or(daily_id).ok_or(Error::NoneError)?;
 
-        let testcase = m.get_one::<String>("testcase");
-        let case_str: Option<String> = match testcase {
-            Some(case) => Option::from(case.replace("\\n", "\n")),
-            _ => None,
-        };
+        let case_str: Option<String> = self.testcase.as_ref().map(|case| case.replace("\\n", "\n"));
 
-        if *m.get_one::<bool>("watch").unwrap_or(&false) {
+        if self.watch {
             let problem = cache.get_problem(id)?;
             let path_str = code_path(&problem, None)?;
             let path = Path::new(&path_str);
