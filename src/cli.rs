@@ -1,6 +1,6 @@
 //! Clap Commanders
 use crate::{
-    cmds::{
+    cmd::{
         completion_handler, Command, CompletionCommand, DataCommand, EditCommand, ExecCommand,
         ListCommand, PickCommand, StatCommand, TestCommand,
     },

@@ -236,7 +236,7 @@ extern crate diesel;
 // show docs
 pub mod cache;
 pub mod cli;
-pub mod cmds;
+pub mod cmd;
 pub mod config;
 pub mod err;
 pub mod flag;

@@ -1,5 +1,5 @@
 //! Errors in leetcode-cli
-use crate::cmds::{Command, DataCommand};
+use crate::cmd::{Command, DataCommand};
 use anyhow::anyhow;
 use colored::Colorize;
 
