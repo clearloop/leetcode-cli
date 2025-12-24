@@ -17,6 +17,8 @@ jobs:
         uses: actions/checkout@v6
       - name: Install Toolchain
         run: rustup update stable && rustup default stable
+      - uses: taiki-e/install-action@sccache
+      - uses: taiki-e/install-action@nextest
       - name: Run tests
         run: cargo nextest run --release --all-features
   check:
@@ -26,6 +28,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Install Toolchain
         run: rustup update stable && rustup default stable
+      - uses: taiki-e/install-action@sccache
       - name: Run format check
         run: cargo fmt --check
       - name: Run clippy
