@@ -1,5 +1,4 @@
 //! Errors in leetcode-cli
-use crate::cmd::{Command, DataCommand};
 use anyhow::anyhow;
 use colored::Colorize;
 
@@ -79,12 +78,9 @@ pub enum Error {
 impl std::convert::From<diesel::result::Error> for Error {
     fn from(err: diesel::result::Error) -> Self {
         match err {
-            diesel::result::Error::NotFound => {
-                DataCommand::usage().print_help().unwrap_or(());
-                Error::Anyhow(anyhow!(
-                    "NotFound, you may update cache, and try it again\r\n"
-                ))
-            }
+            diesel::result::Error::NotFound => Error::Anyhow(anyhow!(
+                "NotFound, you may update cache with `leetcode data -u`, and try it again\r\n"
+            )),
             _ => Error::Anyhow(anyhow!("{err}")),
         }
     }

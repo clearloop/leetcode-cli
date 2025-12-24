@@ -239,7 +239,6 @@ pub mod cli;
 pub mod cmd;
 pub mod config;
 pub mod err;
-pub mod flag;
 pub mod helper;
 pub mod plugins;
 #[cfg(feature = "pym")]

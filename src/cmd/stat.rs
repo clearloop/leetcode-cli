@@ -1,35 +1,14 @@
 //! status command
-use super::Command;
-use async_trait::async_trait;
-use clap::{ArgMatches, Command as ClapCommand};
+use clap::Args;
 use colored::Colorize;
 
-/// Abstract statues command
-///
-/// ```sh
-/// leetcode-stat
-/// Show simple chart about submissions
-///
-/// USAGE:
-///     leetcode stat
-///
-/// FLAGS:
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-/// ```
-pub struct StatCommand;
+/// Stat command arguments
+#[derive(Args)]
+pub struct StatArgs {}
 
-#[async_trait]
-impl Command for StatCommand {
-    /// `stat` usage
-    fn usage() -> ClapCommand {
-        ClapCommand::new("stat")
-            .about("Show simple chart about submissions")
-            .visible_alias("s")
-    }
-
+impl StatArgs {
     /// `stat` handler
-    async fn handler(_m: &ArgMatches) -> Result<(), crate::err::Error> {
+    pub async fn run(&self) -> Result<(), crate::err::Error> {
         use crate::{helper::Digit, Cache};
 
         let cache = Cache::new()?;

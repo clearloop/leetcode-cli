@@ -1,54 +1,23 @@
-//! Cache managger
-use super::Command;
+//! Cache manager
 use crate::{cache::Cache, helper::Digit, Error};
-use async_trait::async_trait;
-use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
+use clap::Args;
 use colored::Colorize;
 
-/// Abstract `data` command
-///
-/// ```sh
-/// leetcode-data
-/// Manage Cache
-///
-/// USAGE:
-///     leetcode data [FLAGS]
-///
-/// FLAGS:
-///     -d, --delete     Delete cache
-///     -u, --update     Update cache
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-/// ```
-pub struct DataCommand;
+/// Data command arguments
+#[derive(Args)]
+pub struct DataArgs {
+    /// Delete cache
+    #[arg(short, long)]
+    pub delete: bool,
 
-#[async_trait]
-impl Command for DataCommand {
-    /// `data` command usage
-    fn usage() -> ClapCommand {
-        ClapCommand::new("data")
-            .about("Manage Cache")
-            .visible_alias("d")
-            .arg(
-                Arg::new("delete")
-                    .display_order(1)
-                    .short('d')
-                    .long("delete")
-                    .help("Delete cache")
-                    .action(ArgAction::SetTrue),
-            )
-            .arg(
-                Arg::new("update")
-                    .display_order(2)
-                    .short('u')
-                    .long("update")
-                    .help("Update cache")
-                    .action(ArgAction::SetTrue),
-            )
-    }
+    /// Update cache
+    #[arg(short, long)]
+    pub update: bool,
+}
 
+impl DataArgs {
     /// `data` handler
-    async fn handler(m: &ArgMatches) -> Result<(), Error> {
+    pub async fn run(&self) -> Result<(), Error> {
         use std::fs::File;
         use std::path::Path;
 
@@ -75,13 +44,13 @@ impl Command for DataCommand {
         title.push_str(&"-".repeat(65));
 
         let mut flags = 0;
-        if m.get_flag("delete") {
+        if self.delete {
             flags += 1;
             cache.clean()?;
             println!("{}", "ok!".bright_green());
         }
 
-        if m.get_flag("update") {
+        if self.update {
             flags += 1;
             cache.update().await?;
             println!("{}", "ok!".bright_green());
