@@ -67,8 +67,6 @@ pub enum Error {
     #[error(transparent)]
     Anyhow(#[from] anyhow::Error),
     #[error(transparent)]
-    Keyring(#[from] keyring::Error),
-    #[error(transparent)]
     OpenSSL(#[from] openssl::error::ErrorStack),
     #[cfg(feature = "pym")]
     #[error(transparent)]

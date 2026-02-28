@@ -22,7 +22,6 @@ clap = { version = "4.5", features = ["cargo", "derive"] }
 colored = "3.1.1"
 dirs = "6.0.0"
 env_logger = "0.11.6"
-keyring = "3.6.3"
 log = "0.4.29"
 openssl = "0.10"
 pyo3 = { version = "0.27", optional = true }
@@ -37,9 +36,10 @@ clap_complete = "4.5"
 thiserror = "2.0.18"
 unicode-width = "0.2"
 notify = "8.2.0"
+rookie = "0.5.6"
 
 [dependencies.diesel]
-version = "2.2.12"
+version = "2.3.6"
 features = ["sqlite"]
 
 [dependencies.reqwest]
