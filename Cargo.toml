@@ -17,7 +17,7 @@ readme = './README.md'
 
 [dependencies]
 async-trait = "0.1.89"
-tokio = { version = "1.50.0", features = ["full"] }
+tokio = { version = "1.52.1", features = ["full"] }
 clap = { version = "4.6", features = ["cargo", "derive"] }
 colored = "3.1.1"
 dirs = "6.0.0"
@@ -25,7 +25,7 @@ env_logger = "0.11.6"
 log = "0.4.29"
 openssl = "0.10"
 pyo3 = { version = "0.28", optional = true }
-rand = "0.10.0"
+rand = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 toml = "1.1.2"
@@ -39,11 +39,11 @@ notify = "8.2.0"
 rookie = "0.5.6"
 
 [dependencies.diesel]
-version = "2.3.6"
+version = "2.3.9"
 features = ["sqlite"]
 
 [dependencies.reqwest]
-version = "0.13.2"
+version = "0.13.3"
 features = ["gzip", "json"]
 
 [features]
