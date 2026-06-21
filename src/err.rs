@@ -66,8 +66,6 @@ pub enum Error {
     Io(#[from] std::io::Error),
     #[error(transparent)]
     Anyhow(#[from] anyhow::Error),
-    #[error(transparent)]
-    OpenSSL(#[from] openssl::error::ErrorStack),
     #[cfg(feature = "pym")]
     #[error(transparent)]
     Pyo3(#[from] pyo3::PyErr),
