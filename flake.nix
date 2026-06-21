@@ -50,9 +50,6 @@
         ];
 
         buildInputs = with pkgs; [
-          openssl
-          dbus
-          sqlite
         ] ++ darwinBuildInputs;
 
         package = naersk'.buildPackage rec {
