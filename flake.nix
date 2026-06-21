@@ -64,10 +64,6 @@
 
           inherit buildInputs nativeBuildInputs;
 
-          buildNoDefaultFeatures = true;
-
-          buildFeatures = "git";
-
           meta = with pkgs.lib; {
             description = "Leet your code in command-line.";
             homepage = "https://github.com/clearloop/leetcode-cli";

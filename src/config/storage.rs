@@ -3,12 +3,12 @@ use crate::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
 
+/// Name of the local sqlite cache file under `root`.
+const CACHE: &str = "Problems";
+
 /// Locate code files
-///
-/// + cache -> the path to cache
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Storage {
-    cache: String,
     code: String,
     root: String,
     scripts: Option<String>,
@@ -17,7 +17,6 @@ pub struct Storage {
 impl Default for Storage {
     fn default() -> Self {
         Self {
-            cache: "Problems".into(),
             code: "code".into(),
             scripts: Some("scripts".into()),
             root: "~/.leetcode".into(),
@@ -44,7 +43,7 @@ impl Storage {
             fs::DirBuilder::new().recursive(true).create(&root)?;
         }
 
-        Ok(root.join("Problems").to_string_lossy().to_string())
+        Ok(root.join(CACHE).to_string_lossy().to_string())
     }
 
     /// get code path

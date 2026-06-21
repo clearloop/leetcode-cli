@@ -6,17 +6,8 @@ fn default_pick() -> String {
     PICK_DEFAULT.into()
 }
 
-const SUBMISSION_DEFAULT: &str = "${fid}.${slug}.${sid}.${ac}";
-fn default_submission() -> String {
-    SUBMISSION_DEFAULT.into()
-}
-
 fn is_default_pick(t: &str) -> bool {
     t == PICK_DEFAULT
-}
-
-fn is_default_submission(t: &String) -> bool {
-    t == SUBMISSION_DEFAULT
 }
 
 fn is_default_string(t: &str) -> bool {
@@ -54,11 +45,6 @@ pub struct Code {
     pub lang: String,
     #[serde(default = "default_pick", skip_serializing_if = "is_default_pick")]
     pub pick: String,
-    #[serde(
-        default = "default_submission",
-        skip_serializing_if = "is_default_submission"
-    )]
-    pub submission: String,
 }
 
 impl Default for Code {
@@ -77,7 +63,6 @@ impl Default for Code {
             test: true,
             lang: "rust".into(),
             pick: "${fid}.${slug}".into(),
-            submission: "${fid}.${slug}.${sid}.${ac}".into(),
         }
     }
 }
