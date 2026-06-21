@@ -44,7 +44,7 @@ impl PickArgs {
     /// `pick` handler
     pub async fn run(&self) -> Result<(), Error> {
         use crate::cache::Cache;
-        use rand::Rng;
+        use rand::RngExt;
 
         let cache = Cache::new()?;
         let mut problems = cache.get_problems()?;
