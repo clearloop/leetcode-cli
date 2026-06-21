@@ -7,7 +7,7 @@
 [![telegram](https://img.shields.io/badge/telegram-blue?logo=telegram)](https://t.me/+U_5si6PhWykxZTI1)
 [![LICENSE](https://img.shields.io/crates/l/leetcode-cli.svg)](https://choosealicense.com/licenses/mit/)
 
-Leet your code in the command-line.
+May the code be with you.
 
 ## Install
 
