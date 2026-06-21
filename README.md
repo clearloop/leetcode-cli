@@ -12,7 +12,7 @@ May the code be with you.
 ## Install
 
 ```sh
-# Required dependencies: gcc, libssl-dev, libdbus-1-dev, libsqlite3-dev
+# Required dependencies: gcc, libssl-dev, libdbus-1-dev
 cargo install leetcode-cli
 ```
 
