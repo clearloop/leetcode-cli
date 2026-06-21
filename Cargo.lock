@@ -1920,6 +1920,7 @@ dependencies = [
  "diesel",
  "dirs",
  "env_logger",
+ "libsqlite3-sys",
  "log",
  "nix 0.31.3",
  "notify",
