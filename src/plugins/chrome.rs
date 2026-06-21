@@ -46,4 +46,3 @@ pub fn cookies() -> Result<Ident> {
             .to_string(),
     })
 }
-
