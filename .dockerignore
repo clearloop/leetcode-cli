@@ -1,0 +1,3 @@
+# Keep the build context small. `.git` is intentionally NOT ignored — rookie's
+# build script reads the commit hash via `git rev-parse HEAD`.
+target/
