@@ -4,7 +4,7 @@ path = "src/bin/lc.rs"
 
 [package]
 name = "leetcode-cli"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["clearloop <tianyi.gc@gmail.com>"]
 edition = "2024"
 description = "Leetcode command-line interface in rust."
@@ -35,7 +35,10 @@ clap_complete = "4.6"
 thiserror = "2.0.18"
 unicode-width = "0.2"
 notify = "8.2.0"
-rookie = "0.5.6"
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc", "block-padding"] }
+pbkdf2 = "0.12"
+sha1 = "0.10"
 libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 
 [dependencies.diesel]

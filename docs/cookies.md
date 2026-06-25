@@ -6,7 +6,7 @@ leetcode-cli talks to LeetCode as you, so it needs your session cookies. There a
 
 If `csrf` and `session` are both empty in `leetcode.toml`, leetcode-cli reads the cookies straight from **Chrome's** cookie store for the configured `site`. Just sign in to LeetCode in Chrome and run any command — there is nothing else to set up.
 
-This is the only automatic path, and it is Chrome-only (powered by [`rookie`](https://crates.io/crates/rookie)). If you use a different browser, or Chrome's cookie store can't be read, fall back to the manual setup below.
+This is the only automatic path, and it is Chrome-only. It works on **macOS and Linux**; on **Windows** Chrome's cookie encryption isn't read automatically yet, so use the manual setup below. The same applies if you use a different browser, or Chrome's cookie store can't be read.
 
 > If you see a "not logged in to Chrome" error, either sign in to LeetCode in Chrome or set the cookies manually.
 

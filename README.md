@@ -26,7 +26,7 @@ Nix users can `nix build` / `nix develop` against the bundled [`flake.nix`](./fl
 
 ## Quickstart
 
-Sign in to LeetCode in **Chrome** first — leetcode-cli reads its cookies automatically (see [Cookies](./docs/cookies.md) for other browsers, manual setup, and environment variables).
+Sign in to LeetCode in **Chrome** first — on macOS and Linux leetcode-cli reads its cookies automatically (on Windows, set them manually). See [Cookies](./docs/cookies.md) for manual setup and environment-variable overrides.
 
 ```sh
 leetcode pick 1        # pick a problem and print its description
