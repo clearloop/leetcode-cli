@@ -182,12 +182,13 @@ fn encryption_key() -> Result<Vec<u8>> {
 }
 
 // for headless installations stub functions are defined
-#[cfg(any(target_os = "android"))]
+// can add to stubs with cfg(any(...))
+#[cfg(target_os = "android")]
 fn cookie_db_path() -> Option<PathBuf> {
     None
 }
 
-#[cfg(any(target_os = "android"))]
+#[cfg(target_os = "android")]
 fn encryption_key() -> Result<Vec<u8>> {
     Err(Error::ChromeNotLogin)
 }
