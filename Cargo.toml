@@ -47,7 +47,8 @@ features = ["sqlite"]
 
 [dependencies.reqwest]
 version = "0.13.4"
-features = ["gzip", "json"]
+default-features = false
+features = ["gzip", "json", "native-tls"]
 
 [features]
 pym = ["pyo3"]

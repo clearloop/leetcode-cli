@@ -180,3 +180,14 @@ fn encryption_key() -> Result<Vec<u8>> {
     // Windows users should set `csrf`/`session` in the config manually.
     Err(Error::ChromeNotLogin)
 }
+
+// for headless installations stub functions are defined
+#[cfg(any(target_os = "android"))]
+fn cookie_db_path() -> Option<PathBuf> {
+    None
+}
+
+#[cfg(any(target_os = "android"))]
+fn encryption_key() -> Result<Vec<u8>> {
+    Err(Error::ChromeNotLogin)
+}
