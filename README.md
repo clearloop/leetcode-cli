@@ -12,7 +12,8 @@ May the code be with you.
 ## Install
 
 ```sh
-# Required dependencies: gcc, cmake (to build the bundled sqlite and aws-lc)
+# Linux build deps: system SQLite + OpenSSL headers + pkg-config
+#   (Debian/Ubuntu: libsqlite3-dev libssl-dev pkg-config). macOS ships both.
 cargo install leetcode-cli
 ```
 
