@@ -39,7 +39,6 @@ aes = "0.8"
 cbc = { version = "0.1", features = ["alloc", "block-padding"] }
 pbkdf2 = "0.12"
 sha1 = "0.10"
-libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 
 [dependencies.diesel]
 version = "2.3.9"

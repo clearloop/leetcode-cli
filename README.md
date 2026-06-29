@@ -12,8 +12,8 @@ May the code be with you.
 ## Install
 
 ```sh
-# Build deps: a C compiler (gcc/clang) for the bundled SQLite.
-# Linux also needs OpenSSL headers + pkg-config (native-tls); macOS/Windows use the system TLS.
+# Linux build deps: system SQLite + OpenSSL headers + pkg-config
+#   (Debian/Ubuntu: libsqlite3-dev libssl-dev pkg-config). macOS ships both.
 cargo install leetcode-cli
 ```
 
