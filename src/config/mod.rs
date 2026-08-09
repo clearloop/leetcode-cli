@@ -71,7 +71,7 @@ impl Config {
     pub fn root() -> Result<std::path::PathBuf> {
         let dir = dirs::home_dir().ok_or(Error::NoneError)?.join(".leetcode");
         if !dir.is_dir() {
-            info!("Generate root dir at {:?}.", &dir);
+            info!("Generate root dir at {:?}.", dir);
             fs::DirBuilder::new().recursive(true).create(&dir)?;
         }
 

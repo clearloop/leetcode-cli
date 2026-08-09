@@ -302,7 +302,7 @@ impl std::fmt::Display for VerifyResult {
             _ => self.expected.expected_code_answer.join("↩ "),
         };
 
-        debug!("{:#?}", &self);
+        debug!("{:#?}", self);
 
         match &self.status.status_code {
             10 => {
@@ -311,14 +311,14 @@ impl std::fmt::Display for VerifyResult {
                     write!(
                         f,
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
-                        &self.status.status_msg.green().bold(),
-                        &"Runtime: ".before_spaces(7).dimmed(),
-                        &self.status.status_runtime.dimmed(),
-                        &"\nYour input:".after_spaces(4),
-                        &self.data_input.replace('\n', "↩ "),
-                        &"\nOutput:".after_spaces(8),
+                        self.status.status_msg.green().bold(),
+                        "Runtime: ".before_spaces(7).dimmed(),
+                        self.status.status_runtime.dimmed(),
+                        "\nYour input:".after_spaces(4),
+                        self.data_input.replace('\n', "↩ "),
+                        "\nOutput:".after_spaces(8),
                         ca,
-                        &"\nExpected:".after_spaces(6),
+                        "\nExpected:".after_spaces(6),
                         eca,
                     )?
                 } else if matches!(self.result_type, Run::Submit)
@@ -375,17 +375,17 @@ impl std::fmt::Display for VerifyResult {
                          {} {}.\n\n",
                         "Success\n\n".green().bold(),
                         "Runtime: ".dimmed(),
-                        &self.status.status_runtime.bold(),
+                        self.status.status_runtime.bold(),
                         rp.to_string().bold(),
                         "% ".bold(),
-                        &self.pretty_lang,
-                        &self.name,
+                        self.pretty_lang,
+                        self.name,
                         "Memory Usage: ".dimmed(),
-                        &self.status.status_memory.bold(),
+                        self.status.status_memory.bold(),
                         mp.to_string().bold(),
                         "% ".bold(),
-                        &self.pretty_lang,
-                        &self.name,
+                        self.pretty_lang,
+                        self.name,
                     )?
                 } else {
                     // Wrong Answer during testing
@@ -394,12 +394,12 @@ impl std::fmt::Display for VerifyResult {
                         "\n{}{}{}\n{}{}{}{}{}{}\n",
                         "Wrong Answer".red().bold(),
                         "   Runtime: ".dimmed(),
-                        &self.status.status_runtime.dimmed(),
-                        &"\nYour input:".after_spaces(4),
-                        &self.data_input.replace('\n', "↩ "),
-                        &"\nOutput:".after_spaces(8),
+                        self.status.status_runtime.dimmed(),
+                        "\nYour input:".after_spaces(4),
+                        self.data_input.replace('\n', "↩ "),
+                        "\nOutput:".after_spaces(8),
                         ca,
-                        &"\nExpected:".after_spaces(6),
+                        "\nExpected:".after_spaces(6),
                         eca,
                     )?
                 }
@@ -408,57 +408,55 @@ impl std::fmt::Display for VerifyResult {
             11 => write!(
                 f,
                 "\n{}\n\n{}{}\n{}{}\n{}{}{}{}{}{}\n",
-                &self.status.status_msg.red().bold(),
+                self.status.status_msg.red().bold(),
                 "Cases passed:".after_spaces(2).green(),
-                &self
-                    .analyse
+                self.analyse
                     .total_correct
                     .as_ref()
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .green(),
-                &"Total cases:".after_spaces(3).yellow(),
-                &self
-                    .analyse
+                "Total cases:".after_spaces(3).yellow(),
+                self.analyse
                     .total_testcases
                     .as_ref()
                     .unwrap_or(&Number::from(0))
                     .to_string()
                     .bold()
                     .yellow(),
-                &"Last case:".after_spaces(5).dimmed(),
-                &self.submit.last_testcase.replace('\n', "↩ ").dimmed(),
-                &"\nOutput:".after_spaces(8),
+                "Last case:".after_spaces(5).dimmed(),
+                self.submit.last_testcase.replace('\n', "↩ ").dimmed(),
+                "\nOutput:".after_spaces(8),
                 self.code_output[0],
-                &"\nExpected:".after_spaces(6),
+                "\nExpected:".after_spaces(6),
                 self.expected_output[0],
             )?,
             // Memory Exceeded
             12 => write!(
                 f,
                 "\n{}\n\n{}{}\n",
-                &self.status.status_msg.yellow().bold(),
-                &"Last case:".after_spaces(5).dimmed(),
-                &self.data_input.replace('\n', "↩ "),
+                self.status.status_msg.yellow().bold(),
+                "Last case:".after_spaces(5).dimmed(),
+                self.data_input.replace('\n', "↩ "),
             )?,
             // Output Timeout Exceeded
             //
             // TODO: 13 and 14 might have some different,
             // if anybody reach this, welcome to fix this!
-            13 | 14 => write!(f, "\n{}\n", &self.status.status_msg.yellow().bold(),)?,
+            13 | 14 => write!(f, "\n{}\n", self.status.status_msg.yellow().bold(),)?,
             // Runtime error
             15 => write!(
                 f,
                 "\n{}\n{}\n'",
-                &self.status.status_msg.red().bold(),
-                &self.status.runtime_error
+                self.status.status_msg.red().bold(),
+                self.status.runtime_error
             )?,
             // Compile Error
             20 => write!(
                 f,
                 "\n{}:\n\n{}\n",
-                &self.status.status_msg.red().bold(),
-                &self.error.full_compile_error.dimmed()
+                self.status.status_msg.red().bold(),
+                self.error.full_compile_error.dimmed()
             )?,
             _ => write!(
                 f,
@@ -482,8 +480,8 @@ impl std::fmt::Display for VerifyResult {
                     write!(
                         f,
                         "{}{}",
-                        &"Stdout:".after_spaces(8).purple(),
-                        &self.code_output.join(&"\n".after_spaces(15))
+                        "Stdout:".after_spaces(8).purple(),
+                        self.code_output.join(&"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
@@ -494,8 +492,8 @@ impl std::fmt::Display for VerifyResult {
                     write!(
                         f,
                         "{}{}",
-                        &"Stdout:".after_spaces(8).purple(),
-                        &self.std_output[0].replace('\n', &"\n".after_spaces(15))
+                        "Stdout:".after_spaces(8).purple(),
+                        self.std_output[0].replace('\n', &"\n".after_spaces(15))
                     )
                 } else {
                     write!(f, "")
