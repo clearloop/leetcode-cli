@@ -10,6 +10,7 @@ Controls the editor that opens and the code that gets generated.
 
 ```toml
 [code]
+# Overridden by $VISUAL, then $EDITOR, if either is set
 editor = 'vim'
 # Extra arguments passed to the editor
 editor_args = ['-nw']
@@ -23,7 +24,7 @@ test = true
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `editor` | `'vim'` | Command used to open the solution file. |
+| `editor` | `'vim'` | Command used to open the solution file. `$VISUAL` wins over `$EDITOR`, and both win over this key. |
 | `editor_args` | — | Extra arguments passed before the file path. |
 | `editor_envs` | — | Environment variables for the editor process, each as `"NAME=VALUE"`. |
 | `lang` | `'rust'` | Language of the generated file. `leetcode edit --lang <lang>` overrides this per-call and persists it. |

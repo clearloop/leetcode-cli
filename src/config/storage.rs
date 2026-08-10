@@ -39,7 +39,7 @@ impl Storage {
     pub fn cache(&self) -> Result<String> {
         let root = PathBuf::from(self.root()?);
         if !root.exists() {
-            info!("Generate cache dir at {:?}.", &root);
+            info!("Generate cache dir at {:?}.", root);
             fs::DirBuilder::new().recursive(true).create(&root)?;
         }
 

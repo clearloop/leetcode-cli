@@ -17,10 +17,14 @@ fn is_default_bool(t: &bool) -> bool {
     !t
 }
 
+fn default_editor() -> String {
+    "vim".into()
+}
+
 /// Code config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Code {
-    #[serde(default)]
+    #[serde(default = "default_editor")]
     pub editor: String,
     #[serde(rename(serialize = "editor-args"), alias = "editor-args", default)]
     pub editor_args: Option<Vec<String>>,
@@ -47,10 +51,24 @@ pub struct Code {
     pub pick: String,
 }
 
+impl Code {
+    /// `$VISUAL` and `$EDITOR` take precedence over the configured editor.
+    pub fn with_env_override(mut self) -> Self {
+        for key in ["EDITOR", "VISUAL"] {
+            if let Ok(editor) = std::env::var(key)
+                && !editor.is_empty()
+            {
+                self.editor = editor;
+            }
+        }
+        self
+    }
+}
+
 impl Default for Code {
     fn default() -> Self {
         Self {
-            editor: "vim".into(),
+            editor: default_editor(),
             editor_args: None,
             editor_envs: None,
             edit_code_marker: false,

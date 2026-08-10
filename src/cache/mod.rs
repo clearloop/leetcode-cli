@@ -158,8 +158,8 @@ impl Cache {
 
         println!(
             "\n[{}] {} {}\n\n",
-            &ids,
-            &target.name.bold().underline(),
+            ids,
+            target.name.bold().underline(),
             "is on the run...".dimmed()
         );
 
@@ -178,7 +178,7 @@ impl Cache {
                 .await?
                 .json()
                 .await?;
-            debug!("{:#?}", &json);
+            debug!("{:#?}", json);
             match parser::desc(&mut rdesc, json) {
                 None => return Err(Error::NoneError),
                 Some(false) => {
@@ -202,13 +202,13 @@ impl Cache {
     }
 
     pub async fn get_tagged_questions(self, rslug: &str) -> Result<Vec<String>, Error> {
-        trace!("Geting {} questions...", &rslug);
+        trace!("Geting {} questions...", rslug);
         let ids: Vec<String>;
         let rtag = tags
             .filter(tag.eq(rslug.to_string()))
             .first::<Tag>(&mut self.conn()?);
         if let Ok(t) = rtag {
-            trace!("Got {} questions from local cache...", &rslug);
+            trace!("Got {} questions from local cache...", rslug);
             ids = serde_json::from_str(&t.refs)?;
         } else {
             ids = parser::tags(
