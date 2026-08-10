@@ -36,6 +36,20 @@ impl Config {
         Ok(())
     }
 
+    /// Parse a config, applying the environment overrides on top of it
+    pub fn parse(s: &str) -> Result<Config> {
+        let mut config: Config = toml::from_str(s)?;
+
+        config.code = config.code.with_env_override();
+        config.cookies = config.cookies.with_env_override();
+
+        if let cookies::LeetcodeSite::LeetcodeCn = config.cookies.site {
+            config.sys.urls = sys::Urls::new_with_leetcode_cn();
+        }
+
+        Ok(config)
+    }
+
     /// Locate lc's config file
     pub fn locate() -> Result<Config> {
         let conf = Self::root()?.join("leetcode.toml");
@@ -44,25 +58,11 @@ impl Config {
             Self::write_default(&conf)?;
         }
 
-        let s = fs::read_to_string(&conf)?;
-        match toml::from_str::<Config>(&s) {
-            Ok(mut config) => {
-                // Override config.cookies with environment variables
-                config.cookies = config.cookies.with_env_override();
-
-                match config.cookies.site {
-                    cookies::LeetcodeSite::LeetcodeCom => Ok(config),
-                    cookies::LeetcodeSite::LeetcodeCn => {
-                        let mut config = config;
-                        config.sys.urls = sys::Urls::new_with_leetcode_cn();
-                        Ok(config)
-                    }
-                }
-            }
+        match Self::parse(&fs::read_to_string(&conf)?) {
+            Ok(config) => Ok(config),
             Err(e) => {
-                let tmp = Self::root()?.join("leetcode.tmp.toml");
-                Self::write_default(tmp)?;
-                Err(e.into())
+                Self::write_default(Self::root()?.join("leetcode.tmp.toml"))?;
+                Err(e)
             }
         }
     }
