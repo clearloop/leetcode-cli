@@ -10,7 +10,7 @@ Controls the editor that opens and the code that gets generated.
 
 ```toml
 [code]
-# Falls back to $VISUAL, then $EDITOR, then 'vim'
+# Overridden by $VISUAL, then $EDITOR, if either is set
 editor = 'vim'
 # Extra arguments passed to the editor
 editor_args = ['-nw']
