@@ -62,7 +62,7 @@ impl LeetCode {
 
     /// Get category problems
     pub async fn get_category_problems(self, category: &str) -> Result<Response> {
-        trace!("Requesting {} problems...", &category);
+        trace!("Requesting {} problems...", category);
         let url = &self.conf.sys.urls.problems(category);
 
         Req {
@@ -79,7 +79,7 @@ impl LeetCode {
     }
 
     pub async fn get_question_ids_by_tag(self, slug: &str) -> Result<Response> {
-        trace!("Requesting {} ref problems...", &slug);
+        trace!("Requesting {} ref problems...", slug);
         let url = &self.conf.sys.urls.graphql;
         let mut json: Json = HashMap::new();
         json.insert("operationName", "getTopicTag".to_string());
@@ -196,7 +196,7 @@ impl LeetCode {
 
     /// Get specific problem detail
     pub async fn get_question_detail(self, slug: &str) -> Result<Response> {
-        trace!("Requesting {} detail...", &slug);
+        trace!("Requesting {} detail...", slug);
         let refer = self.conf.sys.urls.problem(slug);
         let mut json: Json = HashMap::new();
         json.insert(
@@ -302,9 +302,9 @@ mod req {
 
     impl Req {
         pub async fn send(self, client: &Client) -> Result<Response, Error> {
-            trace!("Running leetcode::{}...", &self.name);
+            trace!("Running leetcode::{}...", self.name);
             if self.info {
-                info!("{}", &self.name);
+                info!("{}", self.name);
             }
             let url = self.url.to_owned();
             let headers = LeetCode::headers(
