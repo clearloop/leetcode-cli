@@ -51,6 +51,20 @@ pub struct Code {
     pub pick: String,
 }
 
+impl Code {
+    /// `$VISUAL` and `$EDITOR` take precedence over the configured editor.
+    pub fn with_env_override(mut self) -> Self {
+        for key in ["EDITOR", "VISUAL"] {
+            if let Ok(editor) = std::env::var(key)
+                && !editor.is_empty()
+            {
+                self.editor = editor;
+            }
+        }
+        self
+    }
+}
+
 impl Default for Code {
     fn default() -> Self {
         Self {
