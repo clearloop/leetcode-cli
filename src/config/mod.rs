@@ -29,24 +29,6 @@ pub struct Config {
     pub storage: Storage,
 }
 
-impl FromStr for Config {
-    type Err = Error;
-
-    /// Parses `leetcode.toml`, applying the environment overrides on top of it.
-    fn from_str(s: &str) -> Result<Self> {
-        let mut config: Config = toml::from_str(s)?;
-
-        config.code = config.code.with_env_override();
-        config.cookies = config.cookies.with_env_override();
-
-        if let cookies::LeetcodeSite::LeetcodeCn = config.cookies.site {
-            config.sys.urls = sys::Urls::new_with_leetcode_cn();
-        }
-
-        Ok(config)
-    }
-}
-
 impl Config {
     fn write_default(p: impl AsRef<Path>) -> Result<()> {
         fs::write(p.as_ref(), toml::ser::to_string_pretty(&Self::default())?)?;
@@ -87,5 +69,23 @@ impl Config {
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
 
         Ok(())
+    }
+}
+
+impl FromStr for Config {
+    type Err = Error;
+
+    /// Parses `leetcode.toml`, applying the environment overrides on top of it.
+    fn from_str(s: &str) -> Result<Self> {
+        let mut config: Config = toml::from_str(s)?;
+
+        config.code = config.code.with_env_override();
+        config.cookies = config.cookies.with_env_override();
+
+        if let cookies::LeetcodeSite::LeetcodeCn = config.cookies.site {
+            config.sys.urls = sys::Urls::new_with_leetcode_cn();
+        }
+
+        Ok(config)
     }
 }
