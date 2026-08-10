@@ -24,7 +24,7 @@ test = true
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `editor` | `$VISUAL` / `$EDITOR` / `'vim'` | Command used to open the solution file. |
+| `editor` | `'vim'` | Command used to open the solution file. `$VISUAL` wins over `$EDITOR`, and both win over this key. |
 | `editor_args` | — | Extra arguments passed before the file path. |
 | `editor_envs` | — | Environment variables for the editor process, each as `"NAME=VALUE"`. |
 | `lang` | `'rust'` | Language of the generated file. `leetcode edit --lang <lang>` overrides this per-call and persists it. |
