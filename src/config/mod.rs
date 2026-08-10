@@ -10,7 +10,7 @@ use crate::{
     config::{code::Code, cookies::Cookies, storage::Storage, sys::Sys},
 };
 use serde::{Deserialize, Serialize};
-use std::{fs, path::Path};
+use std::{fs, path::Path, str::FromStr};
 
 mod code;
 mod cookies;
@@ -44,27 +44,11 @@ impl Config {
             Self::write_default(&conf)?;
         }
 
-        let s = fs::read_to_string(&conf)?;
-        match toml::from_str::<Config>(&s) {
-            Ok(mut config) => {
-                // Override config.cookies with environment variables
-                config.cookies = config.cookies.with_env_override();
-
-                match config.cookies.site {
-                    cookies::LeetcodeSite::LeetcodeCom => Ok(config),
-                    cookies::LeetcodeSite::LeetcodeCn => {
-                        let mut config = config;
-                        config.sys.urls = sys::Urls::new_with_leetcode_cn();
-                        Ok(config)
-                    }
-                }
-            }
-            Err(e) => {
-                let tmp = Self::root()?.join("leetcode.tmp.toml");
-                Self::write_default(tmp)?;
-                Err(e.into())
-            }
-        }
+        fs::read_to_string(&conf)?
+            .parse::<Config>()
+            .inspect_err(|_| {
+                let _ = Self::write_default(conf.with_file_name("leetcode.tmp.toml"));
+            })
     }
 
     /// Get root path of leetcode-cli
@@ -85,5 +69,23 @@ impl Config {
         fs::write(conf, toml::ser::to_string_pretty(&self)?)?;
 
         Ok(())
+    }
+}
+
+impl FromStr for Config {
+    type Err = Error;
+
+    /// Parses `leetcode.toml`, applying the environment overrides on top of it.
+    fn from_str(s: &str) -> Result<Self> {
+        let mut config: Config = toml::from_str(s)?;
+
+        config.code = config.code.with_env_override();
+        config.cookies = config.cookies.with_env_override();
+
+        if let cookies::LeetcodeSite::LeetcodeCn = config.cookies.site {
+            config.sys.urls = sys::Urls::new_with_leetcode_cn();
+        }
+
+        Ok(config)
     }
 }
