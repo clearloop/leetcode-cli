@@ -18,15 +18,7 @@ fn is_default_bool(t: &bool) -> bool {
 }
 
 fn default_editor() -> String {
-    std::env::var_os("VISUAL")
-        .and_then(|value| value.into_string().ok())
-        .filter(|value| !value.is_empty())
-        .or_else(|| {
-            std::env::var_os("EDITOR")
-                .and_then(|value| value.into_string().ok())
-                .filter(|value| !value.is_empty())
-        })
-        .unwrap_or_else(|| "vim".into())
+    "vim".into()
 }
 
 /// Code config
