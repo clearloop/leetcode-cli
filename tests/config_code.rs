@@ -19,7 +19,7 @@ scripts = 'scripts'
 /// One test: `set_var` is process-wide, so splitting these would race.
 #[test]
 fn env_overrides_the_configured_editor() {
-    let editor = || Config::parse(CONFIG).unwrap().code.editor;
+    let editor = || CONFIG.parse::<Config>().unwrap().code.editor;
 
     unsafe {
         std::env::remove_var("EDITOR");

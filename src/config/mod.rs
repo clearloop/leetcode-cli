@@ -10,7 +10,7 @@ use crate::{
     config::{code::Code, cookies::Cookies, storage::Storage, sys::Sys},
 };
 use serde::{Deserialize, Serialize};
-use std::{fs, path::Path};
+use std::{fs, path::Path, str::FromStr};
 
 mod code;
 mod cookies;
@@ -29,15 +29,11 @@ pub struct Config {
     pub storage: Storage,
 }
 
-impl Config {
-    fn write_default(p: impl AsRef<Path>) -> Result<()> {
-        fs::write(p.as_ref(), toml::ser::to_string_pretty(&Self::default())?)?;
+impl FromStr for Config {
+    type Err = Error;
 
-        Ok(())
-    }
-
-    /// Parse a config, applying the environment overrides on top of it
-    pub fn parse(s: &str) -> Result<Config> {
+    /// Parses `leetcode.toml`, applying the environment overrides on top of it.
+    fn from_str(s: &str) -> Result<Self> {
         let mut config: Config = toml::from_str(s)?;
 
         config.code = config.code.with_env_override();
@@ -49,6 +45,14 @@ impl Config {
 
         Ok(config)
     }
+}
+
+impl Config {
+    fn write_default(p: impl AsRef<Path>) -> Result<()> {
+        fs::write(p.as_ref(), toml::ser::to_string_pretty(&Self::default())?)?;
+
+        Ok(())
+    }
 
     /// Locate lc's config file
     pub fn locate() -> Result<Config> {
@@ -58,13 +62,11 @@ impl Config {
             Self::write_default(&conf)?;
         }
 
-        match Self::parse(&fs::read_to_string(&conf)?) {
-            Ok(config) => Ok(config),
-            Err(e) => {
-                Self::write_default(Self::root()?.join("leetcode.tmp.toml"))?;
-                Err(e)
-            }
-        }
+        fs::read_to_string(&conf)?
+            .parse::<Config>()
+            .inspect_err(|_| {
+                let _ = Self::write_default(conf.with_file_name("leetcode.tmp.toml"));
+            })
     }
 
     /// Get root path of leetcode-cli
