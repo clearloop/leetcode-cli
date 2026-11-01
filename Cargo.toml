@@ -20,10 +20,10 @@ async-trait = "0.1.89"
 tokio = { version = "1.52.3", features = ["full"] }
 clap = { version = "4.6", features = ["cargo", "derive"] }
 colored = "3.1.1"
-dirs = "6.0.0"
+dirs = "7.0.0"
 env_logger = "0.11.6"
 log = "0.4.31"
-pyo3 = { version = "0.29", optional = true }
+pyo3 = { version = "0.30", optional = true }
 rand = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
@@ -35,10 +35,10 @@ clap_complete = "4.6"
 thiserror = "2.0.18"
 unicode-width = "0.2"
 notify = "8.2.0"
-aes = "0.8"
-cbc = { version = "0.1", features = ["alloc", "block-padding"] }
-pbkdf2 = "0.12"
-sha1 = "0.10"
+aes = "0.9"
+cbc = { version = "0.2", features = ["alloc", "block-padding"] }
+pbkdf2 = "0.13"
+sha1 = "0.11"
 
 [dependencies.diesel]
 version = "2.3.9"
