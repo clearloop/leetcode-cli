@@ -6,7 +6,7 @@
 //! Chrome's value decryption — no second SQLite client and no dbus linkage.
 #![allow(clippy::redundant_field_names)] // diesel derive trips this in generated code
 use crate::{Error, Result};
-use cbc::cipher::{BlockDecryptMut, KeyIvInit, block_padding::Pkcs7};
+use cbc::cipher::{BlockModeDecrypt, KeyIvInit, block_padding::Pkcs7};
 use diesel::{prelude::*, sql_query, sql_types, sqlite::SqliteConnection};
 use std::{collections::HashMap, fmt::Display, path::PathBuf};
 
@@ -97,7 +97,7 @@ fn decrypt(blob: &[u8], key: &[u8]) -> Result<String> {
     let iv = [0x20u8; 16]; // Chrome uses 16 spaces as the IV.
     let plain = Aes128CbcDec::new_from_slices(key, &iv)
         .map_err(|e| anyhow::anyhow!("cipher init: {e}"))?
-        .decrypt_padded_vec_mut::<Pkcs7>(&blob[3..])
+        .decrypt_padded_vec::<Pkcs7>(&blob[3..])
         .map_err(|e| anyhow::anyhow!("decrypt cookie: {e}"))?;
     Ok(finalize(plain))
 }
