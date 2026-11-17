@@ -8,6 +8,8 @@
 //!
 
 // FIXME: Read cookies from local storage. (issue #122)
+// Diesel's QueryableByName derive emits explicit field names.
+#[allow(clippy::redundant_field_names)]
 mod chrome;
 mod leetcode;
 pub use leetcode::LeetCode;
