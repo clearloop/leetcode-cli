@@ -4,6 +4,7 @@
 //! (`LEETCODE_SESSION`, `csrftoken`) from one browser, so this reuses the SQLite
 //! stack already pulled in by `diesel` to read the cookie DB and implements just
 //! Chrome's value decryption — no second SQLite client and no dbus linkage.
+#![allow(clippy::redundant_field_names)] // diesel derive trips this in generated code
 use crate::{Error, Result};
 use cbc::cipher::{BlockModeDecrypt, KeyIvInit, block_padding::Pkcs7};
 use diesel::{prelude::*, sql_query, sql_types, sqlite::SqliteConnection};
