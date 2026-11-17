@@ -43,11 +43,11 @@ pub fn cookies() -> Result<Ident> {
     Ok(Ident {
         csrf: jar
             .get("csrftoken")
-            .ok_or(Error::ChromeNotLogin)?
+            .ok_or(Error::CookieNotFound)?
             .to_string(),
         session: jar
             .get("LEETCODE_SESSION")
-            .ok_or(Error::ChromeNotLogin)?
+            .ok_or(Error::CookieNotFound)?
             .to_string(),
     })
 }
@@ -62,7 +62,7 @@ struct CookieRow {
 
 /// Read Chrome's cookie DB for `domain` and decrypt the matching values.
 fn chrome_cookies(domain: &str) -> Result<HashMap<String, String>> {
-    let db = cookie_db_path().ok_or(Error::ChromeNotLogin)?;
+    let db = cookie_db_path().ok_or(Error::CookieNotFound)?;
 
     // Chrome keeps the DB locked while running; read from a snapshot copy.
     let tmp = std::env::temp_dir().join(format!("leetcode-cli-{}.sqlite", std::process::id()));
@@ -124,7 +124,8 @@ fn derive(password: &[u8], iterations: u32) -> Vec<u8> {
 
 #[cfg(target_os = "macos")]
 fn cookie_db_path() -> Option<PathBuf> {
-    Some(dirs::home_dir()?.join("Library/Application Support/Google/Chrome/Default/Cookies"))
+    let p = dirs::home_dir()?.join("Library/Application Support/Google/Chrome/Default/Cookies");
+    p.exists().then_some(p)
 }
 
 #[cfg(target_os = "macos")]
@@ -142,7 +143,7 @@ fn encryption_key() -> Result<Vec<u8>> {
     let pw = String::from_utf8_lossy(&out.stdout);
     let pw = pw.trim();
     if pw.is_empty() {
-        return Err(Error::ChromeNotLogin);
+        return Err(Error::CookieNotFound);
     }
     Ok(derive(pw.as_bytes(), 1003))
 }
@@ -171,7 +172,8 @@ fn encryption_key() -> Result<Vec<u8>> {
 
 #[cfg(target_os = "windows")]
 fn cookie_db_path() -> Option<PathBuf> {
-    Some(dirs::data_local_dir()?.join("Google/Chrome/User Data/Default/Network/Cookies"))
+    let p = dirs::data_local_dir()?.join("Google/Chrome/User Data/Default/Network/Cookies");
+    p.exists().then_some(p)
 }
 
 #[cfg(target_os = "windows")]
@@ -179,7 +181,7 @@ fn encryption_key() -> Result<Vec<u8>> {
     // Windows uses DPAPI + AES-256-GCM (and app-bound encryption on Chrome
     // 127+), a separate code path that isn't implemented yet. Until then,
     // Windows users should set `csrf`/`session` in the config manually.
-    Err(Error::ChromeNotLogin)
+    Err(Error::CookieNotFound)
 }
 
 // for headless installations stub functions are defined
@@ -191,5 +193,5 @@ fn cookie_db_path() -> Option<PathBuf> {
 
 #[cfg(target_os = "android")]
 fn encryption_key() -> Result<Vec<u8>> {
-    Err(Error::ChromeNotLogin)
+    Err(Error::CookieNotFound)
 }

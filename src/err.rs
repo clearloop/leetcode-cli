@@ -54,8 +54,12 @@ pub enum Error {
         "~/.leetcode/leetcode.toml".yellow().bold().underline(),
     )]
     Config(#[from] toml::de::Error),
-    #[error("Maybe you not login on the Chrome, you can login and retry")]
-    ChromeNotLogin,
+    #[error(
+        "No LeetCode cookies found in Chrome. \
+         Please log in at https://leetcode.com in Chrome, \
+         or set `csrf` and `session` in `~/.leetcode/leetcode.toml`."
+    )]
+    CookieNotFound,
     #[error(transparent)]
     ParseInt(#[from] std::num::ParseIntError),
     #[error(transparent)]
