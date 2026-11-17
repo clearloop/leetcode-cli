@@ -8,6 +8,7 @@ fn main() {
         .expect("Build tokio runtime failed")
         .block_on(cli::main())
     {
-        println!("{:?}", err);
+        eprintln!("{err}");
+        std::process::exit(1);
     }
 }
