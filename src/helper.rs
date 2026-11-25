@@ -178,6 +178,7 @@ mod file {
             "php" => Ok("php"),
             "python" => Ok("py"),
             "python3" => Ok("py"),
+            "racket" => Ok("rkt"),
             "ruby" => Ok("rb"),
             "rust" => Ok("rs"),
             "scala" => Ok("scala"),
